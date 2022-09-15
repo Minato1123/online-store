@@ -32,6 +32,7 @@
   .store-title {
     display: flex;
     text-decoration: none;
+    flex-shrink: 0;
 
     img {
       width: 3.2rem;
