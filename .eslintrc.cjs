@@ -3,7 +3,10 @@ require('@rushstack/eslint-patch/modern-module-resolution')
 
 module.exports = {
   root: true,
-  extends: ['@antfu'],
+  extends: [
+    '@antfu',
+    './.eslintrc-auto-import.json',
+  ],
   parserOptions: {
     ecmaVersion: 'latest',
   },
