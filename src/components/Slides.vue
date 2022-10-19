@@ -2,14 +2,21 @@
 const slides = ref([
   {
     imageUrl: '/images/slides/slide-1.jpeg',
+    imageTabletUrl: '/images/slides/slide-tablet-1.jpeg',
+    imageMobileUrl: '/images/slides/slide-mobile-1.jpeg',
   },
   {
     imageUrl: '/images/slides/slide-2.jpeg',
+    imageTabletUrl: '/images/slides/slide-tablet-2.jpeg',
+    imageMobileUrl: '/images/slides/slide-mobile-2.jpeg',
   },
   {
     imageUrl: '/images/slides/slide-3.jpeg',
+    imageTabletUrl: '/images/slides/slide-tablet-3.jpeg',
+    imageMobileUrl: '/images/slides/slide-mobile-3.jpeg',
   },
 ])
+
 const numOfSlides = computed(() => slides.value.length)
 const currentSlideIndex = ref(0)
 
@@ -45,6 +52,21 @@ watch(
         :key="`slide-${i}`"
         :src="slide.imageUrl"
         alt="ad"
+        class="slide-desktop"
+      >
+      <img
+        v-for="(slide, i) in slides"
+        :key="`slide-${i}`"
+        :src="slide.imageTabletUrl"
+        alt="ad"
+        class="slide-tablet"
+      >
+      <img
+        v-for="(slide, i) in slides"
+        :key="`slide-${i}`"
+        :src="slide.imageMobileUrl"
+        alt="ad"
+        class="slide-mobile"
       >
     </div>
     <div class="slide-btn left-btn" @click="handlePreviousSlide">
@@ -72,6 +94,7 @@ watch(
   padding-top: 41.6666666667%;
   position: relative;
   margin-bottom: 2rem;
+  overflow: hidden;
 
   .slides {
     display: flex;
@@ -129,10 +152,12 @@ watch(
     display: flex;
     align-items: center;
     justify-content: center;
+    left: 50%;
+    transform: translate(-50%, 0%);
 
     .slide-page-point {
-      width: 0.8rem;
-      height: 0.8rem;
+      width: 0.6rem;
+      height: 0.6rem;
       border-radius: 50%;
       background-color: var(--white-color);
       margin: 0 0.5rem;
@@ -147,6 +172,58 @@ watch(
       &:hover {
         opacity: 1;
       }
+    }
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .slides-block {
+    .slide-desktop {
+      display: block;
+    }
+
+    .slide-tablet {
+      display: none;
+    }
+
+    .slide-mobile {
+      display: none;
+    }
+  }
+}
+
+@media screen and (max-width: 991px) {
+  .slides-block {
+    padding-top: 58.52%;
+
+    .slide-tablet {
+      display: block;
+    }
+
+    .slide-desktop {
+      display: none;
+    }
+
+    .slide-mobile {
+      display: none;
+    }
+  }
+}
+
+@media screen and (max-width: 575px) {
+  .slides-block {
+    padding-top: 104%;
+
+    .slide-mobile {
+      display: block;
+    }
+
+    .slide-desktop {
+      display: none;
+    }
+
+    .slide-tablet {
+      display: none;
     }
   }
 }

@@ -3,6 +3,10 @@
 
 <template>
   <div class="nav-container">
+    <div class="nav-rwd">
+      <button><icon-ph-list-bold /></button>
+      <button><icon-ic-baseline-search /></button>
+    </div>
     <a class="store-title" href="/">
       <img class="store-logo" src="../assets/images/pochacco-logo.png" alt="pochacco online store's logo">
       <div class="store-name">
@@ -14,19 +18,26 @@
       <button><icon-ic-baseline-search /></button>
     </div>
     <div class="nav-btns">
-      <icon-mdi-bell-outline />
-      <icon-teenyicons-user-circle-solid />
-      <icon-ph-shopping-cart-simple-bold />
+      <button class="btn-bell">
+        <icon-mdi-bell-outline />
+      </button>
+      <button><icon-teenyicons-user-circle-solid /></button>
+      <button><icon-ph-shopping-cart-simple-bold /></button>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
+button {
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
 .nav-container {
   background-color: var(--main-color);
   height: 5rem;
   display: flex;
-  justify-content: space-around;
   align-items: center;
 
   .store-title {
@@ -36,7 +47,6 @@
 
     img {
       width: 3.2rem;
-
     }
     .store-name {
       margin-left: 0.6rem;
@@ -56,7 +66,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  width: 30rem;
+  width: 40%;
   height: 2rem;
   padding: 0.2rem 0.2rem 0.2rem 1rem;
   border-radius: 5rem;
@@ -107,5 +117,60 @@
   color: var(--white-color);
   width: 2rem;
   height: 2rem;
+}
+
+@media screen and (min-width: 768px) {
+  .nav-container {
+    justify-content: space-around;
+
+    .nav-rwd {
+      display: none;
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+
+  .nav-container {
+    height: 3rem;
+    justify-content: space-between;
+
+    .nav-rwd {
+      display: block;
+
+      button {
+        .svg-icon:hover {
+        cursor: pointer;
+        color: var(--selected-color);
+  }
+      }
+    }
+
+    .store-title {
+
+    img {
+      width: 2rem;
+    }
+    .store-name {
+      font-size: 1.2rem;
+    }
+  }
+
+  .nav-btns {
+    width: 5rem;
+  }
+}
+
+  .svg-icon {
+    width: 1.6rem;
+  height: 1.6rem;
+  }
+  .search-bar {
+    display: none;
+  }
+
+  .btn-bell {
+    display: none;
+  }
 }
 </style>

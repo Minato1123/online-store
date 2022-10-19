@@ -25,4 +25,10 @@ import Footer from './components/Footer.vue'
   margin-top: 5rem;
   min-height: calc(100vh - 21rem);
 }
+
+@media screen and (max-width: 768px) {
+  .content {
+    margin-top: 3rem;
+  }
+}
 </style>

@@ -4,53 +4,57 @@
 
 <template>
   <div class="footer-container">
-    <div class="links-block">
-      <div class="about">
-        <div class="about-title">
-          關於帕恰
-        </div>
-        <div class="about-content">
-          <ul>
-            <li><a href="https://funbox.com.tw/" target="_blank">麗嬰國際官方網站</a></li>
-            <li><a href="https://funbox.cyberbiz.co/" target="_blank">Funbox Toys<br>官方購物網站</a></li>
-            <li><a href="https://www.popcircus.com.tw/" target="_blank">POP CIRCUS<br>星奇市官方購物網站</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="customer-service">
-        <div class="customer-service-title">
-          客服中心
-        </div>
-        <div class="customer-service-content">
-          <ul>
-            <li><a href="#">新手上路</a></li>
-            <li><a href="#">購物FAQ</a></li>
-            <li><a href="#">聯絡客服</a></li>
-            <li><a href="#">會員條款</a></li>
-            <li><a href="#">會員權益</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="contact">
-        <div class="contact-title">
-          聯絡我
-        </div>
-        <div class="contact-contnet">
-          <div class="github-ins-btns">
-            <a class="contact-icon" href="https://github.com/Minato1123" target="_blank"><icon-radix-icons-github-logo /></a>
-            <a class="contact-icon" href="#"><icon-ion-logo-instagram /></a>
+    <div class="links-block-rwd">
+      <div class="links-block">
+        <div class="about">
+          <div class="about-title">
+            關於帕恰
           </div>
-          <div class="twitter-linkedin-btns">
-            <a class="contact-icon" href="#"><icon-ion-logo-twitter /></a>
-            <a class="contact-icon" href="#"><icon-carbon-logo-linkedin /></a>
+          <div class="about-content">
+            <ul>
+              <li><a href="https://funbox.com.tw/" target="_blank">麗嬰國際官方網站</a></li>
+              <li><a href="https://funbox.cyberbiz.co/" target="_blank">Funbox Toys<br>官方購物網站</a></li>
+              <li><a href="https://www.popcircus.com.tw/" target="_blank">POP CIRCUS<br>星奇市官方購物網站</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="customer-service">
+          <div class="customer-service-title">
+            客服中心
+          </div>
+          <div class="customer-service-content">
+            <ul>
+              <li><a href="#">新手上路</a></li>
+              <li><a href="#">購物FAQ</a></li>
+              <li><a href="#">聯絡客服</a></li>
+              <li><a href="#">會員條款</a></li>
+              <li><a href="#">會員權益</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="contact">
+          <div class="contact-title">
+            聯絡我
+          </div>
+          <div class="contact-contnet">
+            <div class="github-ins-btns">
+              <a class="contact-icon" href="https://github.com/Minato1123" target="_blank"><icon-radix-icons-github-logo /></a>
+              <a class="contact-icon" href="#"><icon-ion-logo-instagram /></a>
+            </div>
+            <div class="twitter-linkedin-btns">
+              <a class="contact-icon" href="#"><icon-ion-logo-twitter /></a>
+              <a class="contact-icon" href="#"><icon-carbon-logo-linkedin /></a>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="store-title">
-      <img class="store-logo" src="../assets/images/pochacco-logo.png" alt="pochacco online store's logo">
-      <div class="store-name">
-        帕恰購物
+    <div class="store-title-rwd">
+      <div class="store-title">
+        <img class="store-logo" src="../assets/images/pochacco-logo.png" alt="pochacco online store's logo">
+        <div class="store-name">
+          帕恰購物
+        </div>
       </div>
     </div>
     <div class="company-info">
@@ -85,6 +89,7 @@
 <style scoped lang="scss">
 .footer-container {
   background-color: var(--main-color);
+  width: 100%;
   height: 16rem;
   display: flex;
   justify-content: space-around;
@@ -188,6 +193,28 @@ a {
   &:hover {
     color: var(--selected-color);
     text-decoration: none;
+  }
+}
+
+@media screen and (max-width: 1160px) {
+  .store-title-rwd {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 1090px) {
+  .links-block-rwd {
+    display: none;
+  }
+
+  .store-title-rwd {
+    display: block;
+  }
+}
+
+@media screen and (max-width: 560px) {
+  .store-title-rwd {
+    display: none;
   }
 }
 </style>
