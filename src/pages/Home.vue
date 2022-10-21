@@ -9,7 +9,7 @@ import IconBookOpenBlankVariant from '~icons/mdi/book-open-blank-variant'
 import IconTeddyBear from '~icons/fluent-emoji-high-contrast/teddy-bear'
 
 // 商品
-interface Product {
+export interface Product {
   id: number
   name: string
   categoryId: number
@@ -341,8 +341,8 @@ const categories = ref<Catrgory[]>([
       </select>
     </div>
     <div class="products-content">
-      <div class="categories-block">
-        <div v-for="category in categories" :key="`category-${category.id}`" class="categories-list">
+      <ul class="categories-block">
+        <li v-for="category in categories" :key="`category-${category.id}`" class="categories-list">
           <div class="categories-title">
             <Component :is="category.icon" />
             <div>{{ category.name }}</div>
@@ -353,13 +353,13 @@ const categories = ref<Catrgory[]>([
               <icon-ic-baseline-keyboard-arrow-down />
             </span>
           </div>
-          <div v-show="category.isOpen" class="subCategory-block">
-            <div v-for="subCategory in category.subCategories" :key="`subCategory-${subCategory.id}`" class="subCategories-list">
+          <ul v-show="category.isOpen" class="subCategory-block">
+            <li v-for="subCategory in category.subCategories" :key="`subCategory-${subCategory.id}`" class="subCategories-list">
               <div> {{ subCategory.name }} </div>
-            </div>
-          </div>
-        </div>
-      </div>
+            </li>
+          </ul>
+        </li>
+      </ul>
       <div class="products-list-container">
         <div v-for="(produntLine, i) in lineOfProducts" :key="`product-line-${i}`" class="products-list">
           <ProductBox v-for="product in produntLine" :key="`product-${product.id}`" class="products" :product="product" />
@@ -466,10 +466,8 @@ const categories = ref<Catrgory[]>([
       margin-bottom: 1rem;
 
       .subCategories-list {
-        display: flex;
-        gap: 0.5rem;
         margin: 1rem 0;
-        padding-left: 1rem;
+        margin-left: -1rem;
         cursor: pointer;
 
         &:hover {
@@ -493,7 +491,6 @@ const categories = ref<Catrgory[]>([
       justify-content: flex-start;
 
       .products {
-        margin-bottom: 2rem;
         cursor: pointer;
         &:hover {
           transform: scale(1.05);
@@ -525,6 +522,10 @@ const categories = ref<Catrgory[]>([
     margin-bottom: 2rem;
   }
 
+}
+
+ul, li {
+  list-style-type: none;
 }
 
 @media screen and (max-width: 1160px) {
