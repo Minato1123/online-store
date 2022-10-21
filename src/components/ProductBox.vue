@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import type { PropType } from 'vue'
+import type { Product } from '../pages/Home.vue'
 import ProductDialog from './ProductDialog.vue'
 
 defineProps({
   product: {
-    type: Object,
+    type: Object as PropType<Product>,
     required: true,
   },
 })
@@ -24,8 +26,10 @@ const isOpenProductQuickPage = ref(false)
         </div>
         <div class="product-other">
           <div class="btns">
-            <icon-bi-cart-plus />
-            <icon-icon-park-outline-like />
+            <button @click="isOpenProductQuickPage = true">
+              <icon-bi-cart-plus />
+            </button>
+            <button><icon-icon-park-outline-like /></button>
           </div>
         </div>
       </div>
@@ -34,7 +38,7 @@ const isOpenProductQuickPage = ref(false)
       </div>
     </div>
   </div>
-  <ProductDialog v-if="isOpenProductQuickPage" :product="product" />
+  <ProductDialog v-if="isOpenProductQuickPage" :product="product" @close-product-quick-page="isOpenProductQuickPage = false" />
 </template>
 
 <style scoped lang="scss">
@@ -75,17 +79,16 @@ const isOpenProductQuickPage = ref(false)
       }
 
       .product-other {
-        color: var(--main-product-color);
         width: 40%;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
+        padding-left: 0.5rem;
 
         .btns {
           display: flex;
           justify-content: end;
-          gap: 10%;
           width: 100%;
           font-size: 1.5rem;
         }
@@ -104,10 +107,28 @@ const isOpenProductQuickPage = ref(false)
     }
   }
 
+  button {
+    outline: none;
+    background: transparent;
+    border: none;
+    color: var(--main-product-color);
+    cursor: pointer;
+
+    &:hover {
+      color: var(--match-color);
+    }
+  }
+
   @media screen and (min-width: 1160px) {
     .product-container {
       width: 32%;
 
+    }
+  }
+
+  @media screen and (min-width: 785px) {
+    .btns {
+        gap: 10%;
     }
   }
 
@@ -117,6 +138,9 @@ const isOpenProductQuickPage = ref(false)
         width: 48%;
 
       }
+    .btns {
+        gap: 0;
+    }
   }
 
   @media screen and (max-width: 500px) {
