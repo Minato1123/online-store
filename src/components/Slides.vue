@@ -1,21 +1,6 @@
 <script setup lang="ts">
-const slides = ref([
-  {
-    imageUrl: '/images/slides/slide-1.jpeg',
-    imageTabletUrl: '/images/slides/slide-tablet-1.jpeg',
-    imageMobileUrl: '/images/slides/slide-mobile-1.jpeg',
-  },
-  {
-    imageUrl: '/images/slides/slide-2.jpeg',
-    imageTabletUrl: '/images/slides/slide-tablet-2.jpeg',
-    imageMobileUrl: '/images/slides/slide-mobile-2.jpeg',
-  },
-  {
-    imageUrl: '/images/slides/slide-3.jpeg',
-    imageTabletUrl: '/images/slides/slide-tablet-3.jpeg',
-    imageMobileUrl: '/images/slides/slide-mobile-3.jpeg',
-  },
-])
+import slidePicture from '../assets/json/slides.json'
+const slides = ref(slidePicture)
 
 const numOfSlides = computed(() => slides.value.length)
 const currentSlideIndex = ref(0)

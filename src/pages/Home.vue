@@ -1,155 +1,15 @@
 <script setup lang="ts">
 import _ from 'lodash-es'
-import type { Component } from 'vue'
 import Slides from '../components/Slides.vue'
 import ProductBox from '../components/ProductBox.vue'
-import IconShoppingBagBold from '~icons/ph/shopping-bag-bold'
-import IconFoundationMakeup from '~icons/icon-park-outline/foundation-makeup'
-import IconBookOpenBlankVariant from '~icons/mdi/book-open-blank-variant'
-import IconTeddyBear from '~icons/fluent-emoji-high-contrast/teddy-bear'
+import { useProductsStore } from '../stores/product'
+import { useCategoriesStore } from '../stores/category'
+import { getIconComponent } from '@/utils'
 
 // 商品
-export interface Product {
-  id: number
-  name: string
-  categoryId: number
-  subCategoryId: number
-  price: number
-  description: string[]
-  images: string[]
-  specifications: string[]
-  details: {
-    size: string | null
-    wrapSize: string | null
-    origin: string | null
-    material: string | null
-    content: string | null
-    weight: string | null
-  }
-}
-
-const products = ref<Product[]>([
-  {
-    id: 1,
-    name: '帕恰狗日製迷你便條本（悠閒生活）',
-    categoryId: 3,
-    subCategoryId: 1,
-    price: 50,
-    description: ['日本製造 Sanrio 文具雜貨', '2 款彩色內頁的迷你便條本', '留言記事便利又可愛'],
-    images: [
-      '/images/products/product-1-1.jpeg',
-    ],
-    specifications: ['小', '中', '大'],
-    details: {
-      size: '6.8 * 8.8 cm',
-      wrapSize: '7 * 1 * 9 cm',
-      origin: '日本',
-      material: '紙',
-      content: '兩款圖案、各 50 枚，共 100 枚',
-      weight: '45 g',
-    },
-  },
-  {
-    id: 2,
-    name: '帕恰狗 10mm 紙膠帶（快樂下午茶）',
-    categoryId: 3,
-    subCategoryId: 2,
-    price: 75,
-    description: ['Sanrio 文具雜貨', '圖案豐富，寬度10mm細版紙膠帶', '好撕貼，細小範圍也能漂亮黏貼'],
-    images: [
-      '/images/products/product-2-1.jpeg',
-    ],
-    specifications: [],
-    details: {
-      size: '膠帶尺寸 ─ 寬 1 cm * 長 10 m',
-      wrapSize: '5 * 1.5 * 6.5 cm',
-      origin: '中國大陸',
-      material: '紙',
-      content: null,
-      weight: '10 g',
-    },
-  },
-  {
-    id: 3,
-    name: '帕恰狗 15mm 紙膠帶（悠閒生活）',
-    categoryId: 3,
-    subCategoryId: 2,
-    price: 95,
-    description: ['Sanrio 文具雜貨', '圖案豐富的 15mm 標準寬度紙膠帶', '好撕貼，隨處裝飾都可愛'],
-    images: [
-      '/images/products/product-3-1.jpeg',
-    ],
-    specifications: [],
-    details: {
-      size: '膠帶尺寸─寬 1.5 cm * 長 10 m',
-      wrapSize: '5.5 * 2*7 cm',
-      origin: '中國大陸',
-      material: '紙',
-      content: null,
-      weight: '14 g',
-    },
-  },
-  {
-    id: 4,
-    name: '帕恰狗 PU皮革迷你斜背提包（俏皮姿態）',
-    categoryId: 1,
-    subCategoryId: 1,
-    price: 890,
-    description: ['Sanrio 生活雜貨', 'PU 皮革材質的斜背小提包', '外出手機卡片現金攜帶好方便'],
-    images: [
-      '/images/products/product-4-1.jpeg',
-    ],
-    specifications: [],
-    details: {
-      size: '17 * 10 * 15.5 cm - 不含提把長 34 cm、可調式背帶長 70 ~ 132 cm',
-      wrapSize: '20 * 12 * 18 cm',
-      origin: '中國大陸',
-      material: 'PU 皮革',
-      content: '內部收納格、外側收納格（開口為拉鍊式）',
-      weight: '172 g',
-    },
-  },
-  {
-    id: 5,
-    name: '帕恰狗鉛筆風原子筆組（永遠在一起）',
-    categoryId: 3,
-    subCategoryId: 3,
-    price: 280,
-    description: ['Sanrio 文具雜貨', '復古鉛筆外型的黑色 & 紅色原子筆組', '書寫筆記、重點標示都清晰便利'],
-    images: [
-      '/images/products/product-5-1.jpeg',
-    ],
-    specifications: [],
-    details: {
-      size: '單支直徑約 0.8 * 16.5 cm、收納袋約 4 * 0.9 * 17.9 cm',
-      wrapSize: '4.5 * 1 * 18.3 cm',
-      origin: '中國大陸',
-      material: '塑膠 - ABS, PVC',
-      content: '1 組 2 支入（0.5 mm 黑色、0.5 mm 紅色）',
-      weight: '18 g',
-    },
-  },
-  {
-    id: 6,
-    name: '帕恰狗與好朋友絨毛娃娃組（盎然春意）',
-    categoryId: 4,
-    subCategoryId: 1,
-    price: 1850,
-    description: ['Sanrio 生活雜貨', '內含帕恰狗與好朋友的 3 入 1 組絨毛娃娃', '附透明收納盒，展示也方便不染灰塵'],
-    images: [
-      '/images/products/product-6-1.jpeg',
-    ],
-    specifications: [],
-    details: {
-      size: '帕恰狗：約 19 * 14 * 20cm；ピーちゃん：約 9 * 6.5 * 7.5 cm；兔兔：約 8 * 8 * 15 cm',
-      wrapSize: '25 * 14.7 * 22.2 cm',
-      origin: '中國大陸',
-      material: '棉、丙烯酸',
-      content: null,
-      weight: '314 g',
-    },
-  },
-])
+const { products } = storeToRefs(useProductsStore())
+// 商品種類
+const { categories } = storeToRefs(useCategoriesStore())
 
 // 視窗寬度
 const windowWidth = ref(window.innerWidth)
@@ -188,115 +48,6 @@ const lineOfProducts = computed(() => _.chunk(products.value, numOfProductLine.v
 
 // 商品總數
 const numOfProducts = computed(() => products.value.length)
-
-// 商品種類
-interface Catrgory {
-  id: number
-  name: string
-  path: string
-  icon?: Component
-  isOpen?: boolean
-  subCategories?: Catrgory[]
-}
-
-const categories = ref<Catrgory[]>([
-  {
-    id: 1,
-    name: '包包、時尚小物',
-    path: '/bags-fashion',
-    icon: shallowRef(IconShoppingBagBold),
-    isOpen: false,
-    subCategories: [
-      {
-        id: 1,
-        name: '合成皮革包袋',
-        path: '/synthetic-leather-bags',
-      },
-      {
-        id: 2,
-        name: '托特包、手提包',
-        path: '/tote-bags',
-      },
-      {
-        id: 3,
-        name: '肩包、斜背包',
-        path: '/shoulder-bags',
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: '個人、美妝用品',
-    path: '/personal-beauty',
-    icon: shallowRef(IconFoundationMakeup),
-    isOpen: false,
-    subCategories: [
-      {
-        id: 1,
-        name: '化妝品',
-        path: '/makeup',
-      },
-      {
-        id: 2,
-        name: '身體乳、護手霜、護唇膏',
-        path: '/body-lotion',
-      },
-      {
-        id: 3,
-        name: '鏡子、梳子',
-        path: '/mirror-brush',
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: '文具',
-    path: '/stationery',
-    icon: shallowRef(IconBookOpenBlankVariant),
-    isOpen: false,
-    subCategories: [
-      {
-        id: 1,
-        name: '便條紙、信紙',
-        path: '/note-paper',
-      },
-      {
-        id: 2,
-        name: '貼紙、紙膠帶',
-        path: '/sticker-tape',
-      },
-      {
-        id: 3,
-        name: '筆類',
-        path: '/pens',
-      },
-    ],
-  },
-  {
-    id: 4,
-    name: '絨毛、趣味玩具',
-    path: '/toys',
-    icon: shallowRef(IconTeddyBear),
-    isOpen: false,
-    subCategories: [
-      {
-        id: 1,
-        name: '絨毛娃娃',
-        path: '/plush-toys',
-      },
-      {
-        id: 2,
-        name: '玩偶、吊鏈',
-        path: '/dolls',
-      },
-      {
-        id: 3,
-        name: '紓壓小物',
-        path: '/stress-relief',
-      },
-    ],
-  },
-])
 </script>
 
 <template>
@@ -320,23 +71,11 @@ const categories = ref<Catrgory[]>([
         <option value="">
           商品排序
         </option>
-        <option value="sales-volume-high">
-          銷售量最高
-        </option>
-        <option value="sales-volume-low">
-          銷售量最低
-        </option>
         <option value="price-high">
           價格最高
         </option>
         <option value="price-low">
           價格最低
-        </option>
-        <option value="release-recently">
-          最新上架
-        </option>
-        <option value="release-long-ago">
-          最久遠上架
         </option>
       </select>
     </div>
@@ -344,7 +83,7 @@ const categories = ref<Catrgory[]>([
       <ul class="categories-block">
         <li v-for="category in categories" :key="`category-${category.id}`" class="categories-list">
           <div class="categories-title">
-            <Component :is="category.icon" />
+            <Component :is="getIconComponent(category.icon)" />
             <div>{{ category.name }}</div>
             <span v-show="!category.isOpen" class="open-subcategories-btn" @click="category.isOpen = true">
               <icon-ic-outline-keyboard-arrow-right />
