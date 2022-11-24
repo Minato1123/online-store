@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import type { PropType } from 'vue'
+import type { PropType, Ref } from 'vue'
 import { OnClickOutside } from '@vueuse/components'
-import type { Product } from '../pages/Home.vue'
-import MyButton from './MyButton.vue'
+import type { Product } from '../types/index'
+import { useShoppingCartStore } from '../stores/shoppingCart'
+import PButton from './PButton.vue'
 
 const props = defineProps({
   product: {
@@ -12,6 +13,9 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['closeProductQuickPage'])
+const shoppingCartStore = useShoppingCartStore()
+const { shoppingCartList } = storeToRefs(shoppingCartStore)
+const { addShoppingCart } = shoppingCartStore
 
 const numOfProduct = ref(1)
 const subtotal = computed(() => numOfProduct.value * props.product.price)
@@ -19,7 +23,9 @@ function closeProductQuickPage() {
   emit('closeProductQuickPage')
 }
 
-const specPicked = ref(null)
+const specPicked: Ref<null | string> = ref(null)
+if (props.product.specifications.length > 0)
+  specPicked.value = 'spec-0'
 
 const hasSpecifications = ref(false)
 
@@ -39,6 +45,17 @@ const textInBtnAddCart = {
   text: '加入購物車',
   color: 'main-product-color',
 }
+
+// 按 ESC 可以關閉快速購物車
+window.addEventListener('keydown', (e) => {
+  if (e.code === 'Escape')
+    closeProductQuickPage()
+}, false)
+
+function submitAddCart() {
+  addShoppingCart(props.product.id, specPicked.value, numOfProduct.value)
+  closeProductQuickPage()
+}
 </script>
 
 <template>
@@ -57,43 +74,45 @@ const textInBtnAddCart = {
           <div class="product-img">
             <img :src="product.images[0]" alt="">
           </div>
-          <div class="spec-num">
-            <div class="spec-block">
-              <div class="spec-num-title">
-                規格
+          <form @submit.prevent="submitAddCart">
+            <div class="spec-num">
+              <div class="spec-block">
+                <div class="spec-num-title">
+                  規格
+                </div>
+                <div class="spec-subblock">
+                  <label v-for="(spec, i) in product.specifications" :key="`specifications-${i}`" class="spec-label" :class="{ active: specPicked === `spec-${i}` }">
+                    <input
+                      v-model="specPicked" class="spec-radio"
+                      type="radio" name="specifications"
+                      :value="`spec-${i}`"
+                    >
+                    {{ spec }}
+                  </label>
+                  <label v-if="hasSpecifications" class="active">
+                    <input
+                      v-model="specPicked" class="spec-radio"
+                      type="radio" name="specifications"
+                      value="null" disabled
+                    >
+                    無
+                  </label>
+                </div>
               </div>
-              <div class="spec-subblock">
-                <label v-for="(spec, i) in product.specifications" :key="`specifications-${i}`" class="spec-label" :class="{ active: specPicked === `spec-${i}` }">
-                  <input
-                    v-model="specPicked" class="spec-radio"
-                    type="radio" name="specifications"
-                    :value="`spec-${i}`"
-                  >
-                  {{ spec }}
-                </label>
-                <label v-if="hasSpecifications" class="active">
-                  <input
-                    v-model="specPicked" class="spec-radio"
-                    type="radio" name="specifications"
-                    value="null" disabled
-                  >
-                  無
-                </label>
+              <div class="num-block">
+                <div class="spec-num-title">
+                  數量
+                </div>
+                <input v-model="numOfProduct" name="amount" class="num-product" type="number" min="1" max="10">
               </div>
             </div>
-            <div class="num-block">
-              <div class="spec-num-title">
-                數量
-              </div>
-              <input v-model="numOfProduct" class="num-product" type="number" min="1" max="10">
+            <div class="subtotal">
+              小計：NT$ <span>{{ subtotal }}</span>
             </div>
-          </div>
-          <div class="subtotal">
-            小計：NT$ <span>{{ subtotal }}</span>
-          </div>
-          <div class="add-cart-btn-block">
-            <MyButton :content="textInBtnAddCart" @click="closeProductQuickPage" />
-          </div>
+            <div class="add-cart-btn-block">
+              <PButton type="submit" :content="textInBtnAddCart" />
+            </div>
+          </form>
         </div>
       </OnClickOutside>
     </div>
@@ -175,6 +194,10 @@ const textInBtnAddCart = {
             justify-content: space-evenly;
             height: 100%;
             color: var(--main-color);
+
+            input {
+              text-align: center;
+            }
 
             .spec-num-title {
               font-weight: 500;

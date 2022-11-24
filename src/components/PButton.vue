@@ -1,7 +1,14 @@
 <script setup lang="ts">
-const props = defineProps({
+import type { PropType } from 'vue'
+
+interface BtnType {
+  text: string
+  color: string
+}
+
+defineProps({
   content: {
-    type: Object,
+    type: Object as PropType<BtnType>,
     required: true,
   },
 })
@@ -9,15 +16,15 @@ const props = defineProps({
 
 <template>
   <div class="btn-container">
-    <button
+    <input
+      type="submit"
       :class="{
         'main-product-color': content.color === 'main-product-color',
         'main-color': content.color === 'main-color',
         'match-color': content.color === 'match-color',
       }"
+      :value="content.text"
     >
-      {{ content.text }}
-    </button>
   </div>
 </template>
 
@@ -26,7 +33,7 @@ const props = defineProps({
     width: 40%;
 
   }
-  button {
+  input {
     outline: none;
     border: none;
     width: 100%;
