@@ -2,6 +2,7 @@
 import type { PropType } from 'vue'
 import ProductDialog from './ProductDialog.vue'
 import type { Product } from '@/types/index'
+import { getPublicImgSrc } from '@/utils/index'
 import { useFollowedProductsStore } from '@/stores/followedProduct'
 
 const props = defineProps({
@@ -29,7 +30,7 @@ const isOpenProductQuickPage = ref(false)
     class="product-container"
     :class="$attrs.class"
   >
-    <img :src="product.images[0]" alt="product's image">
+    <img :src="getPublicImgSrc(product.images[0])" alt="product's image">
     <div>
       <div class="product-info">
         <div class="product-name">

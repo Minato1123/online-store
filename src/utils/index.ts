@@ -15,3 +15,8 @@ export function getIconComponent(iconName: string) {
 
   return iconComponent
 }
+
+// 找到第一個斜線，替換成 base 的值 /online-store/
+export function getPublicImgSrc(path: string) {
+  return path.replace(/^\//, import.meta.env.BASE_URL)
+}

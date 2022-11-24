@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import slidePicture from '../assets/json/slides.json'
+import { getPublicImgSrc } from '@/utils'
+
 const slides = ref(slidePicture)
 
 const numOfSlides = computed(() => slides.value.length)
@@ -35,21 +37,21 @@ watch(
       <img
         v-for="(slide, i) in slides"
         :key="`slide-${i}`"
-        :src="slide.imageUrl"
+        :src="getPublicImgSrc(slide.imageUrl)"
         alt="ad"
         class="slide-desktop"
       >
       <img
         v-for="(slide, i) in slides"
         :key="`slide-${i}`"
-        :src="slide.imageTabletUrl"
+        :src="getPublicImgSrc(slide.imageTabletUrl)"
         alt="ad"
         class="slide-tablet"
       >
       <img
         v-for="(slide, i) in slides"
         :key="`slide-${i}`"
-        :src="slide.imageMobileUrl"
+        :src="getPublicImgSrc(slide.imageMobileUrl)"
         alt="ad"
         class="slide-mobile"
       >

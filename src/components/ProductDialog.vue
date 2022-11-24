@@ -2,6 +2,7 @@
 import type { PropType, Ref } from 'vue'
 import { OnClickOutside } from '@vueuse/components'
 import type { Product } from '../types/index'
+import { getPublicImgSrc } from '../utils/index'
 import { useShoppingCartStore } from '../stores/shoppingCart'
 import PButton from './PButton.vue'
 
@@ -72,7 +73,7 @@ function submitAddCart() {
             </button>
           </div>
           <div class="product-img">
-            <img :src="product.images[0]" alt="">
+            <img :src="getPublicImgSrc(product.images[0])" alt="">
           </div>
           <form @submit.prevent="submitAddCart">
             <div class="spec-num">
