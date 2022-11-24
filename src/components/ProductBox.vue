@@ -1,14 +1,25 @@
 <script setup lang="ts">
 import type { PropType } from 'vue'
-import type { Product } from '../pages/Home.vue'
 import ProductDialog from './ProductDialog.vue'
+import type { Product } from '@/types/index'
+import { useFollowedProductsStore } from '@/stores/followedProduct'
 
-defineProps({
+const props = defineProps({
   product: {
     type: Object as PropType<Product>,
     required: true,
   },
 })
+
+const { addFollowedProduct, removeFollowedProduct, isInFollowedProducts } = useFollowedProductsStore()
+
+function handleFollowedProducts() {
+  if (isInFollowedProducts(props.product))
+    removeFollowedProduct(props.product)
+
+  else
+    addFollowedProduct(props.product)
+}
 
 const isOpenProductQuickPage = ref(false)
 </script>
@@ -29,7 +40,9 @@ const isOpenProductQuickPage = ref(false)
             <button @click="isOpenProductQuickPage = true">
               <icon-bi-cart-plus />
             </button>
-            <button><icon-icon-park-outline-like /></button>
+            <button @click="handleFollowedProducts">
+              <icon-icon-park-solid-like v-if="isInFollowedProducts(product)" /><icon-icon-park-outline-like v-else />
+            </button>
           </div>
         </div>
       </div>
