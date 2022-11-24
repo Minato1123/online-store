@@ -1,10 +1,13 @@
 <script setup lang="ts">
+defineEmits(['toggleMenu'])
 </script>
 
 <template>
   <div class="nav-container">
     <div class="nav-rwd">
-      <button><icon-ph-list-bold /></button>
+      <button @click="$emit('toggleMenu')">
+        <icon-ph-list-bold />
+      </button>
       <button><icon-ic-baseline-search /></button>
     </div>
     <a class="store-title" href="/">
@@ -119,7 +122,7 @@ button {
   height: 2rem;
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width: 1090px) { //768
   .nav-container {
     justify-content: space-around;
 
@@ -129,11 +132,13 @@ button {
   }
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 1090px) {
 
   .nav-container {
     height: 3rem;
     justify-content: space-between;
+    padding: 0 0.5rem;
+    box-sizing: border-box;
 
     .nav-rwd {
       display: block;

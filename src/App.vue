@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import Nav from './components/Nav.vue'
+import MenuMobile from './components/MenuMobile.vue'
 import Footer from './components/Footer.vue'
+
+const isOpenMenu = ref(false)
 </script>
 
 <template>
-  <Nav class="nav" />
+  <Nav class="nav" @toggle-menu="isOpenMenu = !isOpenMenu" />
+  <MenuMobile
+    :class="{
+      visible: !isOpenMenu,
+    }"
+  />
   <div class="content">
     <RouterView />
   </div>
@@ -26,9 +34,16 @@ import Footer from './components/Footer.vue'
   min-height: calc(100vh - 21rem);
 }
 
-@media screen and (max-width: 768px) {
+.visible {
+  visibility: hidden;
+  transform: translateX(-100%);
+  transition: all 0.3s ease 0s;
+}
+
+@media screen and (max-width: 1090px) {
   .content {
     margin-top: 3rem;
   }
+
 }
 </style>
