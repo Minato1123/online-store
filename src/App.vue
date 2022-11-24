@@ -9,11 +9,7 @@ const isOpenMenu = ref(false)
 
 <template>
   <Nav class="nav" @toggle-menu="isOpenMenu = !isOpenMenu" />
-  <MenuMobile
-    :class="{
-      visible: !isOpenMenu,
-    }"
-  />
+  <MenuMobile :is-open-menu="isOpenMenu" @close-menu="isOpenMenu = false" />
   <div class="content">
     <RouterView />
   </div>
@@ -32,12 +28,6 @@ const isOpenMenu = ref(false)
 .content {
   margin-top: 5rem;
   min-height: calc(100vh - 21rem);
-}
-
-.visible {
-  visibility: hidden;
-  transform: translateX(-100%);
-  transition: all 0.3s ease 0s;
 }
 
 @media screen and (max-width: 1090px) {

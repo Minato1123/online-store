@@ -145,8 +145,8 @@ button {
 
       button {
         .svg-icon:hover {
-        cursor: pointer;
-        color: var(--selected-color);
+          cursor: pointer;
+          color: var(--selected-color);
   }
       }
     }

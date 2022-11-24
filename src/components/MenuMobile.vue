@@ -1,49 +1,90 @@
 <script setup lang="ts">
+defineProps({
+  isOpenMenu: {
+    type: Boolean,
+    required: true,
+  },
+})
 
+defineEmits(['closeMenu'])
 </script>
 
 <template>
-  <div class="menu-block">
-    <div class="user-container">
-      <div class="user-name">
-        嗨，使用者！
+  <div
+    class="mask" :class="{
+      'invisible-mask': !isOpenMenu,
+    }"
+    @click.self="$emit('closeMenu')"
+  >
+    <div
+      class="menu-block" :class="{
+        'visible-menu': isOpenMenu,
+        'invisible-menu': !isOpenMenu,
+      }"
+    >
+      <div class="user-container">
+        <div class="user-name">
+          嗨，使用者！
+        </div>
+        <button class="log-btn">
+          登出
+        </button>
       </div>
-      <button class="log-btn">
-        登出
-      </button>
-    </div>
-    <ul class="about-container">
-      <li><button>我的帳戶</button></li>
-      <li><button>追蹤清單</button></li>
-      <li><button>關於帕恰</button></li>
-      <li><button>客服中心</button></li>
-    </ul>
-    <div class="contact-container">
-      <div>關注我</div>
-      <div class="contact-btns">
-        <a class="contact-icon" href="https://github.com/Minato1123" target="_blank"><icon-radix-icons-github-logo /></a>
-        <a class="contact-icon" href="#"><icon-ion-logo-instagram /></a>
-        <a class="contact-icon" href="#"><icon-ion-logo-twitter /></a>
-        <a class="contact-icon" href="#"><icon-carbon-logo-linkedin /></a>
+      <ul class="about-container">
+        <li><button>我的帳戶</button></li>
+        <li><button>追蹤清單</button></li>
+        <li><button>關於帕恰</button></li>
+        <li><button>客服中心</button></li>
+      </ul>
+      <div class="contact-container">
+        <div>關注我</div>
+        <div class="contact-btns">
+          <a class="contact-icon" href="https://github.com/Minato1123" target="_blank"><icon-radix-icons-github-logo /></a>
+          <a class="contact-icon" href="#"><icon-ion-logo-instagram /></a>
+          <a class="contact-icon" href="#"><icon-ion-logo-twitter /></a>
+          <a class="contact-icon" href="#"><icon-carbon-logo-linkedin /></a>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
+.mask {
+  position: fixed;
+  top: 3rem;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+
+  &.invisible-mask {
+    visibility: hidden;
+  }
+
+}
   .menu-block {
     width: clamp(20rem, 30vw, 30rem);
     height: 100vh;
-    background-color: rgba($color: #fff, $alpha: 0.9);
-    border: solid 0.1rem var(--main-product-color);
+    background-color: rgba($color: #fff, $alpha: 0.95);
+    border-right: solid 0.1rem var(--main-product-color);
     position: fixed;
-    top: 3rem;
     left: 0;
-    z-index: 1;
+    z-index: 2;
     box-sizing: border-box;
     padding: 1rem;
-    transform: translateX(0%);
-    transition: all 0.3s ease 0s;
+
+    &.visible-menu {
+      transform: translateX(0%);
+      transition: all 0.3s ease 0s;
+    }
+
+    &.invisible-menu {
+      visibility: hidden;
+      transform: translateX(-100%);
+      transition: all 0.3s ease 0s;
+    }
 
     .user-container {
       display: flex;
