@@ -117,5 +117,46 @@
       "content": null,
       "weight": "314 g"
     }
+  },
+  {
+    "id": 7,
+    "name": "帕恰狗絨毛娃娃（圓茸療癒）",
+    "categoryId": 4,
+    "subCategoryId": 1,
+    "price": 1024,
+    "description": ["Sanrio 生活雜貨", "帶有秋季霧色的絨毛娃娃", "戴著彩色的大領巾好時尚", "圓滾滾剪影外型、細緻毛茸茸觸感", "居家擺放做為靠墊使用", "或是懷中擁抱，都超療癒又可愛", "附透明收納盒，展示也方便不染灰塵"],
+    "images": [
+      "/images/products/product-7-1.jpeg"
+    ],
+    "specifications": [],
+    "details": {
+      "size": "33 * 14 * 32.5 cm",
+      "wrapSize": "34 * 15 * 34 cm",
+      "origin": "中國",
+      "material": "棉、丙烯酸",
+      "content": null,
+      "weight": "378 g"
+    }
+  },
+  {
+    "id": 8,
+    "name": "帕恰狗隨身雙面鏡（美麗彩櫻Ⅱ）",
+    "categoryId": 2,
+    "subCategoryId": 3,
+    "price": 295,
+    "description": ["Sanrio 生活雜貨", "內夾櫻花飾片裝飾的隨身雙面鏡", "一面是放大鏡面 細微處可看得更清楚"],
+    "images": [
+      "/images/products/product-8-1.jpeg"
+    ],
+    "specifications": [],
+    "details": {
+      "size": "7.3 * 7.5 * 1.5 cm、鏡面大小約 6 * 6 cm",
+      "wrapSize": "9 * 8 * 1.8 cm",
+      "origin": "中國大陸",
+      "material": "塑膠 - ABS, 玻璃 鏡尺寸：6 * 6 cm",
+      "content": null,
+      "weight": "58 g"
+    }
+    
   }
 ]
