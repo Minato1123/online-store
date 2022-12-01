@@ -7,9 +7,26 @@ import { useCategoriesStore } from '../stores/category'
 import { getIconComponent } from '@/utils'
 
 // 商品
-const { products } = storeToRefs(useProductsStore())
+const { products: originalProducts } = storeToRefs(useProductsStore())
 // 商品種類
 const { categories } = storeToRefs(useCategoriesStore())
+
+// 商品排序
+const products = _.cloneDeep(originalProducts)
+const methodOfSort = ref('default')
+watch(methodOfSort, () => {
+  switch (methodOfSort.value) {
+    case 'default':
+      products.value = originalProducts.value
+      break
+    case 'price-low':
+      products.value = _.sortBy(products.value, [function (p) { return p.price }])
+      break
+    case 'price-high':
+      products.value = _.sortBy(products.value, [function (p) { return -p.price }])
+      break
+  }
+})
 
 // 視窗寬度
 const windowWidth = ref(window.innerWidth)
@@ -103,8 +120,8 @@ const pageList = computed(() => {
         </div>
       </div>
 
-      <select name="products">
-        <option value="">
+      <select v-model="methodOfSort" name="products">
+        <option value="default">
           商品排序
         </option>
         <option value="price-high">
