@@ -28,12 +28,6 @@ onUnmounted(() =>
 
 // 每行商品數量
 const numOfProductLine = ref(0)
-if (windowWidth.value >= 785)
-  numOfProductLine.value = 3
-else if (windowWidth.value < 785 && windowWidth.value >= 500)
-  numOfProductLine.value = 2
-else
-  numOfProductLine.value = 1
 
 watch(windowWidth, () => {
   if (windowWidth.value >= 785)
@@ -42,12 +36,54 @@ watch(windowWidth, () => {
     numOfProductLine.value = 2
   else
     numOfProductLine.value = 1
-})
+}, { immediate: true })
 
 const lineOfProducts = computed(() => _.chunk(products.value, numOfProductLine.value))
 
 // 商品總數
 const numOfProducts = computed(() => products.value.length)
+
+// 每頁商品數量（6 的倍數）
+const productsOfPerPage = ref(6)
+
+// 每頁商品行數
+const numOfProductsPerPage = computed(() => Math.ceil(productsOfPerPage.value / numOfProductLine.value))
+
+// 總頁數
+const numOfPages = computed(() => Math.ceil(numOfProducts.value / productsOfPerPage.value))
+
+// 當前頁數
+const currentPage = ref(1)
+
+// 當前頁商品
+const currentProducts = computed(() => {
+  const start = (currentPage.value - 1) * numOfProductsPerPage.value
+  const end = start + numOfProductsPerPage.value
+  return lineOfProducts.value.slice(start, end)
+})
+
+const pageList = computed(() => {
+  const list = []
+  const minPage = Math.max(currentPage.value - 2, 1)
+  const maxPage = Math.min(minPage + 4, numOfPages.value)
+
+  if (minPage > 1) {
+    list.push(1)
+    if (currentPage.value > 4)
+      list.push('...')
+  }
+
+  for (let i = minPage; i <= maxPage; i++)
+    list.push(i)
+
+  if (maxPage < numOfPages.value) {
+    if (currentPage.value < numOfPages.value - 3)
+      list.push('...')
+    list.push(numOfPages.value)
+  }
+
+  return list
+})
 </script>
 
 <template>
@@ -99,9 +135,31 @@ const numOfProducts = computed(() => products.value.length)
           </ul>
         </li>
       </ul>
-      <div class="products-list-container">
-        <div v-for="(produntLine, i) in lineOfProducts" :key="`product-line-${i}`" class="products-list">
-          <ProductBox v-for="product in produntLine" :key="`product-${product.id}`" class="products" :product="product" />
+      <div class="products-list-pages">
+        <div class="products-list-container">
+          <div v-for="(produntLine, i) in currentProducts" :key="`product-line-${i}`" class="products-list">
+            <ProductBox v-for="product in produntLine" :key="`product-${product.id}`" class="products" :product="product" />
+          </div>
+        </div>
+        <div class="pages-container">
+          <div class="pages">
+            <button :disabled="currentPage === 1" class="page-btn icon-btn" @click="currentPage = currentPage - 1">
+              <icon-material-symbols-chevron-left-rounded />
+            </button>
+            <button
+              v-for="(page, i) in pageList" :key="`page-${i}`" class="page-btn" :class="{
+                'active-page': currentPage === page,
+              }" :disabled="page === '...'" @click="() => {
+                if (typeof page === 'number')
+                  currentPage = page
+              }"
+            >
+              {{ page }}
+            </button>
+            <button class="page-btn icon-btn" :disabled="currentPage === numOfPages" @click="currentPage = currentPage + 1">
+              <icon-material-symbols-chevron-right-rounded />
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -217,22 +275,74 @@ const numOfProducts = computed(() => products.value.length)
     }
   }
 
-  .products-list-container {
+  .products-list-pages {
     width: 78%;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    flex-wrap: nowrap;
+    align-items: center;
 
-    .products-list {
+    .products-list-container {
+      width: 100%;
       display: flex;
-      justify-content: flex-start;
+      flex-direction: column;
+      justify-content: center;
+      flex-wrap: nowrap;
 
-      .products {
-        cursor: pointer;
-        &:hover {
-          transform: scale(1.05);
+      .products-list {
+        display: flex;
+        justify-content: flex-start;
+
+        .products {
+          cursor: pointer;
+          &:hover {
+            transform: scale(1.05);
+          }
+        }
+      }
+    }
+
+    .pages-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .pages {
+        display: flex;
+        gap: 0.2rem;
+
+        .page-btn {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 0.5rem;
+          color: var(--main-product-color);
+          border: 1px solid var(--match-color);
+          background-color: var(--white-color);
+          outline: none;
+          width: 2rem;
+          border-radius: 0.2rem;
+          box-shadow: 1px 1px 3px 0px rgba($color: #000000, $alpha: 0.1);
+
+          &.icon-btn {
+            padding: 0;
+          }
+
+          &.active-page {
+            color: var(--white-color);
+            background-color: var(--main-product-color);
+            border: none;
+          }
+
+          &:hover {
+            opacity: 0.7;
+            cursor: pointer;
+          }
+
+          &:disabled, &.ellipsis-page {
+            opacity: 0.5;
+            cursor: default;
+          }
         }
       }
     }
