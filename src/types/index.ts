@@ -35,3 +35,17 @@ export interface productInCart {
   specification: string | null
   amount: number
 }
+
+export interface BtnType {
+  text: string
+  color: string
+}
+
+export interface User {
+  id: number
+  name: string
+  email: string
+  password: string
+  birthday: string
+  mobile: string
+}

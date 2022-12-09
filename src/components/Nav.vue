@@ -1,5 +1,23 @@
 <script setup lang="ts">
+import { RouterLink, RouterView } from 'vue-router'
+
 defineEmits(['toggleMenu'])
+
+const loginStatus = ref(true)
+const loginStatusContent = computed(() => {
+  if (loginStatus.value === true)
+    return '哈囉！'
+
+  else
+    return '尚未登入！'
+})
+const tooltipTheme = computed(() => {
+  if (loginStatus.value === true)
+    return 'login-tooltip'
+
+  else
+    return 'unlogin-tooltip'
+})
 </script>
 
 <template>
@@ -10,12 +28,12 @@ defineEmits(['toggleMenu'])
       </button>
       <button><icon-ic-baseline-search /></button>
     </div>
-    <a class="store-title" href="/">
+    <RouterLink to="/" class="store-title">
       <img class="store-logo" src="../assets/images/pochacco-logo.png" alt="pochacco online store's logo">
       <div class="store-name">
         帕恰購物
       </div>
-    </a>
+    </RouterLink>
     <div class="search-bar">
       <input type="text" placeholder="Search...">
       <button><icon-ic-baseline-search /></button>
@@ -24,7 +42,17 @@ defineEmits(['toggleMenu'])
       <button class="btn-bell">
         <icon-mdi-bell-outline />
       </button>
-      <button><icon-teenyicons-user-circle-solid /></button>
+      <button
+        v-tooltip="{
+          content: loginStatusContent,
+          theme: tooltipTheme,
+          html: true,
+        }"
+      >
+        <RouterLink to="/login">
+          <icon-teenyicons-user-circle-solid />
+        </RouterLink>
+      </button>
       <button><icon-ph-shopping-cart-simple-bold /></button>
     </div>
   </div>

@@ -22,12 +22,16 @@ const isOpenMenu = ref(false)
   top: 0;
   left: 0;
   width: 100%;
-  z-index: 1;
+  z-index: 2;
 }
 
 .content {
   margin-top: 5rem;
   min-height: calc(100vh - 21rem);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #FFFBF4;
 }
 
 @media screen and (max-width: 1090px) {

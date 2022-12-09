@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import type { PropType } from 'vue'
-
-interface BtnType {
-  text: string
-  color: string
-}
+import type { BtnType } from '@/types'
 
 defineProps({
   content: {
@@ -43,6 +39,7 @@ defineProps({
     font-size: 1.4rem;
     cursor: pointer;
     padding: 0.6rem 0;
+    box-shadow: 1px 1px 1px 1px rgba($color: #000000, $alpha: 0.1);
   }
 
   .main-product-color {
@@ -51,12 +48,16 @@ defineProps({
 
     &:hover {
       background-color: var(--match-color);
-      transition-duration: 0.2s;
     }
   }
 
   .main-color {
     background-color: var(--main-color);
+    transition-duration: 0.2s;
+
+    &:hover {
+      opacity: 0.8;
+    }
   }
 
   .match-color {

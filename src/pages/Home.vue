@@ -104,78 +104,80 @@ const pageList = computed(() => {
 </script>
 
 <template>
-  <Slides />
-  <div class="products-block">
-    <div class="products-header">
-      <div class="produts-intro-title">
-        <button>
-          <span>商品分類</span>
-          <icon-ri-arrow-drop-down-line />
-        </button>
-      </div>
-      <div class="num-total-products">
-        <div class="center-num-total-products">
-          <icon-gridicons-product />
-          共 {{ numOfProducts }} 件商品
+  <div class="home-container">
+    <Slides />
+    <div class="products-block">
+      <div class="products-header">
+        <div class="produts-intro-title">
+          <button>
+            <span>商品分類</span>
+            <icon-ri-arrow-drop-down-line />
+          </button>
         </div>
-      </div>
+        <div class="num-total-products">
+          <div class="center-num-total-products">
+            <icon-gridicons-product />
+            共 {{ numOfProducts }} 件商品
+          </div>
+        </div>
 
-      <select v-model="methodOfSort" name="products">
-        <option value="default">
-          商品排序
-        </option>
-        <option value="price-high">
-          價格最高
-        </option>
-        <option value="price-low">
-          價格最低
-        </option>
-      </select>
-    </div>
-    <div class="products-content">
-      <ul class="categories-block">
-        <li v-for="category in categories" :key="`category-${category.id}`" class="categories-list">
-          <div class="categories-title">
-            <Component :is="getIconComponent(category.icon)" />
-            <div>{{ category.name }}</div>
-            <span v-show="!category.isOpen" class="open-subcategories-btn" @click="category.isOpen = true">
-              <icon-ic-outline-keyboard-arrow-right />
-            </span>
-            <span v-show="category.isOpen" class="open-subcategories-btn" @click="category.isOpen = false">
-              <icon-ic-baseline-keyboard-arrow-down />
-            </span>
+        <select v-model="methodOfSort" name="products">
+          <option value="default">
+            商品排序
+          </option>
+          <option value="price-high">
+            價格最高
+          </option>
+          <option value="price-low">
+            價格最低
+          </option>
+        </select>
+      </div>
+      <div class="products-content">
+        <ul class="categories-block">
+          <li v-for="category in categories" :key="`category-${category.id}`" class="categories-list">
+            <div class="categories-title">
+              <Component :is="getIconComponent(category.icon)" />
+              <div>{{ category.name }}</div>
+              <span v-show="!category.isOpen" class="open-subcategories-btn" @click="category.isOpen = true">
+                <icon-ic-outline-keyboard-arrow-right />
+              </span>
+              <span v-show="category.isOpen" class="open-subcategories-btn" @click="category.isOpen = false">
+                <icon-ic-baseline-keyboard-arrow-down />
+              </span>
+            </div>
+            <ul v-show="category.isOpen" class="subCategory-block">
+              <li v-for="subCategory in category.subCategories" :key="`subCategory-${subCategory.id}`" class="subCategories-list">
+                <div> {{ subCategory.name }} </div>
+              </li>
+            </ul>
+          </li>
+        </ul>
+        <div class="products-list-pages">
+          <div class="products-list-container">
+            <div v-for="(produntLine, i) in currentProducts" :key="`product-line-${i}`" class="products-list">
+              <ProductBox v-for="product in produntLine" :key="`product-${product.id}`" class="products" :product="product" />
+            </div>
           </div>
-          <ul v-show="category.isOpen" class="subCategory-block">
-            <li v-for="subCategory in category.subCategories" :key="`subCategory-${subCategory.id}`" class="subCategories-list">
-              <div> {{ subCategory.name }} </div>
-            </li>
-          </ul>
-        </li>
-      </ul>
-      <div class="products-list-pages">
-        <div class="products-list-container">
-          <div v-for="(produntLine, i) in currentProducts" :key="`product-line-${i}`" class="products-list">
-            <ProductBox v-for="product in produntLine" :key="`product-${product.id}`" class="products" :product="product" />
-          </div>
-        </div>
-        <div class="pages-container">
-          <div class="pages">
-            <button :disabled="currentPage === 1" class="page-btn icon-btn" @click="currentPage = currentPage - 1">
-              <icon-material-symbols-chevron-left-rounded />
-            </button>
-            <button
-              v-for="(page, i) in pageList" :key="`page-${i}`" class="page-btn" :class="{
-                'active-page': currentPage === page,
-              }" :disabled="page === '...'" @click="() => {
-                if (typeof page === 'number')
-                  currentPage = page
-              }"
-            >
-              {{ page }}
-            </button>
-            <button class="page-btn icon-btn" :disabled="currentPage === numOfPages" @click="currentPage = currentPage + 1">
-              <icon-material-symbols-chevron-right-rounded />
-            </button>
+          <div class="pages-container">
+            <div class="pages">
+              <button :disabled="currentPage === 1" class="page-btn icon-btn" @click="currentPage = currentPage - 1">
+                <icon-material-symbols-chevron-left-rounded />
+              </button>
+              <button
+                v-for="(page, i) in pageList" :key="`page-${i}`" class="page-btn" :class="{
+                  'active-page': currentPage === page,
+                }" :disabled="page === '...'" @click="() => {
+                  if (typeof page === 'number')
+                    currentPage = page
+                }"
+              >
+                {{ page }}
+              </button>
+              <button class="page-btn icon-btn" :disabled="currentPage === numOfPages" @click="currentPage = currentPage + 1">
+                <icon-material-symbols-chevron-right-rounded />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -184,6 +186,11 @@ const pageList = computed(() => {
 </template>
 
 <style scoped lang="scss">
+.home-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
 .products-block {
   display: flex;
   flex-direction: column;
