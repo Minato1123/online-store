@@ -72,18 +72,10 @@ export const useRegisterStore = defineStore('register', () => {
 
   const [email, password, name, birthday, mobile] = useFieldModel(['email', 'password', 'name', 'birthday', 'mobile'])
 
-  function onInvalidSubmit({ values, errors, results }) {
-    console.log('register')
-    console.log(values) // current form values
-    console.log(errors) // a map of field names and their first error message
-    console.log(results)
-  }
-
   const register = handleSubmit((values, { resetForm }) => {
     // send values to API
     if (hasUser(values.email)) {
       alert('此帳號已註冊')
-      return
     }
     else {
       const newUser: User = {
@@ -106,8 +98,7 @@ export const useRegisterStore = defineStore('register', () => {
         },
       })
     }
-    console.log('Submit', JSON.stringify(values, null, 2))
-  }, onInvalidSubmit)
+  })
 
   return {
     errors,

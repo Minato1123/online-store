@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import { useForm } from 'vee-validate'
 import { useUsersStore } from '@/stores/user'
-import type { User } from '@/types/index'
 
 const { hasUser, loginVaild } = useUsersStore()
 
@@ -45,13 +44,6 @@ export const useLoginStore = defineStore('login', () => {
 
   const [email, password] = useFieldModel(['email', 'password'])
 
-  function onInvalidSubmit({ values, errors, results }) {
-    console.log('login')
-    console.log(values) // current form values
-    console.log(errors) // a map of field names and their first error message
-    console.log(results)
-  }
-
   const login = handleSubmit((values) => {
     if (loginVaild(values.email, values.password))
       alert('登入成功')
@@ -61,9 +53,7 @@ export const useLoginStore = defineStore('login', () => {
 
     else
       alert('此帳號尚未註冊')
-
-    console.log('Submit', JSON.stringify(values, null, 2))
-  }, onInvalidSubmit)
+  })
 
   return {
     errors,
