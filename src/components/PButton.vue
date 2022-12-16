@@ -26,7 +26,7 @@ defineProps({
 
 <style scoped lang="scss">
 .btn-container {
-    width: 40%;
+    width: 36%;
 
   }
   input {
@@ -36,7 +36,7 @@ defineProps({
     border-radius: 2rem;
     color: var(--white-color);
     font-weight: 500;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     cursor: pointer;
     padding: 0.6rem 0;
     box-shadow: 1px 1px 1px 1px rgba($color: #000000, $alpha: 0.1);
