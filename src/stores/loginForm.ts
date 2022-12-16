@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia'
 import { useForm } from 'vee-validate'
 import { useUsersStore } from '@/stores/user'
+import router from '@/router/index'
 
-const { hasUser, loginVaild } = useUsersStore()
+const { hasUser, isloginVaild, changeLoginStatus, getUserByEmail, setCurrentUser } = useUsersStore()
 
 const schema = {
   email(value: string) {
@@ -45,14 +46,21 @@ export const useLoginStore = defineStore('login', () => {
   const [email, password] = useFieldModel(['email', 'password'])
 
   const login = handleSubmit((values) => {
-    if (loginVaild(values.email, values.password))
+    if (isloginVaild(values.email, values.password)) {
       alert('登入成功')
+      changeLoginStatus(true)
+      const currentUser = getUserByEmail(values.email)
+      if (currentUser !== undefined)
+        setCurrentUser(currentUser)
 
-    else if (hasUser(values.email))
+      router.replace({ path: '/' })
+    }
+
+    else if (hasUser(values.email)) {
       alert('密碼錯誤')
+    }
 
-    else
-      alert('此帳號尚未註冊')
+    else { alert('此帳號尚未註冊') }
   })
 
   return {

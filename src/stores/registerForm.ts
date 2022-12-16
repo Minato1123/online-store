@@ -2,8 +2,9 @@ import { defineStore } from 'pinia'
 import { useForm } from 'vee-validate'
 import { useUsersStore } from '@/stores/user'
 import type { User } from '@/types/index'
+import router from '@/router/index'
 
-const { hasUser, addUser } = useUsersStore()
+const { hasUser, addUser, changeLoginStatus } = useUsersStore()
 
 const schema = {
   email(value: string) {
@@ -85,9 +86,13 @@ export const useRegisterStore = defineStore('register', () => {
         password: values.password,
         birthday: values.birthday,
         mobile: values.mobile,
+        address: '',
       }
       addUser(newUser)
       alert('註冊成功')
+      changeLoginStatus(true)
+      router.replace({ path: '/' })
+
       resetForm({
         values: {
           email: '',
