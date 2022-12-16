@@ -32,8 +32,17 @@ export interface Category {
 
 export interface productInCart {
   id: number
+  productId: number
   specification: string | null
   amount: number
+}
+
+export interface productBought {
+  id: number
+  productId: number
+  specification: string | null
+  amount: number
+  status: 'prepared' | 'shipped' | 'completed'
 }
 
 export interface BtnType {
@@ -48,4 +57,5 @@ export interface User {
   password: string
   birthday: string
   mobile: string
+  address: string | undefined
 }

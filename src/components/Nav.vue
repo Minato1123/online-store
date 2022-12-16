@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+import { useUsersStore } from '@/stores/user'
 
 defineEmits(['toggleMenu'])
 
-const loginStatus = ref(true)
+const { getLoginStatus } = useUsersStore()
+const loginStatus = getLoginStatus()
 const loginStatusContent = computed(() => {
   if (loginStatus.value === true)
-    return '哈囉！'
+    return '<div>哈囉，帕恰！</div><button>我的帳戶</button><button>追蹤清單</button><button>登出</button>'
 
   else
     return '尚未登入！'
@@ -17,6 +19,14 @@ const tooltipTheme = computed(() => {
 
   else
     return 'unlogin-tooltip'
+})
+
+const toUrl = computed(() => {
+  if (loginStatus.value === true)
+    return '/user/profile'
+
+  else
+    return '/login'
 })
 </script>
 
@@ -49,7 +59,7 @@ const tooltipTheme = computed(() => {
           html: true,
         }"
       >
-        <RouterLink to="/login">
+        <RouterLink :to="toUrl">
           <icon-teenyicons-user-circle-solid />
         </RouterLink>
       </button>
@@ -204,6 +214,12 @@ button {
 
   .btn-bell {
     display: none;
+  }
+}
+
+@media screen and (max-width: 289px) {
+  .nav-container {
+    padding: 0;
   }
 }
 </style>

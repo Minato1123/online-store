@@ -22,6 +22,28 @@ const router = createRouter({
       name: 'register',
       component: () => import('../pages/Register.vue'),
     },
+    {
+      path: '/user',
+      name: 'user',
+      children: [
+        {
+          path: 'profile',
+          component: () => import('../pages/Profile.vue'),
+        },
+        {
+          path: 'payment',
+          component: () => import('../pages/Payment.vue'),
+        },
+        {
+          path: 'password',
+          component: () => import('../pages/Password.vue'),
+        },
+        {
+          path: 'purchase-list',
+          component: () => import('../pages/PurchaseList.vue'),
+        },
+      ],
+    },
   ],
 })
 
