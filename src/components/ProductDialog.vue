@@ -14,9 +14,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['closeProductQuickPage'])
-const shoppingCartStore = useShoppingCartStore()
-const { shoppingCartList } = storeToRefs(shoppingCartStore)
-const { addShoppingCart } = shoppingCartStore
+
+const { addShoppingCart } = useShoppingCartStore()
 
 const numOfProduct = ref(1)
 const subtotal = computed(() => numOfProduct.value * props.product.price)
@@ -34,13 +33,6 @@ if (props.product.specifications.length === 0)
   hasSpecifications.value = true
 else
   hasSpecifications.value = false
-
-watch(props.product.specifications, () => {
-  if (props.product.specifications.length === 0)
-    hasSpecifications.value = true
-  else
-    hasSpecifications.value = false
-})
 
 const textInBtnAddCart = {
   text: '加入購物車',

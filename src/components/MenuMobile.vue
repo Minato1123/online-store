@@ -65,7 +65,7 @@ defineEmits(['closeMenu'])
 
 }
   .menu-block {
-    width: clamp(20rem, 30vw, 30rem);
+    width: clamp(15rem, 30vw, 30rem);
     height: 100vh;
     background-color: rgba($color: #fff, $alpha: 0.95);
     border-right: solid 0.1rem var(--main-product-color);
