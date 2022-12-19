@@ -40,8 +40,10 @@ export interface productInCart {
 export interface productBought {
   id: number
   productId: number
+  name: string
   specification: string | null
   amount: number
+  price: number
   status: 'prepared' | 'shipped' | 'completed'
 }
 

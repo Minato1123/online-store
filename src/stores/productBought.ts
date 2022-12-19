@@ -9,9 +9,9 @@ export const useProductBoughtListStore = defineStore('productBoughtList', () => 
   if (productBoughtList.value.length !== 0)
     productBoughtId = productBoughtList.value[productBoughtList.value.length - 1].id
 
-  function addProductBought(productId: number, specification: string | null, amount: number) {
+  function addProductBought(productId: number, name: string, specification: string | null, amount: number, price: number) {
     productBoughtId++
-    productBoughtList.value.push({ id: productBoughtId, productId, specification, amount, status: 'prepared' })
+    productBoughtList.value.push({ id: productBoughtId, productId, name, specification, amount, price, status: 'prepared' })
   }
 
   function cancelProductBought(id: number) {
