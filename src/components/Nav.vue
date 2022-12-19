@@ -63,7 +63,11 @@ const toUrl = computed(() => {
           <icon-teenyicons-user-circle-solid />
         </RouterLink>
       </button>
-      <button><icon-ph-shopping-cart-simple-bold /></button>
+      <button>
+        <RouterLink to="/cart">
+          <icon-ph-shopping-cart-simple-bold />
+        </RouterLink>
+      </button>
     </div>
   </div>
 </template>
