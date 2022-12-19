@@ -11,25 +11,21 @@ defineProps({
 </script>
 
 <template>
-  <div class="btn-container">
-    <input
-      type="submit"
-      :class="{
-        'main-product-color': content.color === 'main-product-color',
-        'main-color': content.color === 'main-color',
-        'match-color': content.color === 'match-color',
-      }"
-      :value="content.text"
-    >
-  </div>
+  <button
+    :class="{
+      'main-product-color': content.color === 'main-product-color',
+      'main-color': content.color === 'main-color',
+      'match-color': content.color === 'match-color',
+    }"
+  >
+    <Component :is="content.beforeTextIcon" />
+    {{ content.text }}
+    <Component :is="content.afterTextIcon" />
+  </button>
 </template>
 
 <style scoped lang="scss">
-.btn-container {
-    width: 36%;
-
-  }
-  input {
+  button {
     outline: none;
     border: none;
     width: 100%;
@@ -40,6 +36,10 @@ defineProps({
     cursor: pointer;
     padding: 0.6rem 0;
     box-shadow: 1px 1px 1px 1px rgba($color: #000000, $alpha: 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .main-product-color {
@@ -47,7 +47,7 @@ defineProps({
     transition-duration: 0.2s;
 
     &:hover {
-      background-color: var(--match-color);
+      opacity: 0.8;
     }
   }
 
@@ -62,5 +62,10 @@ defineProps({
 
   .match-color {
     background-color: var(--match-color);
+    transition-duration: 0.2s;
+
+    &:hover {
+      opacity: 0.7;
+    }
   }
 </style>

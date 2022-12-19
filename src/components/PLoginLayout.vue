@@ -95,7 +95,7 @@ if (props.target === 'register') {
           'footer-btn-left-login': target === 'login',
         }"
       >
-        <PButton :content="textInBtn" />
+        <PButton class="login-register-btn" :content="textInBtn" />
       </div>
     </div>
     <div class="line" />
@@ -109,7 +109,7 @@ if (props.target === 'register') {
           'footer-btn-rwd-login': target === 'login',
         }"
       >
-        <PButton :content="textInBtn" />
+        <PButton class="login-register-btn" :content="textInBtn" />
       </div>
     </div>
   </form>
@@ -215,6 +215,10 @@ if (props.target === 'register') {
       align-items: center;
       margin-top: 4rem;
       margin-bottom: 2rem;
+
+      .login-register-btn {
+        width: 50%;
+      }
     }
   }
 
@@ -316,7 +320,7 @@ if (props.target === 'register') {
 
   .footer-btn-rwd-register {
     display: flex;
-    width: 100%;
+    width: 80%;
     justify-content: center;
     margin-top: 2rem;
   }

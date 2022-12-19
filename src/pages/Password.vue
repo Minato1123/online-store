@@ -36,8 +36,8 @@ const saveBtnContent = {
           </div>
         </div>
       </div>
-      <div class="save-btn">
-        <PButton :content="saveBtnContent" />
+      <div class="save-btn-block">
+        <PButton class="save-btn" :content="saveBtnContent" />
       </div>
     </form>
   </PUserLayout>
@@ -97,9 +97,13 @@ const saveBtnContent = {
       }
     }
 
-    .save-btn {
+    .save-btn-block {
       display: flex;
       justify-content: center;
+
+      .save-btn {
+        width: 50%;
+      }
     }
   }
 

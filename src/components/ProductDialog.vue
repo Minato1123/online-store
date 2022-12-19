@@ -103,7 +103,7 @@ function submitAddCart() {
               小計：NT$ <span>{{ subtotal }}</span>
             </div>
             <div class="add-cart-btn-block">
-              <PButton type="submit" :content="textInBtnAddCart" />
+              <PButton class="add-cart-btn" type="submit" :content="textInBtnAddCart" />
             </div>
           </form>
         </div>
@@ -257,6 +257,10 @@ function submitAddCart() {
           justify-content: center;
           align-items: center;
           margin: 1.5rem 0;
+
+          .add-cart-btn {
+            width: 50%;
+          }
         }
 
       }

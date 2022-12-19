@@ -1,3 +1,5 @@
+import type { Component } from 'vue'
+
 export interface Product {
   id: number
   name: string
@@ -50,6 +52,8 @@ export interface productBought {
 export interface BtnType {
   text: string
   color: string
+  beforeTextIcon?: Component
+  afterTextIcon?: Component
 }
 
 export interface User {

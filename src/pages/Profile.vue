@@ -56,7 +56,7 @@ const saveBtnContent = {
         <input v-model="editProfile.address" type="text">
       </div>
       <div class="save-button">
-        <PButton :content="saveBtnContent">
+        <PButton class="save-btn" :content="saveBtnContent">
           儲存
         </PButton>
       </div>
@@ -101,6 +101,10 @@ const saveBtnContent = {
       margin-top: 2rem;
       display: flex;
       justify-content: center;
+
+      .save-btn {
+        width: 50%;
+      }
     }
   }
 
