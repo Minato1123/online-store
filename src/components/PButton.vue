@@ -40,6 +40,11 @@ defineProps({
     justify-content: center;
     align-items: center;
     gap: 0.5rem;
+
+    &:disabled {
+      opacity: 0.8;
+      cursor: default;
+    }
   }
 
   .main-product-color {
