@@ -32,17 +32,21 @@ export interface Category {
   }[]
 }
 
-export interface productInCart {
+export interface ProductInCart {
   id: number
   productId: number
+  name: string
+  price: number
+  image: string
   specification: string | null
   amount: number
 }
 
-export interface productBought {
+export interface ProductBought {
   id: number
   productId: number
   name: string
+  image: string
   specification: string | null
   amount: number
   price: number

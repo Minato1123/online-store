@@ -1,28 +1,22 @@
 <script lang="ts" setup>
+import type { Ref } from 'vue'
 import { getPublicImgSrc } from '../utils/index'
-import type { productInCart } from '@/types/index'
+import type { ProductInCart } from '@/types/index'
 import { useProductsStore } from '@/stores/product'
+import { useShoppingCartStore } from '@/stores/shoppingCart'
 import PButton from '@/components/PButton.vue'
 import IconShoppingBasketLine from '~icons/ri/shopping-basket-line'
+import router from '@/router/index'
 import IconCashRegister from '~icons/fa-solid/cash-register'
 
 const { getProduct } = useProductsStore()
+const { shoppingCartList } = storeToRefs(useShoppingCartStore())
+const { removeSomeShoppingCart } = useShoppingCartStore()
 
-const productCartList: productInCart[] = [{
-  id: 1,
-  productId: 3,
-  specification: null,
-  amount: 4,
-},
-{
-  id: 2,
-  productId: 1,
-  specification: 'spec-1',
-  amount: 2,
-}]
+const productCartList: Ref<ProductInCart[]> = shoppingCartList
 
-const numOfproductCart = computed(() => productCartList.length)
-const total = computed(() => productCartList.reduce((acc, cur) => acc + cur.amount * (getProduct(cur.productId)?.price as number), 0))
+const numOfproductCart = computed(() => productCartList.value.reduce((acc, cur) => acc + cur.amount, 0))
+const total = computed(() => productCartList.value.reduce((acc, cur) => acc + cur.amount * (getProduct(cur.productId)?.price as number), 0))
 
 const textInGoShoppingBtn = {
   text: '繼續購物',
@@ -34,6 +28,10 @@ const textInCheckoutBtn = {
   text: '訂單結帳',
   color: 'main-product-color',
   afterTextIcon: IconCashRegister,
+}
+
+function handleCheckout() {
+  router.push({ path: '/checkout' })
 }
 </script>
 
@@ -62,47 +60,52 @@ const textInCheckoutBtn = {
         刪除
       </div>
     </div>
-    <div class="cart-content">
+    <div v-if="numOfproductCart !== 0" class="cart-content">
       <div v-for="product in productCartList" :key="`product-cart-${product.id}`" class="product">
         <div class="product-checkbox">
           <button><icon-material-symbols-check-box-outline-blank /></button>
         </div>
         <div class="product-name">
-          <img class="product-img" :src="getPublicImgSrc(getProduct(product.id)?.images[0] as string)" alt="">
-          {{ getProduct(product.id)?.name }}
+          <img class="product-img" :src="getPublicImgSrc(getProduct(product.productId)?.images[0] as string)" alt="">
+          {{ getProduct(product.productId)?.name }}
         </div>
         <div class="product-spec product-else">
           {{ product.specification === null ? '無' : product.specification }}
         </div>
         <div class="product-price product-else">
-          NT$ {{ getProduct(product.id)?.price }}
+          NT$ {{ getProduct(product.productId)?.price }}
         </div>
         <div class="product-amount product-else">
           <input v-model="product.amount" type="number" min="1" max="100">
         </div>
         <div class="product-total product-else">
-          NT$ {{ product.amount * (getProduct(product.id)?.price as number) }}
+          NT$ {{ product.amount * (getProduct(product.productId)?.price as number) }}
         </div>
         <div class="product-rwd">
-          <img class="product-img" :src="getPublicImgSrc(getProduct(product.id)?.images[0] as string)" alt="">
+          <img class="product-img" :src="getPublicImgSrc(getProduct(product.productId)?.images[0] as string)" alt="">
           <div class="product-rwd-else">
-            <div>{{ getProduct(product.id)?.name }}</div>
+            <div>{{ getProduct(product.productId)?.name }}</div>
             <div>
               規格：{{ product.specification === null ? '無' : product.specification }}
             </div>
-            <div>單價：NT$ {{ getProduct(product.id)?.price }}</div>
+            <div>單價：NT$ {{ getProduct(product.productId)?.price }}</div>
             <div>
               數量：<input v-model="product.amount" type="number" min="1" max="100">
             </div>
             <div class="product-total">
-              小計：NT$ {{ product.amount * (getProduct(product.id)?.price as number) }}
+              小計：NT$ {{ product.amount * (getProduct(product.productId)?.price as number) }}
             </div>
           </div>
         </div>
         <div class="product-delete">
-          <button><icon-bi-cart-x /></button>
+          <button @click="removeSomeShoppingCart(product.id, product.amount)">
+            <icon-bi-cart-x />
+          </button>
         </div>
       </div>
+    </div>
+    <div v-else class="cart-no-content">
+      目前還沒有商品喔！
     </div>
     <div class="checkout-container">
       <div class="checkout-total">
@@ -112,7 +115,7 @@ const textInCheckoutBtn = {
         <RouterLink class="btn" to="/">
           <PButton :content="textInGoShoppingBtn" />
         </RouterLink>
-        <PButton class="btn" :content="textInCheckoutBtn" />
+        <PButton class="btn" :disabled="numOfproductCart === 0" :content="textInCheckoutBtn" @click="handleCheckout" />
       </div>
     </div>
   </div>
@@ -245,6 +248,16 @@ const textInCheckoutBtn = {
             }
           }
       }
+    }
+
+    .cart-no-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5rem;
+      color: var(--text-color);
+      font-weight: 500;
+      padding: 1rem 0;
     }
 
     .checkout-container {
