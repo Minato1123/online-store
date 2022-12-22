@@ -1,19 +1,19 @@
 <script lang="ts" setup>
 import PUserLayout from '@/components/PUserLayout.vue'
-import type { productBought } from '@/types/index'
+import type { ProductBought } from '@/types/index'
 import { useProductsStore } from '@/stores/product'
 import { useProductBoughtListStore } from '@/stores/productBought'
 
 const { getProduct } = useProductsStore()
 const { productBoughtList } = storeToRefs(useProductBoughtListStore())
 const orderListPrepared = computed(() => {
-  return productBoughtList.value.filter((item: productBought) => item.status === 'prepared')
+  return productBoughtList.value.filter((item: ProductBought) => item.status === 'prepared')
 })
 const orderListShipped = computed(() => {
-  return productBoughtList.value.filter((item: productBought) => item.status === 'shipped')
+  return productBoughtList.value.filter((item: ProductBought) => item.status === 'shipped')
 })
 const orderListCompleted = computed(() => {
-  return productBoughtList.value.filter((item: productBought) => item.status === 'completed')
+  return productBoughtList.value.filter((item: ProductBought) => item.status === 'completed')
 })
 </script>
 
