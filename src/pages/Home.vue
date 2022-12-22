@@ -101,6 +101,21 @@ const pageList = computed(() => {
 
   return list
 })
+
+function handlePrevPage() {
+  window.scrollTo({ top: 250, behavior: 'smooth' })
+  currentPage.value = currentPage.value - 1
+}
+
+function handleNextPage() {
+  window.scrollTo({ top: 250, behavior: 'smooth' })
+  currentPage.value = currentPage.value + 1
+}
+
+function handleThePage(page: number) {
+  window.scrollTo({ top: 250, behavior: 'smooth' })
+  currentPage.value = page
+}
 </script>
 
 <template>
@@ -161,7 +176,7 @@ const pageList = computed(() => {
           </div>
           <div class="pages-container">
             <div class="pages">
-              <button :disabled="currentPage === 1" class="page-btn icon-btn" @click="currentPage = currentPage - 1">
+              <button :disabled="currentPage === 1" class="page-btn icon-btn" @click="handlePrevPage">
                 <icon-material-symbols-chevron-left-rounded />
               </button>
               <button
@@ -169,12 +184,12 @@ const pageList = computed(() => {
                   'active-page': currentPage === page,
                 }" :disabled="page === '...'" @click="() => {
                   if (typeof page === 'number')
-                    currentPage = page
+                    handleThePage(page)
                 }"
               >
                 {{ page }}
               </button>
-              <button class="page-btn icon-btn" :disabled="currentPage === numOfPages" @click="currentPage = currentPage + 1">
+              <button class="page-btn icon-btn" :disabled="currentPage === numOfPages" @click="handleNextPage">
                 <icon-material-symbols-chevron-right-rounded />
               </button>
             </div>
