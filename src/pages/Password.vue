@@ -20,19 +20,19 @@ const saveBtnContent = {
                 忘記密碼？
               </button>
             </div>
-            <input type="password">
+            <input type="password" autocomplete="off">
           </div>
           <div class="pw-block">
             <div class="subtitle">
               新密碼
             </div>
-            <input type="password">
+            <input type="password" autocomplete="off">
           </div>
           <div class="pw-block">
             <div class="subtitle">
               確認新密碼
             </div>
-            <input type="password">
+            <input type="password" autocomplete="off">
           </div>
         </div>
       </div>
