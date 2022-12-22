@@ -42,8 +42,12 @@ defineProps({
     gap: 0.5rem;
 
     &:disabled {
-      opacity: 0.8;
+      opacity: 0.5;
       cursor: default;
+
+      &:hover {
+        opacity: 0.5;
+      }
     }
   }
 
