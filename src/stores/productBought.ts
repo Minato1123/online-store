@@ -1,11 +1,10 @@
 import { defineStore } from 'pinia'
-import type { Ref } from 'vue'
 import type { ProductBought } from '@/types/index'
 
 let productBoughtId = 0
 
 export const useProductBoughtListStore = defineStore('productBoughtList', () => {
-  const productBoughtList: Ref<ProductBought[]> = ref([])
+  const productBoughtList = ref<ProductBought[]>([])
   if (productBoughtList.value.length !== 0)
     productBoughtId = productBoughtList.value[productBoughtList.value.length - 1].id
 

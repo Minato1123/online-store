@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PropType, Ref } from 'vue'
+import type { PropType } from 'vue'
 import { OnClickOutside } from '@vueuse/components'
 import type { Product } from '../types/index'
 import { getPublicImgSrc } from '../utils/index'
@@ -23,7 +23,7 @@ function closeProductQuickPage() {
   emit('closeProductQuickPage')
 }
 
-const specPicked: Ref<null | string> = ref(null)
+const specPicked = ref<null | string>(null)
 if (props.product.specifications.length > 0)
   specPicked.value = 'spec-0'
 

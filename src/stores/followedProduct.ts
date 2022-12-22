@@ -1,9 +1,8 @@
 import { defineStore } from 'pinia'
-import type { Ref } from 'vue'
 import type { Product } from '@/types/index'
 
 export const useFollowedProductsStore = defineStore('followedProducts', () => {
-  const followedProducts: Ref<Product[]> = ref([])
+  const followedProducts = ref<Product[]>([])
 
   function addFollowedProduct(product: Product) {
     followedProducts.value.push(product)

@@ -4,9 +4,9 @@ import type { User } from '@/types/index'
 import userList from '@/assets/json/users.json'
 
 export const useUsersStore = defineStore('users', () => {
-  const users: Ref<User[]> = ref(userList)
-  const loginStatus: Ref<boolean> = ref(false)
-  const currentUser: Ref<User | undefined> = ref(undefined)
+  const users = ref<User[]>(userList)
+  const loginStatus = ref<boolean>(false)
+  const currentUser = ref<User | undefined>(undefined)
 
   function addUser(user: User): void {
     const lastId = users.value[users.value.length - 1].id
