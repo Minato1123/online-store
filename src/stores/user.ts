@@ -1,11 +1,12 @@
+import { useLocalStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import type { Ref } from 'vue'
 import type { User } from '@/types/index'
 import userList from '@/assets/json/users.json'
 
 export const useUsersStore = defineStore('users', () => {
+  const userLoginStatus = useLocalStorage<boolean>('user-login-status', false)
   const users = ref<User[]>(userList)
-  const loginStatus = ref<boolean>(false)
   const currentUser = ref<User | undefined>(undefined)
 
   function addUser(user: User): void {
@@ -23,11 +24,11 @@ export const useUsersStore = defineStore('users', () => {
   }
 
   function changeLoginStatus(loginChange: boolean): void {
-    loginStatus.value = loginChange
+    userLoginStatus.value = loginChange
   }
 
   function getLoginStatus(): Ref<boolean> {
-    return loginStatus
+    return userLoginStatus
   }
 
   function getUserByEmail(email: string): User | undefined {

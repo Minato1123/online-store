@@ -21,15 +21,11 @@ app
         triggers: [],
         hideTriggers: [],
       },
-      'unlogin-tooltip': {
-        $extend: 'tooltip',
-        placement: 'bottom',
-        triggers: ['hover', 'touch'],
-      },
       'login-tooltip': {
-        $extend: 'menu',
+        $extend: 'dropdown',
         placement: 'bottom',
-        triggers: ['hover', 'touch'],
+        triggers: ['hover'],
+        popperTriggers: ['hover'],
       },
     },
   })

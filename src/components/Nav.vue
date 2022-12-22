@@ -4,21 +4,12 @@ import { useUsersStore } from '@/stores/user'
 
 defineEmits(['toggleMenu'])
 
-const { getLoginStatus } = useUsersStore()
+const { getLoginStatus, getCurrentUser } = useUsersStore()
 const loginStatus = getLoginStatus()
-const loginStatusContent = computed(() => {
-  if (loginStatus.value === true)
-    return '<div>哈囉，帕恰！</div><button>我的帳戶</button><button>追蹤清單</button><button>登出</button>'
-
-  else
-    return '尚未登入！'
-})
-const tooltipTheme = computed(() => {
-  if (loginStatus.value === true)
-    return 'login-tooltip'
-
-  else
-    return 'unlogin-tooltip'
+const currentUser = computed(() => {
+  const user = getCurrentUser()
+  if (user != null)
+    return user
 })
 
 const toUrl = computed(() => {
@@ -52,17 +43,40 @@ const toUrl = computed(() => {
       <button class="btn-bell">
         <icon-mdi-bell-outline />
       </button>
-      <button
-        v-tooltip="{
-          content: loginStatusContent,
-          theme: tooltipTheme,
-          html: true,
-        }"
-      >
-        <RouterLink :to="toUrl">
-          <icon-teenyicons-user-circle-solid />
-        </RouterLink>
-      </button>
+      <VDropdown theme="login-tooltip">
+        <button>
+          <RouterLink :to="toUrl">
+            <icon-teenyicons-user-circle-solid />
+          </RouterLink>
+        </button>
+        <template #popper>
+          <div v-if="toUrl === '/login'" class="hello-user">
+            尚未登入！
+          </div>
+          <div v-else>
+            <div class="hello-user line">
+              哈囉，{{ currentUser?.name }}！
+            </div>
+            <div class="user-btns">
+              <button>
+                <RouterLink class="btn" to="/user/profile">
+                  我的帳戶
+                </RouterLink>
+              </button>
+              <button>
+                <RouterLink class="btn" to="/">
+                  追蹤清單
+                </RouterLink>
+              </button>
+              <button>
+                <RouterLink class="btn" to="/">
+                  登出
+                </RouterLink>
+              </button>
+            </div>
+          </div>
+        </template>
+      </VDropdown>
       <button>
         <RouterLink to="/cart">
           <icon-ph-shopping-cart-simple-bold />
@@ -78,6 +92,43 @@ button {
   border: none;
   outline: none;
   cursor: pointer;
+}
+
+.hello-user {
+  font-size: 1.1rem;
+  font-weight: 400;
+  padding: 0 0.5rem 0.5rem 0.5rem;
+
+  &.line {
+    border-bottom: 1px solid var(--main-product-color);
+  }
+}
+
+.user-btns {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 0.5rem;
+
+  button {
+    width: 100%;
+    padding: 0.5rem 0;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    transition: all 0.2s;
+
+    &:hover {
+      padding-left: 0.5rem;
+      border-left: 3px solid var(--main-color);
+    }
+
+    .btn {
+      text-decoration: none;
+      color: var(--main-color);
+
+    }
+  }
 }
 .nav-container {
   background-color: var(--main-color);
