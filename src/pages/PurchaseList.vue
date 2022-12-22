@@ -1,10 +1,8 @@
 <script lang="ts" setup>
 import PUserLayout from '@/components/PUserLayout.vue'
 import type { ProductBought } from '@/types/index'
-import { useProductsStore } from '@/stores/product'
 import { useProductBoughtListStore } from '@/stores/productBought'
 
-const { getProduct } = useProductsStore()
 const { productBoughtList } = storeToRefs(useProductBoughtListStore())
 const orderListPrepared = computed(() => {
   return productBoughtList.value.filter((item: ProductBought) => item.status === 'prepared')
@@ -27,10 +25,10 @@ const orderListCompleted = computed(() => {
         <div class="order-content">
           <div v-for="(item, i) in orderListPrepared" :key="`prepared-${i + 1}`" class="item">
             <div>{{ i + 1 }}</div>
-            <div>{{ getProduct(item.productId)?.name }}</div>
+            <div>{{ item.name }}</div>
             <div>{{ item.specification }}</div>
             <div>{{ item.amount }}</div>
-            <div>{{ (getProduct(item.productId)?.price || 0) * item.amount }}</div>
+            <div>{{ item.price * item.amount }}</div>
           </div>
         </div>
       </div>

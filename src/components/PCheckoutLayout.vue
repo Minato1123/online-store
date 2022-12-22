@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { getPublicImgSrc } from '../utils/index'
-import { useProductsStore } from '@/stores/product'
 import { useShoppingCartStore } from '@/stores/shoppingCart'
 import { useProductBoughtListStore } from '@/stores/productBought'
 
@@ -11,7 +10,6 @@ const props = defineProps({
   },
 })
 
-const { getProduct } = useProductsStore()
 const { shoppingCartList } = storeToRefs(useShoppingCartStore())
 const { productBoughtList } = storeToRefs(useProductBoughtListStore())
 
@@ -23,7 +21,7 @@ const productsInCurrentPage = computed(() => {
 })
 
 const numOfproductCart = computed(() => productsInCurrentPage.value.reduce((acc, cur) => acc + cur.amount, 0))
-const total = computed(() => productsInCurrentPage.value.reduce((acc, cur) => acc + cur.amount * (getProduct(cur.productId)?.price as number), 0))
+const total = computed(() => productsInCurrentPage.value.reduce((acc, cur) => acc + cur.amount * cur.price, 0))
 </script>
 
 <template>
