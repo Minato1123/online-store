@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import { getPublicImgSrc } from '../utils/index'
-import type { ProductBought } from '@/types/index'
 import { useProductsStore } from '@/stores/product'
+import { useShoppingCartStore } from '@/stores/shoppingCart'
+import { useProductBoughtListStore } from '@/stores/productBought'
 
 const props = defineProps({
   target: {
@@ -11,29 +12,18 @@ const props = defineProps({
 })
 
 const { getProduct } = useProductsStore()
+const { shoppingCartList } = storeToRefs(useShoppingCartStore())
+const { productBoughtList } = storeToRefs(useProductBoughtListStore())
 
-const productBuyingList: ProductBought[] = [{
-  id: 1,
-  productId: 3,
-  name: '帕恰狗 15mm 紙膠帶（悠閒生活）',
-  image: '/images/products/product-3-1.jpeg',
-  specification: null,
-  amount: 2,
-  price: 95,
-  status: 'prepared',
-}, {
-  id: 2,
-  productId: 5,
-  name: '帕恰狗鉛筆風原子筆組（永遠在一起）',
-  image: '/images/products/product-5-1.jpeg',
-  specification: null,
-  amount: 4,
-  price: 280,
-  status: 'prepared',
-}]
+const productsInCurrentPage = computed(() => {
+  if (props.target === 'completed')
+    return productBoughtList.value.filter(product => product.groupId === productBoughtList.value[productBoughtList.value.length - 1].groupId)
+  else
+    return shoppingCartList.value
+})
 
-const numOfproductCart = computed(() => productBuyingList.reduce((acc, cur) => acc + cur.amount, 0))
-const total = computed(() => productBuyingList.reduce((acc, cur) => acc + cur.amount * (getProduct(cur.productId)?.price as number), 0))
+const numOfproductCart = computed(() => productsInCurrentPage.value.reduce((acc, cur) => acc + cur.amount, 0))
+const total = computed(() => productsInCurrentPage.value.reduce((acc, cur) => acc + cur.amount * (getProduct(cur.productId)?.price as number), 0))
 </script>
 
 <template>
@@ -87,42 +77,42 @@ const total = computed(() => productBuyingList.reduce((acc, cur) => acc + cur.am
       </div>
     </div>
     <div class="product-content">
-      <div v-for="product in productBuyingList" :key="`product-cart-${product.id}`" class="product">
+      <div v-for="product in productsInCurrentPage" :key="`product-cart-${product.id}`" class="product">
         <div class="product-name">
-          <img class="product-img" :src="getPublicImgSrc(getProduct(product.productId)?.images[0] as string)" alt="">
-          {{ getProduct(product.id)?.name }}
+          <img class="product-img" :src="getPublicImgSrc(product.image)" alt="">
+          {{ product.name }}
         </div>
         <div class="product-spec product-else">
           {{ product.specification === null ? '無' : product.specification }}
         </div>
         <div class="product-price product-else">
-          NT$ {{ getProduct(product.productId)?.price }}
+          NT$ {{ product.price }}
         </div>
         <div class="product-amount product-else">
           {{ product.amount }}
         </div>
         <div class="product-total product-else">
-          NT$ {{ product.amount * (getProduct(product.productId)?.price as number) }}
+          NT$ {{ product.amount * product.price }}
         </div>
         <div class="product-rwd">
-          <img class="product-img" :src="getPublicImgSrc(getProduct(product.productId)?.images[0] as string)" alt="">
+          <img class="product-img" :src="getPublicImgSrc(product.image)" alt="">
           <div class="product-rwd-else">
-            <div>{{ getProduct(product.productId)?.name }}</div>
+            <div>{{ product.name }}</div>
             <div>
               規格：{{ product.specification === null ? '無' : product.specification }}
             </div>
-            <div>單價：NT$ {{ getProduct(product.productId)?.price }}</div>
+            <div>單價：NT$ {{ product.price }}</div>
             <div>
               數量：{{ product.amount }}
             </div>
             <div class="product-total">
-              小計：NT$ {{ product.amount * (getProduct(product.productId)?.price as number) }}
+              小計：NT$ {{ product.amount * product.price }}
             </div>
           </div>
         </div>
       </div>
     </div>
-    <slot />
+    <slot :num="numOfproductCart" :total="total" />
   </div>
 </template>
 
@@ -274,6 +264,7 @@ const total = computed(() => productBuyingList.reduce((acc, cur) => acc + cur.am
 
 .product-img {
   width: 40%;
+  margin-right: 0.5rem;
 }
 
 .product-name, .product-else {

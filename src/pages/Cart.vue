@@ -11,7 +11,7 @@ import IconCashRegister from '~icons/fa-solid/cash-register'
 
 const { getProduct } = useProductsStore()
 const { shoppingCartList } = storeToRefs(useShoppingCartStore())
-const { removeSomeShoppingCart } = useShoppingCartStore()
+const { removeProductInShoppingCart } = useShoppingCartStore()
 
 const productCartList: Ref<ProductInCart[]> = shoppingCartList
 
@@ -98,7 +98,7 @@ function handleCheckout() {
           </div>
         </div>
         <div class="product-delete">
-          <button @click="removeSomeShoppingCart(product.id, product.amount)">
+          <button @click="removeProductInShoppingCart(product.id)">
             <icon-bi-cart-x />
           </button>
         </div>

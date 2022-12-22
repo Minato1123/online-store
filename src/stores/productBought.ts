@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import type { ProductBought } from '@/types/index'
 
 let productBoughtId = 0
+let groupId = 0
 
 export const useProductBoughtListStore = defineStore('productBoughtList', () => {
   const productBoughtList = ref<ProductBought[]>([])
@@ -10,7 +11,23 @@ export const useProductBoughtListStore = defineStore('productBoughtList', () => 
 
   function addProductBought(productId: number, name: string, image: string, specification: string | null, amount: number, price: number) {
     productBoughtId++
-    productBoughtList.value.push({ id: productBoughtId, productId, name, image, specification, amount, price, status: 'prepared' })
+    productBoughtList.value.push({
+      id: productBoughtId,
+      groupId,
+      productId,
+      name,
+      image,
+      specification,
+      amount,
+      price,
+      dateOfPurchase: new Date().toLocaleDateString(),
+      timeOfPurchase: new Date().toLocaleTimeString('Taiwan', { hour12: false }),
+      status: 'prepared',
+    })
+  }
+
+  function addGroupId() {
+    groupId++
   }
 
   function cancelProductBought(id: number) {
@@ -31,5 +48,5 @@ export const useProductBoughtListStore = defineStore('productBoughtList', () => 
       productBoughtList.value[index].status = 'completed'
   }
 
-  return { productBoughtList, addProductBought, cancelProductBought, shipProductBought, completeProductBought }
+  return { productBoughtList, addProductBought, addGroupId, cancelProductBought, shipProductBought, completeProductBought }
 })

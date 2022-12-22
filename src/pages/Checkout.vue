@@ -14,7 +14,7 @@ function handleSubmit() {
 </script>
 
 <template>
-  <PCheckoutLayout target="checkout">
+  <PCheckoutLayout v-slot="slotProps" target="checkout">
     <form class="container" @submit.prevent>
       <div class="accept-container">
         <div class="title">
@@ -43,7 +43,7 @@ function handleSubmit() {
           使用優惠代碼
         </button>
         <div class="detail">
-          共幾件商品 | 總金額 NT$
+          共 {{ slotProps.num }} 件商品｜總金額 NT$ {{ slotProps.total }}
         </div>
         <PButton class="check-btn" :content="textInCheckoutBtn" @click="handleSubmit" />
       </div>

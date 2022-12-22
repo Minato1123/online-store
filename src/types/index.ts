@@ -42,24 +42,17 @@ export interface ProductInCart {
   amount: number
 }
 
-export interface ProductBuying {
-  id: number
-  productId: number
-  name: string
-  image: string
-  specification: string | null
-  amount: number
-  price: number
-}
-
 export interface ProductBought {
   id: number
+  groupId: number
   productId: number
   name: string
   image: string
   specification: string | null
   amount: number
   price: number
+  dateOfPurchase: string
+  timeOfPurchase: string
   status: 'prepared' | 'shipped' | 'completed'
 }
 

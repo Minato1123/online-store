@@ -1,14 +1,16 @@
 import { defineStore } from 'pinia'
-import type { Ref } from 'vue'
+import { useLocalStorage } from '@vueuse/core'
 import type { ProductInCart } from '@/types/index'
 import { useProductsStore } from '@/stores/product'
+import { useProductBoughtListStore } from '@/stores/productBought'
 
 let cartId = 0
 
 export const useShoppingCartStore = defineStore('shoppingCart', () => {
   const { getProduct } = useProductsStore()
+  const { addProductBought, addGroupId } = useProductBoughtListStore()
+  const shoppingCartList = useLocalStorage<ProductInCart[]>('shopping-cart', [])
 
-  const shoppingCartList: Ref<ProductInCart[]> = ref([])
   if (shoppingCartList.value.length !== 0)
     cartId = shoppingCartList.value[shoppingCartList.value.length - 1].id
 
@@ -43,16 +45,24 @@ export const useShoppingCartStore = defineStore('shoppingCart', () => {
     }
   }
 
-  function removeSomeShoppingCart(id: number, amount: number) {
-    if (amount > 0) {
-      const index = shoppingCartList.value.findIndex(p => p.id === id) // 找有無相同商品
-      if (index !== -1) { // 找到相同的商品
-        shoppingCartList.value[index].amount -= amount
-        if (shoppingCartList.value[index].amount <= 0)
-          shoppingCartList.value.splice(index, 1)
-      }
+  function removeProductInShoppingCart(id: number) {
+    const index = shoppingCartList.value.findIndex(p => p.id === id) // 找有無相同商品
+    if (index !== -1) { // 找到相同的商品
+      shoppingCartList.value.splice(index, 1)
     }
   }
 
-  return { shoppingCartList, addShoppingCart, removeSomeShoppingCart }
+  function cancelShoppingCart() {
+    shoppingCartList.value = []
+    cartId = 0
+  }
+
+  function updateProductsToBought() {
+    shoppingCartList.value.forEach((p) => {
+      addProductBought(p.productId, p.name, p.image, p.specification, p.amount, p.price)
+    })
+    addGroupId()
+  }
+
+  return { shoppingCartList, addShoppingCart, removeProductInShoppingCart, cancelShoppingCart, updateProductsToBought }
 })

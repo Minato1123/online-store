@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import PButton from '@/components/PButton.vue'
 import InfoDialog from '@/components/InfoDialog.vue'
+import { useShoppingCartStore } from '@/stores/shoppingCart'
 import router from '@/router'
 import PCheckoutLayout from '@/components/PCheckoutLayout.vue'
 import IconMoneyDollarCircleLine from '~icons/ri/money-dollar-circle-line'
@@ -9,6 +10,8 @@ import IconCrossCircle from '~icons/gridicons/cross-circle'
 
 const paymentMethod = ref('credit')
 const delievryMethod = ref('homeDelivery')
+
+const { cancelShoppingCart, updateProductsToBought } = useShoppingCartStore()
 
 const textInSureCheckoutBtn = {
   text: '確認付款',
@@ -46,10 +49,12 @@ const isSaveSuccess = ref(true)
 
 function handleCheckout() {
   isDialogOpen.value = false
-  if (isSaveSuccess.value === true)
+  if (isSaveSuccess.value === true) {
     router.replace({ path: '/completed' })
-  else
-    router.replace({ path: '/cart' })
+    updateProductsToBought()
+    cancelShoppingCart()
+  }
+  else { router.replace({ path: '/cart' }) }
 }
 
 const orderSuccessDialog = {
@@ -77,10 +82,10 @@ const orderFailDialog = {
 </script>
 
 <template>
-  <PCheckoutLayout target="delivery">
+  <PCheckoutLayout v-slot="slotProps" target="delivery">
     <div class="container">
       <div class="detail">
-        共幾件商品｜總金額 NT$
+        共 {{ slotProps.num }} 件商品｜總金額 NT$ {{ slotProps.total }}
       </div>
       <div class="data-container">
         <div class="payment-container">

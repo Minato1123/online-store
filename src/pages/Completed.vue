@@ -23,10 +23,10 @@ const receiveInfo = {
 </script>
 
 <template>
-  <PCheckoutLayout target="completed">
+  <PCheckoutLayout v-slot="slotProps" target="completed">
     <div class="container">
       <div class="detail">
-        共幾件商品｜總金額 NT$
+        共 {{ slotProps.num }} 件商品｜總金額 NT$ {{ slotProps.total }}
       </div>
       <div class="data-container">
         <div class="orderer-data-container">
