@@ -132,6 +132,8 @@ function submitAddCart() {
         background-color: var(--white-color);
         height: calc(100% - 10rem);
         width: 100%;
+        border-radius: 1.5rem;
+        border: solid 0.1rem var(--main-product-color);
 
         .product-upbar {
           display: flex;
@@ -168,7 +170,7 @@ function submitAddCart() {
           align-items: center;
 
           img {
-            width: 70%;
+            width: 60%;
             height: auto;
           }
         }
@@ -298,6 +300,7 @@ function submitAddCart() {
   @media screen and (max-width: 785px) {
     .out-product-container {
       width: 60%;
+      margin-top: 3rem;
 
       .spec-num {
         flex-direction: column;
@@ -312,19 +315,13 @@ function submitAddCart() {
 
   @media screen and (min-width: 577px) {
     .product-container {
-      border-radius: 1.5rem;
-      border: solid 0.1rem var(--main-product-color);
+
     }
   }
 
   @media screen and (max-width: 576px) {
     .out-product-container {
-      width: 100%;
-      .product-container {
-        border-radius: 0;
-        border-bottom: solid 0.1rem var(--main-product-color);
-        border-top: solid 0.1rem var(--main-product-color);
-      }
+      width: 95%;
     }
   }
 
