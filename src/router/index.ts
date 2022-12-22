@@ -49,7 +49,25 @@ const router = createRouter({
       name: 'cart',
       component: () => import('../pages/Cart.vue'),
     },
+    {
+      path: '/checkout',
+      name: 'checkout',
+      component: () => import('../pages/Checkout.vue'),
+    },
+    {
+      path: '/delivery',
+      name: 'delivery',
+      component: () => import('../pages/Delivery.vue'),
+    },
+    {
+      path: '/completed',
+      name: 'completed',
+      component: () => import('../pages/Completed.vue'),
+    },
   ],
+  scrollBehavior() {
+    return { top: 0 }
+  },
 })
 
 export default router
