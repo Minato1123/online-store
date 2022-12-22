@@ -42,6 +42,16 @@ export interface ProductInCart {
   amount: number
 }
 
+export interface ProductBuying {
+  id: number
+  productId: number
+  name: string
+  image: string
+  specification: string | null
+  amount: number
+  price: number
+}
+
 export interface ProductBought {
   id: number
   productId: number
@@ -58,6 +68,16 @@ export interface BtnType {
   color: string
   beforeTextIcon?: Component
   afterTextIcon?: Component
+}
+
+export interface InfoType {
+  iconBeforeText?: Component
+  text: string
+  additionalText?: string
+  color: string
+  borderColor: string
+  textInBtnNO?: BtnType
+  textInBtnOK: BtnType
 }
 
 export interface User {
