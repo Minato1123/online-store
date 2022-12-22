@@ -1,10 +1,39 @@
 <script lang="ts" setup>
 import PUserLayout from '@/components/PUserLayout.vue'
 import PButton from '@/components/PButton.vue'
+import InfoDialog from '@/components/InfoDialog.vue'
+import IconCheckCircleRounded from '~icons/material-symbols/check-circle-rounded'
+import IconCrossCircle from '~icons/gridicons/cross-circle'
+
+const isDialogOpen = ref(false)
+const isSaveSuccess = ref(true)
 
 const saveBtnContent = {
   text: '儲存',
   color: 'main-color',
+}
+
+const saveBtnSuccessDialog = {
+  iconBeforeText: IconCheckCircleRounded,
+  text: '儲存成功！',
+  color: 'main-color',
+  borderColor: 'main-color',
+  textInBtnOK: {
+    text: '確定',
+    color: 'match-color',
+  },
+}
+
+const saveBtnFailDialog = {
+  iconBeforeText: IconCrossCircle,
+  text: '儲存失敗！',
+  additionalText: '請稍後再試一次',
+  color: 'main-product-color',
+  borderColor: 'main-product-color',
+  textInBtnOK: {
+    text: '確定',
+    color: 'main-product-color',
+  },
 }
 </script>
 
@@ -37,10 +66,12 @@ const saveBtnContent = {
         </div>
       </div>
       <div class="save-btn-block">
-        <PButton class="save-btn" :content="saveBtnContent" />
+        <PButton class="save-btn" :content="saveBtnContent" @click="isDialogOpen = true" />
       </div>
     </form>
   </PUserLayout>
+  <InfoDialog v-if="isDialogOpen && isSaveSuccess" :text-in-dialog="saveBtnSuccessDialog" @close-info-dialog="isDialogOpen = false" />
+  <InfoDialog v-if="isDialogOpen && !isSaveSuccess" :text-in-dialog="saveBtnFailDialog" @close-info-dialog="isDialogOpen = false" />
 </template>
 
 <style lang="scss" scoped>

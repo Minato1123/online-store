@@ -1,10 +1,15 @@
 <script lang="ts" setup>
 import PUserLayout from '@/components/PUserLayout.vue'
 import PButton from '@/components/PButton.vue'
+import InfoDialog from '@/components/InfoDialog.vue'
 import { useUsersStore } from '@/stores/user'
+import IconCheckCircleRounded from '~icons/material-symbols/check-circle-rounded'
+import IconCrossCircle from '~icons/gridicons/cross-circle'
 
 const { getCurrentUser } = useUsersStore()
 const user = getCurrentUser()
+const isDialogOpen = ref(false)
+const isSaveSuccess = ref(true)
 
 const editProfile = ref({
   name: user?.name,
@@ -17,6 +22,29 @@ const editProfile = ref({
 const saveBtnContent = {
   text: '儲存',
   color: 'main-color',
+}
+
+const saveBtnSuccessDialog = {
+  iconBeforeText: IconCheckCircleRounded,
+  text: '儲存成功！',
+  color: 'main-color',
+  borderColor: 'main-color',
+  textInBtnOK: {
+    text: '確定',
+    color: 'match-color',
+  },
+}
+
+const saveBtnFailDialog = {
+  iconBeforeText: IconCrossCircle,
+  text: '儲存失敗！',
+  additionalText: '請稍後再試一次',
+  color: 'main-product-color',
+  borderColor: 'main-product-color',
+  textInBtnOK: {
+    text: '確定',
+    color: 'main-product-color',
+  },
 }
 </script>
 
@@ -56,9 +84,11 @@ const saveBtnContent = {
         <input v-model="editProfile.address" type="text">
       </div>
       <div class="save-button">
-        <PButton class="save-btn" :content="saveBtnContent">
+        <PButton class="save-btn" :content="saveBtnContent" @click="isDialogOpen = true">
           儲存
         </PButton>
+        <InfoDialog v-if="isDialogOpen && isSaveSuccess" :text-in-dialog="saveBtnSuccessDialog" @close-info-dialog="isDialogOpen = false" />
+        <InfoDialog v-if="isDialogOpen && !isSaveSuccess" :text-in-dialog="saveBtnFailDialog" @close-info-dialog="isDialogOpen = false" />
       </div>
     </form>
   </PUserLayout>

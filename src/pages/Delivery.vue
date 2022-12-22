@@ -1,8 +1,11 @@
 <script lang="ts" setup>
 import PButton from '@/components/PButton.vue'
+import InfoDialog from '@/components/InfoDialog.vue'
 import router from '@/router'
 import PCheckoutLayout from '@/components/PCheckoutLayout.vue'
 import IconMoneyDollarCircleLine from '~icons/ri/money-dollar-circle-line'
+import IconCheckCircleRounded from '~icons/material-symbols/check-circle-rounded'
+import IconCrossCircle from '~icons/gridicons/cross-circle'
 
 const paymentMethod = ref('credit')
 const delievryMethod = ref('homeDelivery')
@@ -38,8 +41,38 @@ const taiwanCounty = [
   '連江縣',
 ]
 
+const isDialogOpen = ref(false)
+const isSaveSuccess = ref(true)
+
 function handleCheckout() {
-  router.push({ path: '/completed' })
+  isDialogOpen.value = false
+  if (isSaveSuccess.value === true)
+    router.replace({ path: '/completed' })
+  else
+    router.replace({ path: '/cart' })
+}
+
+const orderSuccessDialog = {
+  iconBeforeText: IconCheckCircleRounded,
+  text: '訂單已送出！',
+  color: 'main-color',
+  borderColor: 'main-color',
+  textInBtnOK: {
+    text: '確定',
+    color: 'match-color',
+  },
+}
+
+const orderFailDialog = {
+  iconBeforeText: IconCrossCircle,
+  text: '訂單失敗！',
+  additionalText: '請稍後再試一次',
+  color: 'main-product-color',
+  borderColor: 'main-product-color',
+  textInBtnOK: {
+    text: '確定',
+    color: 'main-product-color',
+  },
 }
 </script>
 
@@ -113,10 +146,12 @@ function handleCheckout() {
         </div>
       </div>
       <div class="complete-btn">
-        <PButton class="btn" :content="textInSureCheckoutBtn" @click="handleCheckout" />
+        <PButton class="btn" :content="textInSureCheckoutBtn" @click="isDialogOpen = true" />
       </div>
     </div>
   </PCheckoutLayout>
+  <InfoDialog v-if="isDialogOpen && isSaveSuccess" :text-in-dialog="orderSuccessDialog" @close-info-dialog="handleCheckout" />
+  <InfoDialog v-if="isDialogOpen && !isSaveSuccess" :text-in-dialog="orderFailDialog" @close-info-dialog="handleCheckout" />
 </template>
 
 <style lang="scss" scoped>
