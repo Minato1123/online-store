@@ -7,15 +7,15 @@ import { useProductBoughtListStore } from '@/stores/productBought'
 let cartId = 0
 
 export const useShoppingCartStore = defineStore('shoppingCart', () => {
-  const { getProduct } = useProductsStore()
+  const { getProductById } = useProductsStore()
   const { addProductBought, addGroupId } = useProductBoughtListStore()
   const shoppingCartList = useLocalStorage<ProductInCart[]>('shopping-cart', [])
 
   if (shoppingCartList.value.length !== 0)
     cartId = shoppingCartList.value[shoppingCartList.value.length - 1].id
 
-  function addShoppingCart(productId: number, specification: string | null, amount: number) {
-    const p = getProduct(productId)
+  function addShoppingCart(productId: number, specification: number | null, amount: number) {
+    const p = getProductById(productId)
 
     if (p == null)
       return

@@ -10,6 +10,23 @@ const router = createRouter({
       component: Home,
     },
     {
+      path: '/category/:categoryId',
+      name: 'categories',
+      // component: () => import('../pages/Category.vue'),
+      children: [
+        {
+          path: ':subCategoryId',
+          // component: () => import('../pages/Category.vue'),
+          children: [
+            {
+              path: 'product/:productId',
+              component: () => import('../pages/Product.vue'),
+            },
+          ],
+        },
+      ],
+    },
+    {
       path: '/login',
       name: 'login',
       // route level code-splitting

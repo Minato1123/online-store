@@ -2,6 +2,7 @@
 import type { PropType } from 'vue'
 import ProductDialog from './ProductDialog.vue'
 import type { Product } from '@/types/index'
+import router from '@/router'
 import { getPublicImgSrc } from '@/utils/index'
 import { useFollowedProductsStore } from '@/stores/followedProduct'
 
@@ -23,12 +24,17 @@ function handleFollowedProducts() {
 }
 
 const isOpenProductQuickPage = ref(false)
+
+function handleClickProductBox(categoryId: number, subCategoryId: number, productId: number) {
+  router.push(`/category/${categoryId}/${subCategoryId}/product/${productId}`)
+}
 </script>
 
 <template>
   <div
     class="product-container"
     :class="$attrs.class"
+    @click="handleClickProductBox(product.categoryId, product.subCategoryId, product.id)"
   >
     <img :src="getPublicImgSrc(product.images[0])" alt="product's image">
     <div>
@@ -38,10 +44,10 @@ const isOpenProductQuickPage = ref(false)
         </div>
         <div class="product-other">
           <div class="btns">
-            <button @click="isOpenProductQuickPage = true">
+            <button @click.stop="isOpenProductQuickPage = true">
               <icon-bi-cart-plus />
             </button>
-            <button @click="handleFollowedProducts">
+            <button @click.stop="handleFollowedProducts">
               <icon-icon-park-solid-like v-if="isInFollowedProducts(product)" /><icon-icon-park-outline-like v-else />
             </button>
           </div>
