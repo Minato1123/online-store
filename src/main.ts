@@ -3,6 +3,7 @@ import { createPinia } from 'pinia'
 import FloatingVue from 'floating-vue'
 import App from './App.vue'
 import router from './router'
+import 'animate.css'
 import DisableAutocomplete from '@/plugins/disable-autocomplete'
 import 'floating-vue/dist/style.css'
 
