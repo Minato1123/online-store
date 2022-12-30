@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PropType, Ref } from 'vue'
+import type { PropType } from 'vue'
 import { OnClickOutside } from '@vueuse/components'
 import PButton from './PButton.vue'
 import type { BtnType, InfoType } from '@/types'
@@ -52,9 +52,9 @@ window.addEventListener('keydown', (e) => {
             {{ textInDialog.additionalText }}
           </div>
         </div>
-        <div class="btns">
+        <div v-if="textInDialog.textInBtnNO || textInDialog.textInBtnOK" class="btns">
           <PButton v-if="textInDialog.textInBtnNO" class="btn" :content="textInDialog.textInBtnNO" @click="closeInfoDialog" />
-          <PButton class="btn" :content="textInDialog.textInBtnOK" @click="closeInfoDialog" />
+          <PButton v-if="textInDialog.textInBtnOK" class="btn" :content="textInDialog.textInBtnOK" @click="closeInfoDialog" />
         </div>
       </OnClickOutside>
     </div>
@@ -77,7 +77,6 @@ window.addEventListener('keydown', (e) => {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 20rem;
-    height: 10rem;
     background-color: var(--white-color);
     border-radius: 2rem;
     padding: 1rem;
@@ -85,7 +84,7 @@ window.addEventListener('keydown', (e) => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2rem;
+
     &.border-main-color {
       border: 0.2rem solid var(--main-color);
     }
@@ -96,6 +95,7 @@ window.addEventListener('keydown', (e) => {
 
     .text {
       width: 100%;
+      padding: 2rem 0;
 
       .title {
         width: 100%;
