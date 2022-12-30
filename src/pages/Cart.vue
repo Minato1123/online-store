@@ -2,6 +2,7 @@
 import type { Ref } from 'vue'
 import { getPublicImgSrc } from '../utils/index'
 import type { ProductInCart } from '@/types/index'
+import { useProductsStore } from '@/stores/product'
 import { useShoppingCartStore } from '@/stores/shoppingCart'
 import PButton from '@/components/PButton.vue'
 import IconShoppingBasketLine from '~icons/ri/shopping-basket-line'
@@ -10,6 +11,7 @@ import IconCashRegister from '~icons/fa-solid/cash-register'
 
 const { shoppingCartList } = storeToRefs(useShoppingCartStore())
 const { removeProductInShoppingCart } = useShoppingCartStore()
+const { getProductSpec } = useProductsStore()
 
 const productCartList: Ref<ProductInCart[]> = shoppingCartList
 
@@ -68,7 +70,7 @@ function handleCheckout() {
           {{ product.name }}
         </div>
         <div class="product-spec product-else">
-          {{ product.specification === null ? '無' : product.specification }}
+          {{ product.specification === null ? '無' : getProductSpec(product.productId, product.specification) }}
         </div>
         <div class="product-price product-else">
           NT$ {{ product.price }}
@@ -84,7 +86,7 @@ function handleCheckout() {
           <div class="product-rwd-else">
             <div>{{ product.name }}</div>
             <div>
-              規格：{{ product.specification === null ? '無' : product.specification }}
+              規格：{{ product.specification === null ? '無' : getProductSpec(product.productId, product.specification) }}
             </div>
             <div>單價：NT$ {{ product.price }}</div>
             <div>

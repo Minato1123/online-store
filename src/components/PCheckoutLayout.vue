@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import { getPublicImgSrc } from '../utils/index'
+import type { ProductBought, ProductInCart } from '@/types/index'
+import { useProductsStore } from '@/stores/product'
 import { useShoppingCartStore } from '@/stores/shoppingCart'
 import { useProductBoughtListStore } from '@/stores/productBought'
 
@@ -12,15 +14,25 @@ const props = defineProps({
 
 const { shoppingCartList } = storeToRefs(useShoppingCartStore())
 const { productBoughtList } = storeToRefs(useProductBoughtListStore())
+const { getProductSpec } = useProductsStore()
 
-const productsInCurrentPage = computed(() => {
+const productsInCurrentPage = computed<ProductInCart[] | ProductBought[]>(() => {
   if (props.target === 'completed')
     return productBoughtList.value.filter(product => product.groupId === productBoughtList.value[productBoughtList.value.length - 1].groupId)
   else
     return shoppingCartList.value
 })
 
-const numOfproductCart = computed(() => productsInCurrentPage.value.reduce((acc, cur) => acc + cur.amount, 0))
+function handleSpecToString(id: number, spec: number | null | string) {
+  if (spec === null)
+    return '無'
+  else if (typeof spec === 'string')
+    return spec
+  else
+    return getProductSpec(id, spec)
+}
+
+const numOfproductCart = computed(() => productsInCurrentPage.value.reduce((acc: number, cur: ProductInCart | ProductBought) => acc + cur.amount, 0))
 const total = computed(() => productsInCurrentPage.value.reduce((acc, cur) => acc + cur.amount * cur.price, 0))
 </script>
 
@@ -81,7 +93,7 @@ const total = computed(() => productsInCurrentPage.value.reduce((acc, cur) => ac
           {{ product.name }}
         </div>
         <div class="product-spec product-else">
-          {{ product.specification === null ? '無' : product.specification }}
+          {{ handleSpecToString(product.productId, product.specification) }}
         </div>
         <div class="product-price product-else">
           NT$ {{ product.price }}
@@ -97,7 +109,7 @@ const total = computed(() => productsInCurrentPage.value.reduce((acc, cur) => ac
           <div class="product-rwd-else">
             <div>{{ product.name }}</div>
             <div>
-              規格：{{ product.specification === null ? '無' : product.specification }}
+              規格：{{ handleSpecToString(product.productId, product.specification) }}
             </div>
             <div>單價：NT$ {{ product.price }}</div>
             <div>

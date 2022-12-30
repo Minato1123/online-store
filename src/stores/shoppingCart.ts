@@ -7,7 +7,7 @@ import { useProductBoughtListStore } from '@/stores/productBought'
 let cartId = 0
 
 export const useShoppingCartStore = defineStore('shoppingCart', () => {
-  const { getProductById } = useProductsStore()
+  const { getProductById, getProductSpec } = useProductsStore()
   const { addProductBought, addGroupId } = useProductBoughtListStore()
   const shoppingCartList = useLocalStorage<ProductInCart[]>('shopping-cart', [])
 
@@ -29,11 +29,17 @@ export const useShoppingCartStore = defineStore('shoppingCart', () => {
       specification,
       amount,
     }
-    const index = shoppingCartList.value.findIndex(p => p.productId === productId) // 找有無相同商品
-    if (index !== -1) { // 已經有相同的商品
-      if (shoppingCartList.value[index].specification === specification) { // 找到相同的商品規格
-        shoppingCartList.value[index].amount += amount
-      }
+    // const index = shoppingCartList.value.findIndex(p => p.productId === productId) // 找有無相同商品
+    const indexes: number[] = shoppingCartList.value.reduce((acc: number[], cur, index) => {
+      if (cur.productId === productId)
+        acc.push(index)
+
+      return acc
+    }, [])
+    if (indexes.length > 0) { // 已經有相同的商品
+      const index = indexes.findIndex(i => shoppingCartList.value[i].specification === specification)
+      if (index !== -1) { shoppingCartList.value[index].amount += amount }
+
       else {
         cartId++
         shoppingCartList.value.push(product)
@@ -59,7 +65,9 @@ export const useShoppingCartStore = defineStore('shoppingCart', () => {
 
   function updateProductsToBought() {
     shoppingCartList.value.forEach((p) => {
-      addProductBought(p.productId, p.name, p.image, p.specification, p.amount, p.price)
+      const specName = getProductSpec(p.productId, p.specification)
+      if (specName != null)
+        addProductBought(p.productId, p.name, p.image, specName, p.amount, p.price)
     })
     addGroupId()
   }

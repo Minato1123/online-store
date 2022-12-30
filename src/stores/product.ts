@@ -10,5 +10,17 @@ export const useProductsStore = defineStore('products', () => {
     return products.value.find(product => product.id === id)
   }
 
-  return { products, getProductById }
+  function getProductSpec(id: number, spec: number | null) {
+    const product = getProductById(id)
+    if (product == null)
+      return
+
+    if (spec == null)
+      return '無'
+
+    else
+      return product.specifications[spec]
+  }
+
+  return { products, getProductById, getProductSpec }
 })

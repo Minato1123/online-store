@@ -38,7 +38,7 @@ export interface ProductInCart {
   name: string
   price: number
   image: string
-  specification: string | null
+  specification: number | null
   amount: number
 }
 
@@ -70,7 +70,7 @@ export interface InfoType {
   color: string
   borderColor: string
   textInBtnNO?: BtnType
-  textInBtnOK: BtnType
+  textInBtnOK?: BtnType
 }
 
 export interface User {

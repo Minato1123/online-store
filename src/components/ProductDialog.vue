@@ -23,16 +23,11 @@ function closeProductQuickPage() {
   emit('closeProductQuickPage')
 }
 
-const specPicked = ref<null | string>(null)
+const specPicked = ref<null | number>(null)
 if (props.product.specifications.length > 0)
-  specPicked.value = 'spec-0'
+  specPicked.value = 0
 
-const hasSpecifications = ref(false)
-
-if (props.product.specifications.length === 0)
-  hasSpecifications.value = true
-else
-  hasSpecifications.value = false
+const hasSpecifications = computed(() => props.product.specifications.length > 0)
 
 const textInBtnAddCart = {
   text: '加入購物車',
@@ -74,15 +69,15 @@ function submitAddCart() {
                   規格
                 </div>
                 <div class="spec-subblock">
-                  <label v-for="(spec, i) in product.specifications" :key="`specifications-${i}`" class="spec-label" :class="{ active: specPicked === `spec-${i}` }">
+                  <label v-for="(spec, i) in product.specifications" :key="`specifications-${i}`" class="spec-label" :class="{ active: specPicked === i }">
                     <input
                       v-model="specPicked" class="spec-radio"
                       type="radio" name="specifications"
-                      :value="`spec-${i}`"
+                      :value="i"
                     >
                     {{ spec }}
                   </label>
-                  <label v-if="hasSpecifications" class="active">
+                  <label v-if="!hasSpecifications" class="active">
                     <input
                       v-model="specPicked" class="spec-radio"
                       type="radio" name="specifications"
