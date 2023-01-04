@@ -1,13 +1,11 @@
-import { useLocalStorage } from '@vueuse/core'
+import { StorageSerializers, useLocalStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
-import type { Ref } from 'vue'
 import type { User } from '@/types/index'
 import userList from '@/assets/json/users.json'
 
 export const useUsersStore = defineStore('users', () => {
-  const userLoginStatus = useLocalStorage<boolean>('user-login-status', false)
+  const currentUser = useLocalStorage<User | null>('user', null, { serializer: StorageSerializers.object })
   const users = ref<User[]>(userList)
-  const currentUser = ref<User | undefined>(undefined)
 
   function addUser(user: User): void {
     const lastId = users.value[users.value.length - 1].id
@@ -23,25 +21,32 @@ export const useUsersStore = defineStore('users', () => {
     return users.value.some(user => user.email === email && user.password === password)
   }
 
-  function changeLoginStatus(loginChange: boolean): void {
-    userLoginStatus.value = loginChange
+  function getLoginStatus() {
+    if (currentUser.value != null)
+      return true
+
+    else
+      return false
   }
 
-  function getLoginStatus(): Ref<boolean> {
-    return userLoginStatus
+  function getUserByEmail(email: string): User | null {
+    return users.value.find(user => user.email === email) ?? null
   }
 
-  function getUserByEmail(email: string): User | undefined {
-    return users.value.find(user => user.email === email)
-  }
-
-  function setCurrentUser(user: User): void {
+  function userLogin(user: User): void {
     currentUser.value = user
   }
 
-  function getCurrentUser(): User | undefined {
-    return currentUser.value
+  function getCurrentUser(): User | null {
+    if (currentUser.value != null)
+      return currentUser.value
+    else
+      return null
   }
 
-  return { users, addUser, hasUser, isloginVaild, changeLoginStatus, getLoginStatus, getUserByEmail, setCurrentUser, getCurrentUser }
+  function userLogout(): void {
+    currentUser.value = null
+  }
+
+  return { users, addUser, hasUser, isloginVaild, getLoginStatus, getUserByEmail, userLogin, getCurrentUser, userLogout }
 })
