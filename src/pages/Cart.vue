@@ -11,7 +11,7 @@ import IconCashRegister from '~icons/fa-solid/cash-register'
 
 const { shoppingCartList } = storeToRefs(useShoppingCartStore())
 const { removeProductInShoppingCart } = useShoppingCartStore()
-const { getProductSpec } = useProductsStore()
+const { getProductById, getProductSpec } = useProductsStore()
 
 const productCartList: Ref<ProductInCart[]> = shoppingCartList
 
@@ -31,7 +31,21 @@ const textInCheckoutBtn = {
 }
 
 function handleCheckout() {
-  router.push({ path: '/checkout' })
+  router.push({ name: 'checkout' })
+}
+
+function handleClickProduct(productId: number) {
+  const p = getProductById(productId)
+  if (p) {
+    router.push({
+      name: 'product',
+      params: {
+        categoryId: p.categoryId,
+        subCategoryId: p.subCategoryId,
+        id: p.id,
+      },
+    })
+  }
 }
 </script>
 
@@ -65,7 +79,7 @@ function handleCheckout() {
         <div class="product-checkbox">
           <button><icon-material-symbols-check-box-outline-blank /></button>
         </div>
-        <div class="product-name">
+        <div class="product-name" @click="handleClickProduct(product.productId)">
           <img class="product-img" :src="getPublicImgSrc(product.image)" alt="">
           {{ product.name }}
         </div>
@@ -82,7 +96,7 @@ function handleCheckout() {
           NT$ {{ product.amount * product.price }}
         </div>
         <div class="product-rwd">
-          <img class="product-img" :src="getPublicImgSrc(product.image)" alt="">
+          <img class="product-img" :src="getPublicImgSrc(product.image)" alt="" @click="handleClickProduct(product.productId)">
           <div class="product-rwd-else">
             <div>{{ product.name }}</div>
             <div>
@@ -112,7 +126,11 @@ function handleCheckout() {
         共 {{ numOfproductCart }} 件商品 | 總計 NT$ {{ total }}
       </div>
       <div class="checkout-btns">
-        <RouterLink class="btn" to="/">
+        <RouterLink
+          class="btn" :to="{
+            name: 'home',
+          }"
+        >
           <PButton :content="textInGoShoppingBtn" />
         </RouterLink>
         <PButton class="btn" :disabled="numOfproductCart === 0" :content="textInCheckoutBtn" @click="handleCheckout" />
@@ -205,7 +223,7 @@ function handleCheckout() {
           justify-content: center;
           align-items: center;
           color: var(--text-color);
-
+          cursor: pointer;
         }
 
         .product-else {

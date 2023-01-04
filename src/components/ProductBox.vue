@@ -26,7 +26,14 @@ function handleFollowedProducts() {
 const isOpenProductQuickPage = ref(false)
 
 function handleClickProductBox(categoryId: number, subCategoryId: number, productId: number) {
-  router.push(`/category/${categoryId}/${subCategoryId}/product/${productId}`)
+  router.push({
+    name: 'product',
+    params: {
+      categoryId,
+      subCategoryId,
+      productId,
+    },
+  })
 }
 </script>
 

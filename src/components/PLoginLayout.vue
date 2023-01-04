@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { PropType, Ref } from 'vue'
-import { RouterLink, RouterView } from 'vue-router'
+import { type RouteLocationRaw, RouterLink, RouterView } from 'vue-router'
 import { useLoginStore } from '../stores/loginForm'
 import { useRegisterStore } from '../stores/registerForm'
 
@@ -13,8 +13,8 @@ const props = defineProps({
     type: Object as PropType<BtnType>,
     required: true,
   },
-  path: {
-    type: String,
+  routeName: {
+    type: Object as PropType<RouteLocationRaw>,
     required: true,
   },
   target: {
@@ -44,7 +44,7 @@ if (props.target === 'register') {
             Title
           </slot>
         </div>
-        <RouterLink :to="path" class="login-btn">
+        <RouterLink :to="routeName" class="login-btn">
           <slot name="login-btn" />
         </RouterLink>
       </div>

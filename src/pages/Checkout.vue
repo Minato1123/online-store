@@ -9,7 +9,7 @@ const textInCheckoutBtn = {
 }
 
 function handleSubmit() {
-  router.push({ path: '/delivery' })
+  router.push({ name: 'delivery' })
 }
 </script>
 

@@ -7,8 +7,10 @@
       <button>
         <RouterLink
           class="user-sidebar-title" :class="{
-            active: $route.path === '/user/profile',
-          }" to="/user/profile"
+            active: $route.name === 'profile',
+          }" :to="{
+            name: 'profile',
+          }"
         >
           個人資訊
         </RouterLink>
@@ -16,8 +18,8 @@
       <button>
         <RouterLink
           class="user-sidebar-title" :class="{
-            active: $route.path === '/user/payment',
-          }" to="/user/payment"
+            active: $route.name === 'payment',
+          }" :to="{ name: 'payment' }"
         >
           付款方式
         </RouterLink>
@@ -25,8 +27,8 @@
       <button>
         <RouterLink
           class="user-sidebar-title" :class="{
-            active: $route.path === '/user/password',
-          }" to="/user/password"
+            active: $route.name === 'password',
+          }" :to="{ name: 'password' }"
         >
           更改密碼
         </RouterLink>
@@ -34,8 +36,8 @@
       <button>
         <RouterLink
           class="user-sidebar-title" :class="{
-            active: $route.path === '/user/purchase-list',
-          }" to="/user/purchase-list"
+            active: $route.name === 'purchaseList',
+          }" :to="{ name: 'purchaseList' }"
         >
           訂單記錄
         </RouterLink>

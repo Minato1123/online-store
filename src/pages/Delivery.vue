@@ -50,11 +50,11 @@ const isSaveSuccess = ref(true)
 function handleCheckout() {
   isDialogOpen.value = false
   if (isSaveSuccess.value === true) {
-    router.replace({ path: '/completed' })
+    router.replace({ name: 'completed' })
     updateProductsToBought()
     cancelShoppingCart()
   }
-  else { router.replace({ path: '/cart' }) }
+  else { router.replace({ name: 'cart' }) }
 }
 
 const orderSuccessDialog = {

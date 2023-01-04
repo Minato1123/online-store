@@ -4,7 +4,7 @@ import { useUsersStore } from '@/stores/user'
 import type { User } from '@/types/index'
 import router from '@/router/index'
 
-const { hasUser, addUser, changeLoginStatus } = useUsersStore()
+const { hasUser, addUser, userLogin } = useUsersStore()
 
 const schema = {
   email(value: string) {
@@ -90,8 +90,8 @@ export const useRegisterStore = defineStore('register', () => {
       }
       addUser(newUser)
       alert('註冊成功')
-      changeLoginStatus(true)
-      router.replace({ path: '/' })
+      userLogin(newUser)
+      router.replace({ name: 'home' })
 
       resetForm({
         values: {

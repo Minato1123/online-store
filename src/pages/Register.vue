@@ -9,13 +9,13 @@ const textInBtnRegister = {
 
 const pageContent = ref('register')
 
-const pathForLogin = '/login'
+const routeNameForLogin = { name: 'login' }
 
 const { errors, name, birthday, mobile } = storeToRefs(useRegisterStore())
 </script>
 
 <template>
-  <PLoginLayout :text-in-btn="textInBtnRegister" :path="pathForLogin" :target="pageContent">
+  <PLoginLayout :text-in-btn="textInBtnRegister" :route-name="routeNameForLogin" :target="pageContent">
     <template #title>
       會員註冊
     </template>

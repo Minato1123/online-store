@@ -92,7 +92,11 @@ const receiveInfo = {
           </div>
         </div>
         <div class="complete-btn">
-          <RouterLink class="btn" to="/">
+          <RouterLink
+            class="btn" :to="{
+              name: 'home',
+            }"
+          >
             <PButton :content="textInGoShoppingBtn" />
           </RouterLink>
         </div>

@@ -16,10 +16,12 @@ const router = createRouter({
       children: [
         {
           path: ':subCategoryId',
+          name: 'subCategories',
           // component: () => import('../pages/Category.vue'),
           children: [
             {
               path: 'product/:productId',
+              name: 'product',
               component: () => import('../pages/Product.vue'),
             },
           ],
@@ -45,18 +47,22 @@ const router = createRouter({
       children: [
         {
           path: 'profile',
+          name: 'profile',
           component: () => import('../pages/Profile.vue'),
         },
         {
           path: 'payment',
+          name: 'payment',
           component: () => import('../pages/Payment.vue'),
         },
         {
           path: 'password',
+          name: 'password',
           component: () => import('../pages/Password.vue'),
         },
         {
           path: 'purchase-list',
+          name: 'purchaseList',
           component: () => import('../pages/PurchaseList.vue'),
         },
       ],

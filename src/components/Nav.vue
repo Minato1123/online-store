@@ -1,23 +1,29 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { type RouteLocationRaw, RouterLink } from 'vue-router'
 import { useUsersStore } from '@/stores/user'
+import { useShoppingCartStore } from '@/stores/shoppingCart'
 
 defineEmits(['toggleMenu'])
 
-const { getLoginStatus, getCurrentUser } = useUsersStore()
-const loginStatus = getLoginStatus()
+const { getLoginStatus, getCurrentUser, userLogout } = useUsersStore()
+const { getNumOfCartProducts } = useShoppingCartStore()
 const currentUser = computed(() => {
   const user = getCurrentUser()
   if (user != null)
     return user
+  return null
 })
 
-const toUrl = computed(() => {
+const loginStatus = computed(() => {
+  return getLoginStatus()
+})
+
+const userPageRoute = computed<RouteLocationRaw>(() => {
   if (loginStatus.value === true)
-    return '/user/profile'
+    return { name: 'profile' }
 
   else
-    return '/login'
+    return { name: 'login' }
 })
 </script>
 
@@ -29,7 +35,7 @@ const toUrl = computed(() => {
       </button>
       <button><icon-ic-baseline-search /></button>
     </div>
-    <RouterLink to="/" class="store-title">
+    <RouterLink :to="{ name: 'home' }" class="store-title">
       <img class="store-logo" src="../assets/images/pochacco-logo.png" alt="pochacco online store's logo">
       <div class="store-name">
         帕恰購物
@@ -45,31 +51,45 @@ const toUrl = computed(() => {
       </button>
       <VDropdown theme="login-tooltip">
         <button>
-          <RouterLink :to="toUrl">
+          <RouterLink
+            :to="userPageRoute"
+          >
             <icon-teenyicons-user-circle-solid />
           </RouterLink>
         </button>
         <template #popper>
-          <div v-if="toUrl === '/login'" class="hello-user">
+          <div v-if="!loginStatus" class="hello-user">
             尚未登入！
           </div>
           <div v-else>
-            <div class="hello-user line">
-              哈囉，{{ currentUser?.name }}！
+            <div v-if="currentUser != null" class="hello-user line">
+              哈囉，{{ currentUser.name }}！
             </div>
             <div class="user-btns">
               <button>
-                <RouterLink class="btn" to="/user/profile">
+                <RouterLink
+                  class="btn" :to="{
+                    name: 'profile',
+                  }"
+                >
                   我的帳戶
                 </RouterLink>
               </button>
               <button>
-                <RouterLink class="btn" to="/">
+                <RouterLink
+                  class="btn" :to="{
+                    name: 'home',
+                  }"
+                >
                   追蹤清單
                 </RouterLink>
               </button>
               <button>
-                <RouterLink class="btn" to="/">
+                <RouterLink
+                  class="btn" :to="{
+                    name: 'home',
+                  }" @click="userLogout"
+                >
                   登出
                 </RouterLink>
               </button>
@@ -77,10 +97,17 @@ const toUrl = computed(() => {
           </div>
         </template>
       </VDropdown>
-      <button>
-        <RouterLink to="/cart">
+      <button class="cart-btn">
+        <RouterLink
+          :to="{
+            name: 'cart',
+          }"
+        >
           <icon-ph-shopping-cart-simple-bold />
         </RouterLink>
+        <div v-if="getNumOfCartProducts() > 0" class="num-of-cart">
+          {{ getNumOfCartProducts() }}
+        </div>
       </button>
     </div>
   </div>
@@ -206,6 +233,26 @@ button {
   .svg-icon:hover {
     cursor: pointer;
     color: var(--selected-color);
+  }
+
+  .cart-btn {
+    position: relative;
+
+    .num-of-cart {
+      position: absolute;
+      background-color: var(--match-color);
+      color: var(--white-color);
+      top: -0.3rem;
+      right: -0.3rem;
+      border-radius: 3rem;
+      padding: 0.22rem;
+      height: 0.8rem;
+      width: 0.8rem;
+      font-size: 0.45rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 
 }

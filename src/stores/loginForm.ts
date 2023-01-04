@@ -3,7 +3,7 @@ import { useForm } from 'vee-validate'
 import { useUsersStore } from '@/stores/user'
 import router from '@/router/index'
 
-const { hasUser, isloginVaild, changeLoginStatus, getUserByEmail, setCurrentUser } = useUsersStore()
+const { hasUser, isloginVaild, getUserByEmail, userLogin } = useUsersStore()
 
 const schema = {
   email(value: string) {
@@ -48,12 +48,11 @@ export const useLoginStore = defineStore('login', () => {
   const login = handleSubmit((values) => {
     if (isloginVaild(values.email, values.password)) {
       alert('登入成功')
-      changeLoginStatus(true)
       const currentUser = getUserByEmail(values.email)
-      if (currentUser !== undefined)
-        setCurrentUser(currentUser)
-
-      router.replace({ path: '/' })
+      if (currentUser != null) {
+        userLogin(currentUser)
+        router.replace({ name: 'home' })
+      }
     }
 
     else if (hasUser(values.email)) {

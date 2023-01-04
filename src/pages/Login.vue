@@ -7,13 +7,13 @@ const textInBtnLogin = {
 }
 
 const pageContent = ref('login')
-const pathForRegister = '/register'
+const routeNameForRegister = { name: 'register' }
 
 const accountRemember = ref(false)
 </script>
 
 <template>
-  <PLoginLayout :text-in-btn="textInBtnLogin" :path="pathForRegister" :target="pageContent">
+  <PLoginLayout :text-in-btn="textInBtnLogin" :route-name="routeNameForRegister" :target="pageContent">
     <template #title>
       會員登入
     </template>
@@ -38,7 +38,11 @@ const accountRemember = ref(false)
           記住我
         </label>
         <div>
-          <RouterLink class="forget-password" to="/">
+          <RouterLink
+            class="forget-password" :to="{
+              name: 'home',
+            }"
+          >
             忘記密碼？
           </RouterLink>
         </div>
