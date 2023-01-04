@@ -29,7 +29,6 @@ export const useShoppingCartStore = defineStore('shoppingCart', () => {
       specification,
       amount,
     }
-    // const index = shoppingCartList.value.findIndex(p => p.productId === productId) // 找有無相同商品
     const indexes: number[] = shoppingCartList.value.reduce((acc: number[], cur, index) => {
       if (cur.productId === productId)
         acc.push(index)
@@ -72,5 +71,9 @@ export const useShoppingCartStore = defineStore('shoppingCart', () => {
     addGroupId()
   }
 
-  return { shoppingCartList, addShoppingCart, removeProductInShoppingCart, cancelShoppingCart, updateProductsToBought }
+  function getNumOfCartProducts(): number {
+    return shoppingCartList.value.reduce((acc, cur) => acc + cur.amount, 0)
+  }
+
+  return { shoppingCartList, addShoppingCart, removeProductInShoppingCart, cancelShoppingCart, updateProductsToBought, getNumOfCartProducts }
 })
