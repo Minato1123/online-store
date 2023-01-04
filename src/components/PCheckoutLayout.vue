@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { sum } from 'lodash-es'
 import { getPublicImgSrc } from '../utils/index'
 import type { ProductBought, ProductInCart } from '@/types/index'
 import { useProductsStore } from '@/stores/product'
@@ -32,8 +33,8 @@ function handleSpecToString(id: number, spec: number | null | string) {
     return getProductSpec(id, spec)
 }
 
-const numOfproductCart = computed(() => productsInCurrentPage.value.reduce((acc: number, cur: ProductInCart | ProductBought) => acc + cur.amount, 0))
-const total = computed(() => productsInCurrentPage.value.reduce((acc, cur) => acc + cur.amount * cur.price, 0))
+const numOfproductCart = computed(() => sum(productsInCurrentPage.value.map(({ amount }) => amount)))
+const total = computed(() => sum(productsInCurrentPage.value.map(({ amount, price }) => amount * price)))
 </script>
 
 <template>
