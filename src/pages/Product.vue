@@ -112,7 +112,7 @@ function handleAddCart() {
     isOpenDialogAddCart.value = true
     window.setTimeout(() => {
       isOpenDialogAddCart.value = false
-    }, 600)
+    }, 800)
   }
 }
 
@@ -336,7 +336,7 @@ const slidesConfig: SlideType = {
       </div>
     </div>
   </div>
-  <InfoDialog v-if="isOpenDialogAddCart" :text-in-dialog="textInDialogAddCart" />
+  <InfoDialog :show="isOpenDialogAddCart" :text-in-dialog="textInDialogAddCart" />
 </template>
 
 <style lang="scss" scoped>
@@ -847,6 +847,5 @@ const slidesConfig: SlideType = {
         padding: 0 1rem;
       }
     }
-
   }
 </style>

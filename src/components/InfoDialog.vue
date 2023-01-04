@@ -5,6 +5,10 @@ import PButton from './PButton.vue'
 import type { BtnType, InfoType } from '@/types'
 
 const props = defineProps({
+  show: {
+    type: Boolean,
+    required: true,
+  },
   textInDialog: {
     type: Object as PropType<InfoType>,
     required: true,
@@ -25,39 +29,41 @@ window.addEventListener('keydown', (e) => {
 
 <template>
   <Teleport to="body">
-    <div class="mask">
-      <OnClickOutside
-        class="info-container" :class="{
-          'border-main-color': textInDialog.borderColor === 'main-color',
-          'border-main-product-color': textInDialog.borderColor === 'main-product-color',
-        }" @trigger="closeInfoDialog"
-      >
-        <div class="text">
-          <div
-            class="title"
-            :class="{
-              'text-main-color': textInDialog.color === 'main-color',
-              'text-main-product-color': textInDialog.color === 'main-product-color',
-            }"
-          >
-            <Component :is="textInDialog.iconBeforeText" />
-            <span>{{ textInDialog.text }}</span>
+    <Transition>
+      <div v-if="show" class="mask">
+        <OnClickOutside
+          class="info-container" :class="{
+            'border-main-color': textInDialog.borderColor === 'main-color',
+            'border-main-product-color': textInDialog.borderColor === 'main-product-color',
+          }" @trigger="closeInfoDialog"
+        >
+          <div class="text">
+            <div
+              class="title"
+              :class="{
+                'text-main-color': textInDialog.color === 'main-color',
+                'text-main-product-color': textInDialog.color === 'main-product-color',
+              }"
+            >
+              <Component :is="textInDialog.iconBeforeText" />
+              <span>{{ textInDialog.text }}</span>
+            </div>
+            <div
+              class="addition-text" :class="{
+                'text-main-color': textInDialog.color === 'main-color',
+                'text-main-product-color': textInDialog.color === 'main-product-color',
+              }"
+            >
+              {{ textInDialog.additionalText }}
+            </div>
           </div>
-          <div
-            class="addition-text" :class="{
-              'text-main-color': textInDialog.color === 'main-color',
-              'text-main-product-color': textInDialog.color === 'main-product-color',
-            }"
-          >
-            {{ textInDialog.additionalText }}
+          <div v-if="textInDialog.textInBtnNO || textInDialog.textInBtnOK" class="btns">
+            <PButton v-if="textInDialog.textInBtnNO" class="btn" :content="textInDialog.textInBtnNO" @click="closeInfoDialog" />
+            <PButton v-if="textInDialog.textInBtnOK" class="btn" :content="textInDialog.textInBtnOK" @click="closeInfoDialog" />
           </div>
-        </div>
-        <div v-if="textInDialog.textInBtnNO || textInDialog.textInBtnOK" class="btns">
-          <PButton v-if="textInDialog.textInBtnNO" class="btn" :content="textInDialog.textInBtnNO" @click="closeInfoDialog" />
-          <PButton v-if="textInDialog.textInBtnOK" class="btn" :content="textInDialog.textInBtnOK" @click="closeInfoDialog" />
-        </div>
-      </OnClickOutside>
-    </div>
+        </OnClickOutside>
+      </div>
+    </Transition>
   </Teleport>
 </template>
 
@@ -143,6 +149,15 @@ window.addEventListener('keydown', (e) => {
       }
     }
   }
+}
 
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.6s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
 }
 </style>

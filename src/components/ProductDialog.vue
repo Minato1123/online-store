@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import type { PropType } from 'vue'
+import { type PropType, Teleport } from 'vue'
 import { OnClickOutside } from '@vueuse/components'
-import type { Product } from '../types/index'
+import type { InfoType, Product } from '../types/index'
 import { getPublicImgSrc } from '../utils/index'
 import { useShoppingCartStore } from '../stores/shoppingCart'
 import PButton from './PButton.vue'
+import InfoDialog from '@/components/InfoDialog.vue'
+import IconCartCheckFill from '~icons/bi/cart-check-fill'
 
 const props = defineProps({
   product: {
@@ -40,9 +42,23 @@ window.addEventListener('keydown', (e) => {
     closeProductQuickPage()
 }, false)
 
+const isOpenDialogAddCart = ref(false)
 function submitAddCart() {
   addShoppingCart(props.product.id, specPicked.value, numOfProduct.value)
-  closeProductQuickPage()
+  isOpenDialogAddCart.value = true
+  window.setTimeout(() => {
+    isOpenDialogAddCart.value = false
+  }, 800)
+  window.setTimeout(() => {
+    closeProductQuickPage()
+  }, 1200)
+}
+
+const textInDialogAddCart: InfoType = {
+  iconBeforeText: IconCartCheckFill,
+  text: '已加入購物車',
+  color: 'main-color',
+  borderColor: 'main-color',
 }
 </script>
 
@@ -105,6 +121,7 @@ function submitAddCart() {
       </OnClickOutside>
     </div>
   </Teleport>
+  <InfoDialog :show="isOpenDialogAddCart" :text-in-dialog="textInDialogAddCart" />
 </template>
 
 <style scoped lang="scss">

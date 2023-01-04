@@ -155,8 +155,8 @@ const orderFailDialog = {
       </div>
     </div>
   </PCheckoutLayout>
-  <InfoDialog v-if="isDialogOpen && isSaveSuccess" :text-in-dialog="orderSuccessDialog" @close-info-dialog="handleCheckout" />
-  <InfoDialog v-if="isDialogOpen && !isSaveSuccess" :text-in-dialog="orderFailDialog" @close-info-dialog="handleCheckout" />
+  <InfoDialog :show="isDialogOpen && isSaveSuccess" :text-in-dialog="orderSuccessDialog" @close-info-dialog="handleCheckout" />
+  <InfoDialog :show="isDialogOpen && isSaveSuccess" :text-in-dialog="orderFailDialog" @close-info-dialog="handleCheckout" />
 </template>
 
 <style lang="scss" scoped>
