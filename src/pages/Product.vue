@@ -1,11 +1,13 @@
 <script lang="ts" setup>
 import { RouterLink } from 'vue-router'
 import router from '@/router'
-import type { BtnType, InfoType, Product } from '@/types/index'
+import type { BtnType, InfoType, Product, SlideType } from '@/types/index'
 import { getPublicImgSrc } from '@/utils/index'
 import PButton from '@/components/PButton.vue'
 import ProductBox from '@/components/ProductBox.vue'
 import InfoDialog from '@/components/InfoDialog.vue'
+import Slide from '@/components/Slide.vue'
+
 import { useProductsStore } from '@/stores/product'
 import { useFollowedProductsStore } from '@/stores/followedProduct'
 import { useCategoriesStore } from '@/stores/category'
@@ -124,6 +126,22 @@ function handleCheckout() {
     router.push({ name: 'cart' })
   }
 }
+
+const slideImgs = computed(() => {
+  if (product.value == null)
+    return null
+
+  else
+    return product.value.images ?? null
+})
+
+const slidesConfig: SlideType = {
+  slides: slideImgs.value ?? [],
+  height: '100%',
+  hasPage: false,
+  hasTimeInterval: false,
+  btnColor: 'black',
+}
 </script>
 
 <template>
@@ -139,8 +157,8 @@ function handleCheckout() {
       <span>/</span>{{ category?.name }}<span>/</span>{{ subCategory?.name }}
     </div>
     <div class="product-main-container">
-      <div class="image-block">
-        <img class="main-image" :src="getPublicImgSrc(product.images[activeImageIndex])" alt="product's image">
+      <div v-if="slidesConfig.slides != null" class="image-block">
+        <Slide v-model:selectedPage="activeImageIndex" :slides-config="slidesConfig" />
         <div class="product-images-list">
           <label
             v-for="(image, i) in product.images" :key="`image-${i}`" :class="{
@@ -378,6 +396,7 @@ function handleCheckout() {
             align-items: center;
             border: 0.02rem solid var(--main-color);
             position: relative;
+            transition: all 0.2s ease-in-out;
 
             &.active {
               border: 0.02rem solid var(--main-product-color);

@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import _ from 'lodash-es'
-import Slides from '../components/Slides.vue'
+import slidePicture from '../assets/json/slides.json'
+import Slide from '../components/Slide.vue'
 import ProductBox from '../components/ProductBox.vue'
 import { useProductsStore } from '../stores/product'
 import { useCategoriesStore } from '../stores/category'
 import { getIconComponent } from '@/utils'
+import type { SlideType } from '@/types'
 
 // 商品
 const { products: originalProducts } = storeToRefs(useProductsStore())
@@ -42,6 +44,36 @@ onMounted(() =>
 onUnmounted(() =>
   window.removeEventListener('resize', getWidth),
 )
+
+const slideHeight = ref<string>('')
+const slideImgs = ref<string[]>([])
+watch(windowWidth, () => {
+  const tempSlides = []
+  for (let i = 0; i < slidePicture.length; i++) {
+    if (windowWidth.value > 991) {
+      tempSlides.push(slidePicture[i].imageUrl)
+      slideHeight.value = '41.6666666667%'
+    }
+    else if (windowWidth.value > 575) {
+      tempSlides.push(slidePicture[i].imageTabletUrl)
+      slideHeight.value = '58.52%'
+    }
+
+    else {
+      tempSlides.push(slidePicture[i].imageMobileUrl)
+      slideHeight.value = '104%'
+    }
+  }
+  slideImgs.value = tempSlides
+}, { immediate: true })
+
+const slidesConfig: SlideType = {
+  slides: slideImgs.value ?? [],
+  height: slideHeight.value,
+  hasPage: true,
+  hasTimeInterval: true,
+  btnColor: 'white',
+}
 
 // 每行商品數量
 const numOfProductLine = ref(0)
@@ -120,7 +152,7 @@ function handleThePage(page: number) {
 
 <template>
   <div class="home-container">
-    <Slides />
+    <Slide :slides-config="slidesConfig" />
     <div class="products-block">
       <div class="products-header">
         <div class="produts-intro-title">

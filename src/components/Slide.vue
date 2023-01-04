@@ -1,11 +1,40 @@
 <script setup lang="ts">
-import slidePicture from '../assets/json/slides.json'
+import type { PropType } from 'vue'
 import { getPublicImgSrc } from '@/utils'
+import type { SlideType } from '@/types'
 
-const slides = ref(slidePicture)
+const props = defineProps(
+  {
+    slidesConfig: {
+      type: Object as PropType<SlideType>,
+      required: true,
+    },
+    selectedPage: {
+      type: Number,
+      default: undefined,
+    },
+  },
+)
 
-const numOfSlides = computed(() => slides.value.length)
-const currentSlideIndex = ref(0)
+const emit = defineEmits(['update:selectedPage'])
+
+const currentPage = ref(0)
+
+const currentSlideIndex = computed({
+  get() {
+    if (props.selectedPage === undefined)
+      return currentPage.value
+
+    return props.selectedPage
+  },
+  set(value) {
+    if (props.selectedPage === undefined)
+      currentPage.value = value
+    emit('update:selectedPage', value)
+  },
+})
+
+const numOfSlides = computed(() => props.slidesConfig.slides.length)
 
 function handleNextSlide() {
   if (currentSlideIndex.value === numOfSlides.value - 1)
@@ -19,52 +48,50 @@ function handlePreviousSlide() {
   else currentSlideIndex.value -= 1
 }
 
-let slideInterval = setInterval(handleNextSlide, 5000)
-onBeforeUnmount(() => clearInterval(slideInterval))
+if (props.slidesConfig.hasTimeInterval) {
+  let slideInterval = setInterval(handleNextSlide, 5000)
+  onBeforeUnmount(() => clearInterval(slideInterval))
 
-watch(
-  currentSlideIndex,
-  () => {
-    clearInterval(slideInterval)
-    slideInterval = setInterval(handleNextSlide, 5000)
-  },
-)
+  watch(
+    currentSlideIndex,
+    () => {
+      clearInterval(slideInterval)
+      slideInterval = setInterval(handleNextSlide, 5000)
+    },
+  )
+}
 </script>
 
 <template>
-  <div class="slides-block">
+  <div class="slides-block" :style="`--height: ${slidesConfig.height}`">
     <div class="slides">
       <img
-        v-for="(slide, i) in slides"
+        v-for="(slide, i) in slidesConfig.slides"
         :key="`slide-${i}`"
-        :src="getPublicImgSrc(slide.imageUrl)"
-        alt="ad"
+        :src="getPublicImgSrc(slide)"
+        alt="images"
         class="slide-desktop"
       >
-      <img
-        v-for="(slide, i) in slides"
-        :key="`slide-${i}`"
-        :src="getPublicImgSrc(slide.imageTabletUrl)"
-        alt="ad"
-        class="slide-tablet"
-      >
-      <img
-        v-for="(slide, i) in slides"
-        :key="`slide-${i}`"
-        :src="getPublicImgSrc(slide.imageMobileUrl)"
-        alt="ad"
-        class="slide-mobile"
-      >
     </div>
-    <div class="slide-btn left-btn" @click="handlePreviousSlide">
+    <div
+      class="slide-btn left-btn" :class="{
+        white: slidesConfig.btnColor === 'white',
+        black: slidesConfig.btnColor === 'black',
+      }" @click="handlePreviousSlide"
+    >
       <icon-ic-twotone-keyboard-arrow-left />
     </div>
-    <div class="slide-btn right-btn" @click="handleNextSlide">
+    <div
+      class="slide-btn right-btn" :class="{
+        white: slidesConfig.btnColor === 'white',
+        black: slidesConfig.btnColor === 'black',
+      }" @click="handleNextSlide"
+    >
       <icon-ic-outline-chevron-right />
     </div>
-    <div class="slide-pages">
+    <div v-if="slidesConfig.hasPage" class="slide-pages">
       <div
-        v-for="(slide, i) in slides" :key="`slide-${i}`"
+        v-for="(slide, i) in slidesConfig.slides" :key="`slide-${i}`"
         class="slide-page-point"
         :class="{
           active: i === currentSlideIndex,
@@ -78,10 +105,11 @@ watch(
 <style scoped lang="scss">
 .slides-block {
   width: 100%;
-  padding-top: 41.6666666667%;
+  padding-top: var(--height);
   position: relative;
   margin-bottom: 2rem;
   overflow: hidden;
+  user-select: none;
 
   .slides {
     display: flex;
@@ -105,14 +133,20 @@ watch(
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 6rem;
     height: 100%;
     opacity: 0.6;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: var(--white-color);
+
+    &.white {
+      color: var(--white-color);
+    }
+
+    &.black {
+      color: rgba(0, 0, 0, 0.2);
+    }
 
     .svg-icon {
       width: 4rem;
@@ -159,58 +193,6 @@ watch(
       &:hover {
         opacity: 1;
       }
-    }
-  }
-}
-
-@media screen and (min-width: 992px) {
-  .slides-block {
-    .slide-desktop {
-      display: block;
-    }
-
-    .slide-tablet {
-      display: none;
-    }
-
-    .slide-mobile {
-      display: none;
-    }
-  }
-}
-
-@media screen and (max-width: 991px) {
-  .slides-block {
-    padding-top: 58.52%;
-
-    .slide-tablet {
-      display: block;
-    }
-
-    .slide-desktop {
-      display: none;
-    }
-
-    .slide-mobile {
-      display: none;
-    }
-  }
-}
-
-@media screen and (max-width: 575px) {
-  .slides-block {
-    padding-top: 104%;
-
-    .slide-mobile {
-      display: block;
-    }
-
-    .slide-desktop {
-      display: none;
-    }
-
-    .slide-tablet {
-      display: none;
     }
   }
 }

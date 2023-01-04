@@ -73,6 +73,14 @@ export interface InfoType {
   textInBtnOK?: BtnType
 }
 
+export interface SlideType {
+  slides: string[]
+  height: string
+  hasPage: boolean
+  hasTimeInterval: boolean
+  btnColor: 'white' | 'black'
+}
+
 export interface User {
   id: number
   name: string
