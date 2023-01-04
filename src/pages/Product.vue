@@ -1,6 +1,7 @@
 <script lang="ts" setup>
+import { RouterLink } from 'vue-router'
 import router from '@/router'
-import type { BtnType, InfoType } from '@/types/index'
+import type { BtnType, InfoType, Product } from '@/types/index'
 import { getPublicImgSrc } from '@/utils/index'
 import PButton from '@/components/PButton.vue'
 import ProductBox from '@/components/ProductBox.vue'
@@ -13,38 +14,69 @@ import IconCartPlus from '~icons/bi/cart-plus'
 import IconCartCheckFill from '~icons/bi/cart-check-fill'
 
 const { getProductById } = useProductsStore()
-const product = getProductById(Number(router.currentRoute.value.params.productId))
+const { products } = storeToRefs(useProductsStore())
+const route = useRoute()
+const productId = computed(() => route.params.productId)
+const product = ref<Product | null>(null)
+
+watch(productId, () => {
+  const temp = getProductById(Number(productId.value))
+  if (temp == null) {
+    product.value = null
+    return
+  }
+  product.value = temp
+}, { immediate: true })
+
 const { getCategoryById, getSubCategoryById } = useCategoriesStore()
 
-if (product == null)
-  throw new Error('product is null')
+const category = computed(() => {
+  if (product.value == null)
+    return null
 
-const category = getCategoryById(product.categoryId)
-const subCategory = getSubCategoryById(product.categoryId, product.subCategoryId)
+  else
+    return getCategoryById(product.value.categoryId) ?? null
+})
+
+const subCategory = computed(() => {
+  if (product.value == null)
+    return null
+
+  else
+    return getSubCategoryById(product.value.categoryId, product.value.subCategoryId) ?? null
+})
 
 const { addFollowedProduct, removeFollowedProduct, isInFollowedProducts } = useFollowedProductsStore()
 
 function handleFollowedProducts() {
-  if (product == null)
+  if (product.value == null)
     throw new Error('product is null')
 
-  if (isInFollowedProducts(product))
-    removeFollowedProduct(product)
+  if (isInFollowedProducts(product.value))
+    removeFollowedProduct(product.value)
   else
-    addFollowedProduct(product)
+    addFollowedProduct(product.value)
 }
 
 const activeImageIndex = ref(0)
 const specPicked = ref(null)
-const hasSpecifications = computed(() => product.specifications.length > 0)
+const hasSpecifications = computed(() => {
+  if (product.value == null)
+    return false
+
+  else
+    return product.value.specifications.length > 0
+})
 const amountOfProduct = ref(1)
 
 const showTab = ref<'image' | 'info'>('image')
 
-const recommendProducts = computed(() => {
-  const products = useProductsStore().products
-  const recommendProducts = products.filter(p => p.categoryId === product.categoryId && p.subCategoryId === product.subCategoryId && p.id !== product.id)
-  return recommendProducts
+const recommendProducts = computed<Product[]>(() => {
+  const theProduct = product.value
+  if (theProduct == null)
+    return []
+  else
+    return products.value.filter(p => p.categoryId === theProduct.categoryId && p.subCategoryId === theProduct.subCategoryId && p.id !== theProduct.id)
 })
 
 const textInBtnToAddCart: BtnType = {
@@ -69,9 +101,10 @@ const isOpenDialogAddCart = ref(false)
 const { addShoppingCart } = useShoppingCartStore()
 
 function handleAddCart() {
-  if (product == null)
-    throw new Error('product is null')
-  const pId = product.id
+  if (product.value == null)
+    return
+
+  const pId = product.value.id
   if (pId != null) {
     addShoppingCart(pId, specPicked.value, amountOfProduct.value)
     isOpenDialogAddCart.value = true
@@ -82,20 +115,25 @@ function handleAddCart() {
 }
 
 function handleCheckout() {
-  if (product == null)
-    throw new Error('product is null')
-  const pId = product.id
+  if (product.value == null)
+    return
+
+  const pId = product.value.id
   if (pId != null) {
     addShoppingCart(pId, specPicked.value, amountOfProduct.value)
-    router.push('/cart')
+    router.push({ name: 'cart' })
   }
 }
 </script>
 
 <template>
-  <div class="product-container">
+  <div v-if="product != null" class="product-container">
     <div class="breadcrumb">
-      <RouterLink class="home-btn" to="/">
+      <RouterLink
+        class="home-btn" :to="{
+          name: 'home',
+        }"
+      >
         <icon-mdi-home-variant />
       </RouterLink>
       <span>/</span>{{ category?.name }}<span>/</span>{{ subCategory?.name }}
@@ -372,6 +410,7 @@ function handleCheckout() {
           color: var(--text-color);
           font-size: 1.4rem;
           font-weight: 500;
+          margin-bottom: 1rem;
         }
 
         .description {
@@ -523,7 +562,6 @@ function handleCheckout() {
         display: flex;
         flex-direction: column;
         align-items: center;
-        width: 20%;
         padding-top: 1rem;
 
         button {
@@ -581,11 +619,6 @@ function handleCheckout() {
             color: var(--text-color);
             font-size: 1.1rem;
             font-weight: 500;
-            width: 20%;
-          }
-
-          .info-content {
-            width: 80%;
           }
         }
 
@@ -748,6 +781,14 @@ function handleCheckout() {
         border: 0.1rem solid var(--main-product-color);
         border-radius: 2rem;
       }
+
+      .info-subtitle {
+        width: 20%;
+      }
+
+      .info-content {
+        width: 80%;
+      }
     }
   }
 
@@ -765,15 +806,28 @@ function handleCheckout() {
       .product-info-container {
         border-top: 0.1rem solid var(--main-product-color);
         border-bottom: 0.1rem solid var(--main-product-color);
+        .info-detail {
+
+          .info-line {
+            width: 100%;
+            flex-direction: column;
+            gap: 0.5rem;
+
+            .info-subtitle, .info-content {
+              width: 100%;
+            }
+          }
+        }
+
+        .info-images {
+          padding-top: 1rem;
+        }
+      }
+
+      .else-products {
+        padding: 0 1rem;
       }
     }
 
-    .info-detail {
-
-      .info-line {
-        flex-direction: column;
-        gap: 0.5rem;
-      }
-    }
   }
 </style>
