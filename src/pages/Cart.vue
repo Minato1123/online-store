@@ -42,7 +42,7 @@ function handleClickProduct(productId: number) {
       params: {
         categoryId: p.categoryId,
         subCategoryId: p.subCategoryId,
-        id: p.id,
+        productId: p.id,
       },
     })
   }
