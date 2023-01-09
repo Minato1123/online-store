@@ -621,7 +621,7 @@ const slidesConfig: SlideType = {
         gap: 0.5rem;
 
         img {
-          width: 80%;
+          width: 60%;
         }
       }
 
@@ -711,6 +711,10 @@ const slidesConfig: SlideType = {
       .activity-content {
         align-items: center;
       }
+    }
+
+    .info-title {
+      padding: 0 1rem;
     }
 
     .info-detail {
