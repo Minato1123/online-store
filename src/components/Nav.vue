@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { type RouteLocationRaw, RouterLink } from 'vue-router'
+import SearchBarMobile from '@/components/SearchBarMobile.vue'
 import { useUsersStore } from '@/stores/user'
 import { useShoppingCartStore } from '@/stores/shoppingCart'
 
@@ -14,6 +15,8 @@ const currentUser = computed(() => {
   return null
 })
 
+const isOpenSearchBar = ref(false)
+
 const loginStatus = computed(() => {
   return getLoginStatus()
 })
@@ -25,90 +28,98 @@ const userPageRoute = computed<RouteLocationRaw>(() => {
   else
     return { name: 'login' }
 })
+
+const searchBtnRef = ref<HTMLElement | null>(null)
 </script>
 
 <template>
-  <div class="nav-container">
-    <div class="nav-rwd">
-      <button @click="$emit('toggleMenu')">
-        <icon-ph-list-bold />
-      </button>
-      <button><icon-ic-baseline-search /></button>
-    </div>
-    <RouterLink :to="{ name: 'home' }" class="store-title">
-      <img class="store-logo" src="../assets/images/pochacco-logo.png" alt="pochacco online store's logo">
-      <div class="store-name">
-        帕恰購物
-      </div>
-    </RouterLink>
-    <div class="search-bar">
-      <input type="text" placeholder="Search...">
-      <button><icon-ic-baseline-search /></button>
-    </div>
-    <div class="nav-btns">
-      <button class="btn-bell">
-        <icon-mdi-bell-outline />
-      </button>
-      <VDropdown theme="login-tooltip">
-        <button>
-          <RouterLink
-            :to="userPageRoute"
-          >
-            <icon-teenyicons-user-circle-solid />
-          </RouterLink>
+  <div>
+    <SearchBarMobile v-if="searchBtnRef != null" :search-btn-el="searchBtnRef" :is-open-search-bar="isOpenSearchBar" @close-search-bar="isOpenSearchBar = false" />
+
+    <div class="nav-container">
+      <div class="nav-rwd">
+        <button @click="$emit('toggleMenu')">
+          <icon-ph-list-bold />
         </button>
-        <template #popper>
-          <div v-if="!loginStatus" class="hello-user">
-            尚未登入！
-          </div>
-          <div v-else>
-            <div v-if="currentUser != null" class="hello-user line">
-              哈囉，{{ currentUser.name }}！
-            </div>
-            <div class="user-btns">
-              <button>
-                <RouterLink
-                  class="btn" :to="{
-                    name: 'profile',
-                  }"
-                >
-                  我的帳戶
-                </RouterLink>
-              </button>
-              <button>
-                <RouterLink
-                  class="btn" :to="{
-                    name: 'home',
-                  }"
-                >
-                  追蹤清單
-                </RouterLink>
-              </button>
-              <button>
-                <RouterLink
-                  class="btn" :to="{
-                    name: 'home',
-                  }" @click="userLogout"
-                >
-                  登出
-                </RouterLink>
-              </button>
-            </div>
-          </div>
-        </template>
-      </VDropdown>
-      <button class="cart-btn">
-        <RouterLink
-          :to="{
-            name: 'cart',
-          }"
-        >
-          <icon-ph-shopping-cart-simple-bold />
-        </RouterLink>
-        <div v-if="getNumOfCartProducts() > 0" class="num-of-cart">
-          {{ getNumOfCartProducts() }}
+        <button ref="searchBtnRef" @click="isOpenSearchBar = !isOpenSearchBar">
+          <icon-ic-baseline-search />
+        </button>
+      </div>
+      <RouterLink :to="{ name: 'home' }" class="store-title">
+        <img class="store-logo" src="../assets/images/pochacco-logo.png" alt="pochacco online store's logo">
+        <div class="store-name">
+          帕恰購物
         </div>
-      </button>
+      </RouterLink>
+      <div class="search-bar">
+        <input type="text" placeholder="Search...">
+        <button><icon-ic-baseline-search /></button>
+      </div>
+      <div class="nav-btns">
+        <button class="btn-bell">
+          <icon-mdi-bell-outline />
+        </button>
+        <VDropdown theme="login-tooltip">
+          <button>
+            <RouterLink
+              :to="userPageRoute"
+            >
+              <icon-teenyicons-user-circle-solid />
+            </RouterLink>
+          </button>
+          <template #popper>
+            <div v-if="!loginStatus" class="hello-user">
+              尚未登入！
+            </div>
+            <div v-else>
+              <div v-if="currentUser != null" class="hello-user line">
+                哈囉，{{ currentUser.name }}！
+              </div>
+              <div class="user-btns">
+                <button>
+                  <RouterLink
+                    class="btn" :to="{
+                      name: 'profile',
+                    }"
+                  >
+                    我的帳戶
+                  </RouterLink>
+                </button>
+                <button>
+                  <RouterLink
+                    class="btn" :to="{
+                      name: 'following',
+                    }"
+                  >
+                    追蹤清單
+                  </RouterLink>
+                </button>
+                <button>
+                  <RouterLink
+                    class="btn" :to="{
+                      name: 'home',
+                    }" @click="userLogout"
+                  >
+                    登出
+                  </RouterLink>
+                </button>
+              </div>
+            </div>
+          </template>
+        </VDropdown>
+        <button class="cart-btn">
+          <RouterLink
+            :to="{
+              name: 'cart',
+            }"
+          >
+            <icon-ph-shopping-cart-simple-bold />
+          </RouterLink>
+          <div v-if="getNumOfCartProducts() > 0" class="num-of-cart">
+            {{ getNumOfCartProducts() }}
+          </div>
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -158,6 +169,7 @@ button {
   }
 }
 .nav-container {
+  position: relative;
   background-color: var(--main-color);
   height: 5rem;
   display: flex;
@@ -262,7 +274,7 @@ button {
   height: 2rem;
 }
 
-@media screen and (min-width: 1090px) { //768
+@media screen and (min-width: 1090px) {
   .nav-container {
     justify-content: space-around;
 
