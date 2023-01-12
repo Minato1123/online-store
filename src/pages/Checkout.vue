@@ -3,6 +3,9 @@ import PButton from '@/components/PButton.vue'
 import PCheckoutLayout from '@/components/PCheckoutLayout.vue'
 import router from '@/router'
 
+const isOpenDiscount = ref(false)
+const codeForDiscount = ref('')
+
 const textInCheckoutBtn = {
   text: '確認結帳',
   color: 'main-product-color',
@@ -39,9 +42,12 @@ function handleSubmit() {
         </div>
       </div>
       <div class="check-container">
-        <button class="discount-btn">
+        <button class="discount-btn" @click="isOpenDiscount = !isOpenDiscount">
           使用優惠代碼
         </button>
+        <div v-show="isOpenDiscount" class="discount-input">
+          <input v-model="codeForDiscount" type="text"><button>套用</button>
+        </div>
         <div class="detail">
           共 {{ slotProps.num }} 件商品｜總金額 NT$ {{ slotProps.total }}
         </div>
@@ -143,7 +149,30 @@ function handleSubmit() {
       color: var(--main-product-color);
       font-size: 0.8rem;
       cursor: pointer;
+    }
 
+    .discount-input {
+      display: flex;
+
+      input {
+        outline: none;
+        border: 0.1rem solid var(--main-product-color);
+        height: 1.5rem;
+        padding-left: 0.3rem;
+      }
+
+      button {
+        outline: none;
+        border: none;
+        background-color: var(--main-product-color);
+        color: var(--white-color);
+        cursor: pointer;
+
+        &:hover {
+          opacity: 0.8;
+
+        }
+      }
     }
 
     .detail {
