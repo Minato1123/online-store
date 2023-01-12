@@ -12,28 +12,21 @@ const router = createRouter({
     {
       path: '/category/:categoryId',
       name: 'categories',
-      // component: () => import('../pages/Category.vue'),
-      children: [
-        {
-          path: ':subCategoryId',
-          name: 'subCategories',
-          // component: () => import('../pages/Category.vue'),
-          children: [
-            {
-              path: 'product/:productId',
-              name: 'product',
-              component: () => import('../pages/Product.vue'),
-            },
-          ],
-        },
-      ],
+      component: () => import('../pages/Category.vue'),
+    },
+    {
+      path: '/category/:categoryId/:subCategoryId',
+      name: 'subCategories',
+      component: () => import('../pages/SubCategory.vue'),
+    },
+    {
+      path: '/category/:categoryId/:subCategoryId/product/:productId',
+      name: 'product',
+      component: () => import('../pages/Product.vue'),
     },
     {
       path: '/login',
       name: 'login',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('../pages/Login.vue'),
     },
     {
@@ -68,6 +61,11 @@ const router = createRouter({
       ],
     },
     {
+      path: '/following',
+      name: 'following',
+      component: () => import('../pages/Following.vue'),
+    },
+    {
       path: '/cart',
       name: 'cart',
       component: () => import('../pages/Cart.vue'),
@@ -83,7 +81,7 @@ const router = createRouter({
       component: () => import('../pages/Delivery.vue'),
     },
     {
-      path: '/completed',
+      path: '/completed/:orderId',
       name: 'completed',
       component: () => import('../pages/Completed.vue'),
     },

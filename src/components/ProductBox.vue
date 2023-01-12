@@ -44,7 +44,7 @@ function handleClickProductBox(categoryId: number, subCategoryId: number, produc
     @click="handleClickProductBox(product.categoryId, product.subCategoryId, product.id)"
   >
     <img :src="getPublicImgSrc(product.images[0])" alt="product's image">
-    <div>
+    <div class="product-content">
       <div class="product-info">
         <div class="product-name">
           {{ product.name }}
@@ -88,9 +88,17 @@ function handleClickProductBox(categoryId: number, subCategoryId: number, produc
     }
 
     img {
-      height: 70%;
+      height: 60%;
       min-height: 10rem;
       width: auto;
+    }
+
+    .product-content {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 40%;
+      min-height: 5rem;
     }
 
     .product-info {
