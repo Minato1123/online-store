@@ -91,7 +91,7 @@ const userAccounts = ref([
     padding: 2rem;
 
     .main-block {
-      overflow-y: scroll;
+      overflow-y: auto;
       .block {
         margin-bottom: 2rem;
 

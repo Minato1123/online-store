@@ -60,6 +60,16 @@ const textInDialogAddCart: InfoType = {
   color: 'main-color',
   borderColor: 'main-color',
 }
+
+const isBackgroundLocked = useScrollLock(window.document.body)
+
+onMounted(() => {
+  isBackgroundLocked.value = true
+})
+
+onBeforeUnmount(() => {
+  isBackgroundLocked.value = false
+})
 </script>
 
 <template>
@@ -121,7 +131,7 @@ const textInDialogAddCart: InfoType = {
       </OnClickOutside>
     </div>
   </Teleport>
-  <InfoDialog :show="isOpenDialogAddCart" :text-in-dialog="textInDialogAddCart" />
+  <InfoDialog v-if="isOpenDialogAddCart" :text-in-dialog="textInDialogAddCart" />
 </template>
 
 <style scoped lang="scss">

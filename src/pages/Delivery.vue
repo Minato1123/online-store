@@ -50,7 +50,7 @@ const isSaveSuccess = ref(true)
 function handleCheckout() {
   isDialogOpen.value = false
   if (isSaveSuccess.value === true) {
-    router.replace({ name: 'completed' })
+    router.replace({ name: 'completed', params: { orderId: '123456789' } })
     updateProductsToBought()
     cancelShoppingCart()
   }
@@ -155,8 +155,8 @@ const orderFailDialog = {
       </div>
     </div>
   </PCheckoutLayout>
-  <InfoDialog :show="isDialogOpen && isSaveSuccess" :text-in-dialog="orderSuccessDialog" @close-info-dialog="handleCheckout" />
-  <InfoDialog :show="isDialogOpen && !isSaveSuccess" :text-in-dialog="orderFailDialog" @close-info-dialog="handleCheckout" />
+  <InfoDialog v-if="isDialogOpen && isSaveSuccess" :text-in-dialog="orderSuccessDialog" @close-info-dialog="handleCheckout" />
+  <InfoDialog v-if="isDialogOpen && !isSaveSuccess" :text-in-dialog="orderFailDialog" @close-info-dialog="handleCheckout" />
 </template>
 
 <style lang="scss" scoped>

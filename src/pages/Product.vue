@@ -336,7 +336,7 @@ const slidesConfig: SlideType = {
       </div>
     </div>
   </div>
-  <InfoDialog :show="isOpenDialogAddCart" :text-in-dialog="textInDialogAddCart" />
+  <InfoDialog v-if="isOpenDialogAddCart" :text-in-dialog="textInDialogAddCart" />
 </template>
 
 <style lang="scss" scoped>
@@ -385,7 +385,7 @@ const slidesConfig: SlideType = {
           justify-content: start;
           align-items: center;
           gap: 0.5rem;
-          overflow-x: scroll;
+          overflow-x: auto;
 
           label {
             width: 4rem;

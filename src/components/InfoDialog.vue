@@ -1,14 +1,11 @@
 <script setup lang="ts">
 import type { PropType } from 'vue'
 import { OnClickOutside } from '@vueuse/components'
+import { useScrollLock } from '@vueuse/core'
 import PButton from './PButton.vue'
 import type { BtnType, InfoType } from '@/types'
 
 const props = defineProps({
-  show: {
-    type: Boolean,
-    required: true,
-  },
   textInDialog: {
     type: Object as PropType<InfoType>,
     required: true,
@@ -16,6 +13,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['closeInfoDialog'])
+
+const isBackgroundLocked = useScrollLock(window.document.body)
 
 function closeInfoDialog() {
   emit('closeInfoDialog')
@@ -25,12 +24,20 @@ window.addEventListener('keydown', (e) => {
   if (e.code === 'Escape')
     closeInfoDialog()
 }, false)
+
+onMounted(() => {
+  isBackgroundLocked.value = true
+})
+
+onBeforeUnmount(() => {
+  isBackgroundLocked.value = false
+})
 </script>
 
 <template>
   <Teleport to="body">
     <Transition>
-      <div v-if="show" class="mask">
+      <div class="mask">
         <OnClickOutside
           class="info-container" :class="{
             'border-main-color': textInDialog.borderColor === 'main-color',

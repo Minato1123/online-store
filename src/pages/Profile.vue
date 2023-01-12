@@ -87,8 +87,8 @@ const saveBtnFailDialog = {
         <PButton class="save-btn" :content="saveBtnContent" @click="isDialogOpen = true">
           儲存
         </PButton>
-        <InfoDialog :show="isDialogOpen && isSaveSuccess" :text-in-dialog="saveBtnSuccessDialog" @close-info-dialog="isDialogOpen = false" />
-        <InfoDialog :show="isDialogOpen && !isSaveSuccess" :text-in-dialog="saveBtnFailDialog" @close-info-dialog="isDialogOpen = false" />
+        <InfoDialog v-if="isDialogOpen && isSaveSuccess" :text-in-dialog="saveBtnSuccessDialog" @close-info-dialog="isDialogOpen = false" />
+        <InfoDialog v-if="isDialogOpen && !isSaveSuccess" :text-in-dialog="saveBtnFailDialog" @close-info-dialog="isDialogOpen = false" />
       </div>
     </form>
   </PUserLayout>
