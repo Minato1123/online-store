@@ -31,8 +31,26 @@ defineEmits(['closeMenu'])
         </button>
       </div>
       <ul class="about-container">
-        <li><button>我的帳戶</button></li>
-        <li><button>追蹤清單</button></li>
+        <li>
+          <RouterLink
+            :to="{
+              name: 'profile',
+            }"
+            @click.self="$emit('closeMenu')"
+          >
+            我的帳戶
+          </RouterLink>
+        </li>
+        <li>
+          <RouterLink
+            :to="{
+              name: 'following',
+            }"
+            @click.self="$emit('closeMenu')"
+          >
+            追蹤清單
+          </RouterLink>
+        </li>
         <li><button>關於帕恰</button></li>
         <li><button>客服中心</button></li>
       </ul>
@@ -40,9 +58,9 @@ defineEmits(['closeMenu'])
         <div>關注我</div>
         <div class="contact-btns">
           <a class="contact-icon" href="https://github.com/Minato1123" target="_blank"><icon-radix-icons-github-logo /></a>
-          <a class="contact-icon" href="#"><icon-ion-logo-instagram /></a>
-          <a class="contact-icon" href="#"><icon-ion-logo-twitter /></a>
-          <a class="contact-icon" href="#"><icon-carbon-logo-linkedin /></a>
+          <a class="contact-icon" href="https://www.instagram.com/carrie16_/" target="_blank"><icon-ion-logo-instagram /></a>
+          <a class="contact-icon" href="https://twitter.com/minato23_" target="_blank"><icon-ion-logo-twitter /></a>
+          <a class="contact-icon" href="https://www.linkedin.com/in/minato1123/" target="_blank"><icon-carbon-logo-linkedin /></a>
         </div>
       </div>
     </div>
@@ -121,7 +139,9 @@ defineEmits(['closeMenu'])
         font-size: 1.2rem;
         padding-left: 0.5rem;
 
-        button {
+        a, button {
+          text-decoration: none;
+          display: block;
           color: var(--text-color);
           width: 100%;
           text-align: left;

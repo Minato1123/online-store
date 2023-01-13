@@ -37,15 +37,30 @@ const { categories } = storeToRefs(useCategoriesStore())
         }" @trigger="closeCategoryMenu"
       >
         <ul v-for="(category, i) in categories" :key="`category-${i}`" class="category-menu-ul">
-          <button class="category-btn">
+          <RouterLink
+            :to="{
+              name: 'categories',
+              params: {
+                categoryId: category.id,
+              },
+            }" class="category-btn" @click="$emit('closeCategoryMenu')"
+          >
             <li>{{ category.name }}</li>
-          </button>
+          </RouterLink>
           <div class="subcategory-btns">
-            <button v-for="(subcategory, j) in category.subCategories" :key="`category-${i}-subcategory-${j}`" class="subcategory-btn">
+            <RouterLink
+              v-for="(subcategory, j) in category.subCategories" :key="`category-${i}-subcategory-${j}`" :to="{
+                name: 'subCategories',
+                params: {
+                  categoryId: category.id,
+                  subCategoryId: subcategory.id,
+                },
+              }" class="subcategory-btn" @click="$emit('closeCategoryMenu')"
+            >
               <li>
                 {{ subcategory.name }}
               </li>
-            </button>
+            </RouterLink>
           </div>
         </ul>
       </OnClickOutside>
@@ -109,9 +124,6 @@ const { categories } = storeToRefs(useCategoriesStore())
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5rem;
-        .subcategory-btn {
-
-        }
       }
 
     }
@@ -123,12 +135,9 @@ const { categories } = storeToRefs(useCategoriesStore())
     color: var(--text-color);
   }
 
-  button {
-    outline: none;
-    border: none;
-    cursor: pointer;
-    background-color: transparent;
+  a {
     transition: all 0.3s;
+    text-decoration: none;
 
     :hover {
       color: var(--main-product-color);
