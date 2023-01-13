@@ -3,12 +3,42 @@ import _ from 'lodash-es'
 import { RouterLink } from 'vue-router'
 import type { PropType } from 'vue'
 import ProductBox from '../components/ProductBox.vue'
-import { useProductsStore } from '../stores/product'
 import { useCategoriesStore } from '../stores/category'
+import type { Product } from '@/types'
 import CategoryMenuMobile from '@/components/CategoryMenuMobile.vue'
 import { getIconComponent } from '@/utils'
+import type { Pagination } from '@/utils/request'
 
-defineProps({
+const props = defineProps({
+  productList: {
+    type: Array as PropType<Product[]>,
+    required: true,
+  },
+  totalNumOfProducts: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  pagination: {
+    type: [Object, null] as PropType<Pagination | null>,
+    required: true,
+  },
+  currentPage: {
+    type: Number,
+    required: true,
+  },
+  pageSize: {
+    type: Number,
+    required: true,
+  },
+  sortBy: {
+    type: String,
+    required: true,
+  },
+  orderBy: {
+    type: String,
+    required: true,
+  },
   linkCategoryId: {
     type: Number,
   },
@@ -17,29 +47,32 @@ defineProps({
   },
 })
 
+const emit = defineEmits(['update:currentPage', 'update:pageSize', 'update:sortBy', 'update:orderBy'])
+
+const { currentPage, pageSize, sortBy, orderBy } = useVModels(props, emit)
+
 const isOpenCategoryMenu = ref(false)
 
-// 商品
-const { products: originalProducts } = storeToRefs(useProductsStore())
-// 商品種類
-const { categories } = storeToRefs(useCategoriesStore())
-
-// 商品排序
-const products = _.cloneDeep(originalProducts)
-const methodOfSort = ref('default')
+const methodOfSort = ref<'default' | 'price-high' | 'price-low'>('default')
 watch(methodOfSort, () => {
-  switch (methodOfSort.value) {
-    case 'default':
-      products.value = originalProducts.value
-      break
-    case 'price-low':
-      products.value = _.sortBy(products.value, [function (p) { return p.price }])
-      break
-    case 'price-high':
-      products.value = _.sortBy(products.value, [function (p) { return -p.price }])
-      break
+  if (!sortBy || !orderBy)
+    return
+  if (methodOfSort.value === 'default') {
+    sortBy.value = 'id'
+    orderBy.value = 'asc'
+  }
+  else if (methodOfSort.value === 'price-high') {
+    sortBy.value = 'price'
+    orderBy.value = 'desc'
+  }
+  else if (methodOfSort.value === 'price-low') {
+    sortBy.value = 'price'
+    orderBy.value = 'asc'
   }
 })
+
+// 商品種類
+const { categories } = storeToRefs(useCategoriesStore())
 
 // 視窗寬度
 const windowWidth = ref(window.innerWidth)
@@ -57,41 +90,27 @@ onUnmounted(() =>
 )
 
 // 每行商品數量
-const numOfProductLine = ref(0)
-
-watch(windowWidth, () => {
+const numOfProductLine = computed(() => {
   if (windowWidth.value >= 785)
-    numOfProductLine.value = 3
+    return 3
   else if (windowWidth.value < 785 && windowWidth.value >= 500)
-    numOfProductLine.value = 2
+    return 2
   else
-    numOfProductLine.value = 1
-}, { immediate: true })
-
-const lineOfProducts = computed(() => _.chunk(products.value, numOfProductLine.value))
-
-// 商品總數
-const numOfProducts = computed(() => products.value.length)
-
-// 每頁商品數量（6 的倍數）
-const productsOfPerPage = ref(6)
-
-// 每頁商品行數
-const numOfProductsPerPage = computed(() => Math.ceil(productsOfPerPage.value / numOfProductLine.value))
-
-// 總頁數
-const numOfPages = computed(() => Math.ceil(numOfProducts.value / productsOfPerPage.value))
-
-// 當前頁數
-const currentPage = ref(1)
-
-// 當前頁商品
-const currentProducts = computed(() => {
-  const start = (currentPage.value - 1) * numOfProductsPerPage.value
-  const end = start + numOfProductsPerPage.value
-  return lineOfProducts.value.slice(start, end)
+    return 1
 })
 
+const lineOfProducts = computed(() => _.chunk(props.productList, numOfProductLine.value))
+
+// 總頁數
+const numOfPages = computed(() => {
+  if (props.pagination == null)
+    return 0
+  if (props.pagination.last == null)
+    return 0
+  return props.pagination.last.page
+})
+
+// 頁碼
 const pageList = computed(() => {
   const list = []
   const minPage = Math.max(currentPage.value - 2, 1)
@@ -116,17 +135,18 @@ const pageList = computed(() => {
 })
 
 function handlePrevPage() {
-  window.scrollTo({ top: 250, behavior: 'smooth' })
-  currentPage.value = currentPage.value - 1
+  if (props.pagination?.prev == null)
+    return
+  currentPage.value = props.pagination.prev.page
 }
 
 function handleNextPage() {
-  window.scrollTo({ top: 250, behavior: 'smooth' })
-  currentPage.value = currentPage.value + 1
+  if (props.pagination?.next == null)
+    return
+  currentPage.value = props.pagination.next.page
 }
 
 function handleThePage(page: number) {
-  window.scrollTo({ top: 250, behavior: 'smooth' })
   currentPage.value = page
 }
 </script>
@@ -143,7 +163,7 @@ function handleThePage(page: number) {
       <div class="num-total-products">
         <div class="center-num-total-products">
           <icon-gridicons-product />
-          共 {{ numOfProducts }} 件商品
+          共 {{ totalNumOfProducts }} 件商品
         </div>
       </div>
 
@@ -206,13 +226,13 @@ function handleThePage(page: number) {
           </ul>
         </li>
       </ul>
-      <div class="products-list-pages">
+      <div v-if="productList.length > 0" class="products-list-pages">
         <div class="products-list-container">
-          <div v-for="(produntLine, i) in currentProducts" :key="`product-line-${i}`" class="products-list">
+          <div v-for="(produntLine, i) in lineOfProducts" :key="`product-line-${i}`" class="products-list">
             <ProductBox v-for="product in produntLine" :key="`product-${product.id}`" class="products" :product="product" />
           </div>
         </div>
-        <div class="pages-container">
+        <div v-if="pagination != null" class="pages-container">
           <div class="pages">
             <button :disabled="currentPage === 1" class="page-btn icon-btn" @click="handlePrevPage">
               <icon-material-symbols-chevron-left-rounded />
@@ -232,6 +252,9 @@ function handleThePage(page: number) {
             </button>
           </div>
         </div>
+      </div>
+      <div v-else class="no-products">
+        目前沒有商品喔～ 去看看其他分類吧！
       </div>
     </div>
   </div>
@@ -440,6 +463,15 @@ function handleThePage(page: number) {
         }
       }
     }
+  }
+
+  .no-products {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--text-color);
+
   }
 }
 
