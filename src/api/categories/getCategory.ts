@@ -7,18 +7,11 @@ export interface GetCategoryRequestData {
 export interface GetCategoryResponseData {
   id: number
   name: string
-  path: string
   icon: string
-  isOpen: boolean
-  subCategories: {
-    id: number
-    name: string
-    path: string
-  }[]
 }
 
-export function getCategory(requestData: GetCategoryRequestData) {
+export function getCategory({ id }: GetCategoryRequestData) {
   return http.get<GetCategoryResponseData>({
-    url: `/categories/${requestData.id}`,
+    url: `/categories/${id}`,
   })
 }
