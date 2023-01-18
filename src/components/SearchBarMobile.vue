@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { OnClickOutside } from '@vueuse/components'
 import type { PropType } from 'vue'
+import router from '@/router'
 
 const props = defineProps({
   isOpenSearchBar: {
@@ -25,6 +26,11 @@ window.addEventListener('keydown', (e) => {
   if (e.code === 'Escape')
     emit('closeSearchBar')
 }, false)
+
+const searchText = ref<string>('')
+function handleSearch() {
+  router.push({ name: 'search', params: { keyword: searchText.value } })
+}
 </script>
 
 <template>
@@ -35,8 +41,10 @@ window.addEventListener('keydown', (e) => {
     }" @trigger="closeSearchBar"
   >
     <div class="search-bar">
-      <input type="text" placeholder="Search">
-      <button>搜尋</button>
+      <input v-model="searchText" type="text" placeholder="Search" @keyup.enter="handleSearch">
+      <button @click="handleSearch">
+        搜尋
+      </button>
     </div>
   </OnClickOutside>
 </template>

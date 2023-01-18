@@ -4,7 +4,11 @@ import ProductDialog from './ProductDialog.vue'
 import type { Product } from '@/types/index'
 import router from '@/router'
 import { getPublicImgSrc } from '@/utils/index'
-import { useFollowedProductsStore } from '@/stores/followedProduct'
+import { getProductImagesByProductId } from '@/api/productImages/getProductImagesByProductId'
+import type { GetProductImagesByProductIdResponseData } from '@/api/productImages/getProductImagesByProductId'
+import { getProductListFromFollowingByUserId, type getProductListFromFollowingByUserIdResponseData } from '@/api/followItems/getProductListFromFollowingByUserId'
+import { addProductToFollowing } from '@/api/followItems/addProductToFollowing'
+import { deleteProductFromFollowing } from '@/api/followItems/deleteProductFromFollowing'
 
 const props = defineProps({
   product: {
@@ -13,14 +17,45 @@ const props = defineProps({
   },
 })
 
-const { addFollowedProduct, removeFollowedProduct, isInFollowedProducts } = useFollowedProductsStore()
+const productImages = ref<GetProductImagesByProductIdResponseData[]>([])
+const followProductList = ref<getProductListFromFollowingByUserIdResponseData[]>([])
 
-function handleFollowedProducts() {
-  if (isInFollowedProducts(props.product))
-    removeFollowedProduct(props.product)
+async function fetchProductImages() {
+  productImages.value = (await getProductImagesByProductId({ productId: props.product.id })).data
+}
 
-  else
-    addFollowedProduct(props.product)
+async function fetchFollowProductList() {
+  followProductList.value = (await getProductListFromFollowingByUserId({ userId: 1 })).data
+}
+
+watch(props, async () => {
+  await fetchProductImages()
+  fetchFollowProductList()
+})
+
+onMounted(() => {
+  fetchProductImages()
+  fetchFollowProductList()
+})
+
+const followingList = computed(() => {
+  return new Set(followProductList.value.map(item => item.productId))
+})
+
+async function handleFollowedProducts() {
+  const p = props.product
+  if (p == null)
+    return
+
+  if (followingList.value.has(p.id)) {
+    const followItem = followProductList.value.find(item => item.productId === p.id)
+    if (followItem != null)
+      await deleteProductFromFollowing({ id: followItem.id })
+  }
+  else {
+    await addProductToFollowing({ data: { productId: p.id, userId: 1 } })
+  }
+  fetchFollowProductList()
 }
 
 const isOpenProductQuickPage = ref(false)
@@ -43,7 +78,7 @@ function handleClickProductBox(categoryId: number, subCategoryId: number, produc
     :class="$attrs.class"
     @click="handleClickProductBox(product.categoryId, product.subCategoryId, product.id)"
   >
-    <img :src="getPublicImgSrc(product.images[0])" alt="product's image">
+    <img v-if="productImages[0] != null" :src="getPublicImgSrc(productImages[0].image)" alt="product's image">
     <div class="product-content">
       <div class="product-info">
         <div class="product-name">
@@ -55,7 +90,7 @@ function handleClickProductBox(categoryId: number, subCategoryId: number, produc
               <icon-bi-cart-plus />
             </button>
             <button @click.stop="handleFollowedProducts">
-              <icon-icon-park-solid-like v-if="isInFollowedProducts(product)" /><icon-icon-park-outline-like v-else />
+              <icon-icon-park-solid-like v-if="followingList.has(product.id)" /><icon-icon-park-outline-like v-else />
             </button>
           </div>
         </div>

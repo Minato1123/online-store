@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { sum } from 'lodash-es'
 import { getPublicImgSrc } from '../utils/index'
-import type { ProductBought, ProductInCart } from '@/types/index'
+import type { OrdererData, ProductBought, ProductInCart } from '@/types/index'
 import { useProductsStore } from '@/stores/product'
 import { useShoppingCartStore } from '@/stores/shoppingCart'
 import { useProductBoughtListStore } from '@/stores/productBought'
@@ -16,6 +16,24 @@ const props = defineProps({
 const { shoppingCartList } = storeToRefs(useShoppingCartStore())
 const { productBoughtList } = storeToRefs(useProductBoughtListStore())
 const { getProductSpec } = useProductsStore()
+
+const ordererData = ref<OrdererData>({
+  name: '',
+  mobile: '',
+  email: '',
+  payment: {
+    method: 'credit-card',
+    cardNumber: '',
+    cardOwner: '',
+    cardValidDate: '',
+    cardValidCode: '',
+  },
+  delivery: {
+    method: 'delivery',
+    county: '',
+    address: '',
+  },
+})
 
 const productsInCurrentPage = computed<ProductInCart[] | ProductBought[]>(() => {
   if (props.target === 'completed')

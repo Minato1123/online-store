@@ -22,15 +22,26 @@ const orderListCompleted = computed(() => {
         <div class="subtitle">
           訂單準備中
         </div>
-        <div class="order-content">
-          <div v-for="(item, i) in orderListPrepared" :key="`prepared-${i + 1}`" class="item">
-            <div>{{ i + 1 }}</div>
-            <div>{{ item.name }}</div>
-            <div>{{ item.specification }}</div>
-            <div>{{ item.amount }}</div>
-            <div>{{ item.price * item.amount }}</div>
-          </div>
-        </div>
+        <table v-if="orderListPrepared.length > 0" class="order-content">
+          <thead>
+            <tr class="item">
+              <th>編號</th>
+              <th>商品名稱</th>
+              <th>規格</th>
+              <th>數量</th>
+              <th>總計</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, i) in orderListPrepared" :key="`prepared-${i + 1}`" class="item">
+              <td>{{ i + 1 }}</td>
+              <td>{{ item.name }}</td>
+              <td>{{ item.specification }}</td>
+              <td>{{ item.amount }}</td>
+              <td>{{ item.price * item.amount }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
       <div class="order-shipped-block block">
         <div class="subtitle">
@@ -55,8 +66,6 @@ const orderListCompleted = computed(() => {
 <style lang="scss" scoped>
   .purchase-list-container {
     padding: 2rem;
-    display: flex;
-    flex-direction: column;
 
     .block {
       width: 100%;
@@ -66,15 +75,17 @@ const orderListCompleted = computed(() => {
       font-size: 1.1rem;
       font-weight: 500;
       margin: 1rem 0;
-      color: var(--text-color)
+      color: var(--main-color)
     }
     .order-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      width: 100%;
+      color: var(--text-color);
+
+      th, td {
+        height: 1.5rem;
+        text-align: center;
+      }
       .item {
-        display: flex;
-        justify-content: space-between;
         width: 100%;
         padding: 0.5rem 0;
       }

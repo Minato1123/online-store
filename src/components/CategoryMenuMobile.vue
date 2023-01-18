@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { OnClickOutside } from '@vueuse/components'
-import { useCategoriesStore } from '@/stores/category'
+import { getCategoryList } from '@/api/categories/getCategoryList'
+import { getSubCategoryList } from '@/api/subCategories/getSubCategoryList'
+import type { GetCategoryResponseData } from '@/api/categories/getCategory'
+import type { GetSubCategoryResponseData } from '@/api/subCategories/getSubCategory'
 
 defineProps({
   isOpenCategoryMenu: {
@@ -11,6 +14,35 @@ defineProps({
 
 const emit = defineEmits(['closeCategoryMenu'])
 
+const categoryList = ref<GetCategoryResponseData[]>([])
+async function fetchCategoryList() {
+  categoryList.value = (await getCategoryList()).data
+}
+
+const currentCategoryList = ref<{
+  id: number
+  name: string
+  subCategoryList: GetSubCategoryResponseData[]
+}[]>([])
+
+async function fetchCurrentCategoryList() {
+  currentCategoryList.value = await Promise.all(
+    (categoryList.value ?? []).map(async (item) => {
+      const subCategoryList = (await getSubCategoryList({ categoryId: item.id })).data
+      return {
+        id: item.id,
+        name: item.name,
+        subCategoryList,
+      }
+    }),
+  )
+}
+
+onMounted(async () => {
+  await fetchCategoryList()
+  await fetchCurrentCategoryList()
+})
+
 function closeCategoryMenu() {
   emit('closeCategoryMenu')
 }
@@ -19,8 +51,6 @@ window.addEventListener('keydown', (e) => {
   if (e.code === 'Escape')
     closeCategoryMenu()
 }, false)
-
-const { categories } = storeToRefs(useCategoriesStore())
 </script>
 
 <template>
@@ -36,7 +66,7 @@ const { categories } = storeToRefs(useCategoriesStore())
           'invisible-menu': !isOpenCategoryMenu,
         }" @trigger="closeCategoryMenu"
       >
-        <ul v-for="(category, i) in categories" :key="`category-${i}`" class="category-menu-ul">
+        <ul v-for="(category, i) in currentCategoryList" :key="`category-${i}`" class="category-menu-ul">
           <RouterLink
             :to="{
               name: 'categories',
@@ -49,7 +79,7 @@ const { categories } = storeToRefs(useCategoriesStore())
           </RouterLink>
           <div class="subcategory-btns">
             <RouterLink
-              v-for="(subcategory, j) in category.subCategories" :key="`category-${i}-subcategory-${j}`" :to="{
+              v-for="(subcategory, j) in category.subCategoryList" :key="`category-${i}-subcategory-${j}`" :to="{
                 name: 'subCategories',
                 params: {
                   categoryId: category.id,

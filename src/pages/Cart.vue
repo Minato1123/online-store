@@ -1,22 +1,54 @@
 <script lang="ts" setup>
-import type { Ref } from 'vue'
+import { RouterLink } from 'vue-router'
 import { getPublicImgSrc } from '../utils/index'
-import type { ProductInCart } from '@/types/index'
-import { useProductsStore } from '@/stores/product'
-import { useShoppingCartStore } from '@/stores/shoppingCart'
 import PButton from '@/components/PButton.vue'
 import IconShoppingBasketLine from '~icons/ri/shopping-basket-line'
 import router from '@/router/index'
 import IconCashRegister from '~icons/fa-solid/cash-register'
+import { getProductListFromShoppingCartByUserId } from '@/api/cartItems/getProductListFromShoppingCartByUserId'
+import type { getProductListFromShoppingCartByUserIdResponseData } from '@/api/cartItems/getProductListFromShoppingCartByUserId'
+import { getProduct } from '@/api/products/getProduct'
+import { getProductImagesByProductId } from '@/api/productImages/getProductImagesByProductId'
+import { getProductSpecificationsByProductId } from '@/api/productSpecifications/getProductSpecificationsByProductId'
+import type { ProductInCart } from '@/types'
+import { deleteProductFromCart } from '@/api/cartItems/deleteProductFromCart'
+import { updateProductToShoppingCart } from '@/api/cartItems/updateProductToShoppingCart'
 
-const { shoppingCartList } = storeToRefs(useShoppingCartStore())
-const { removeProductInShoppingCart } = useShoppingCartStore()
-const { getProductById, getProductSpec } = useProductsStore()
+const shoppingCartList = ref<getProductListFromShoppingCartByUserIdResponseData[]>()
+async function fetchCartItemsByUserId() {
+  shoppingCartList.value = (await getProductListFromShoppingCartByUserId({ userId: 1 })).data
+}
 
-const productCartList: Ref<ProductInCart[]> = shoppingCartList
+const cartProductList = ref<ProductInCart[]>([])
+async function fetchCartProductList() {
+  cartProductList.value = await Promise.all(
+    (shoppingCartList.value ?? []).map(async (item) => {
+      const product = (await getProduct({ id: item.productId })).data
+      const productImage = (await getProductImagesByProductId({ productId: item.productId })).data
+      const productSpec = (await getProductSpecificationsByProductId({ productId: item.productId })).data
+      return {
+        id: item.id,
+        productId: item.productId,
+        categoryId: product.categoryId,
+        subCategoryId: product.subCategoryId,
+        name: product.name,
+        image: productImage[0].image,
+        price: product.price,
+        amount: item.amount,
+        specificationId: item.specificationId,
+        specificationName: productSpec.find(spec => spec.id === item.specificationId)?.specName ?? '無',
+      }
+    }),
+  )
+}
 
-const numOfproductCart = computed(() => productCartList.value.reduce((acc, cur) => acc + cur.amount, 0))
-const total = computed(() => productCartList.value.reduce((acc, cur) => acc + cur.amount * cur.price, 0))
+onMounted(async () => {
+  await fetchCartItemsByUserId()
+  await fetchCartProductList()
+})
+
+const numOfproductCart = computed(() => cartProductList.value.reduce((acc, cur) => acc + cur.amount, 0))
+const total = computed(() => cartProductList.value.reduce((acc, cur) => acc + cur.amount * cur.price, 0))
 
 const textInGoShoppingBtn = {
   text: '繼續購物',
@@ -30,22 +62,63 @@ const textInCheckoutBtn = {
   afterTextIcon: IconCashRegister,
 }
 
+const checkedIdSet = ref(new Set<number>())
+
+function checkeItem(id: number) {
+  checkedIdSet.value.add(id)
+}
+
+function uncheckeItem(id: number) {
+  checkedIdSet.value.delete(id)
+}
+
+function checkAllItems() {
+  cartProductList.value.forEach((item) => {
+    checkedIdSet.value.add(item.id)
+  })
+}
+
+function uncheckAllItems() {
+  checkedIdSet.value.clear()
+}
+
+async function handleDeleteCheckedItems() {
+  await Promise.all(Array.from(checkedIdSet.value).map(id => deleteProductFromCart({ id })))
+  checkedIdSet.value.clear()
+  await fetchCartItemsByUserId()
+  await fetchCartProductList()
+}
+
 function handleCheckout() {
   router.push({ name: 'checkout' })
 }
 
-function handleClickProduct(productId: number) {
-  const p = getProductById(productId)
-  if (p) {
-    router.push({
-      name: 'product',
-      params: {
-        categoryId: p.categoryId,
-        subCategoryId: p.subCategoryId,
-        productId: p.id,
-      },
-    })
-  }
+function handleClickProduct(productId: number, categoryId: number, subCategoryId: number) {
+  router.push({
+    name: 'product',
+    params: {
+      categoryId,
+      subCategoryId,
+      productId,
+    },
+  })
+}
+
+async function handleClickDelete(id: number) {
+  await deleteProductFromCart({ id })
+  await fetchCartItemsByUserId()
+  await fetchCartProductList()
+}
+
+async function updateCartItemAmount(id: number, amount: number) {
+  await updateProductToShoppingCart({
+    data: {
+      id,
+      amount,
+    },
+  })
+  await fetchCartItemsByUserId()
+  await fetchCartProductList()
 }
 </script>
 
@@ -53,10 +126,19 @@ function handleClickProduct(productId: number) {
   <div class="cart-container">
     <div class="cart-title">
       購物車
+      <button :disabled="checkedIdSet.size <= 0" class="all-delete-btn" @click="handleDeleteCheckedItems">
+        全部刪除
+      </button>
     </div>
     <div class="cart-bar">
       <div class="bar-all-product">
-        <button><icon-material-symbols-check-box-outline-blank /></button>全部商品
+        <button v-if="checkedIdSet.size === cartProductList.length && cartProductList.length > 0" @click="uncheckAllItems">
+          <icon-material-symbols-check-box-outline />
+        </button>
+        <button v-else @click="checkAllItems">
+          <icon-material-symbols-check-box-outline-blank />
+        </button>
+        全部商品
       </div>
       <div class="bar-else">
         規格
@@ -75,36 +157,41 @@ function handleClickProduct(productId: number) {
       </div>
     </div>
     <div v-if="numOfproductCart !== 0" class="cart-content">
-      <div v-for="product in productCartList" :key="`product-cart-${product.id}`" class="product">
+      <div v-for="product in cartProductList" :key="`product-cart-${product.id}`" class="product">
         <div class="product-checkbox">
-          <button><icon-material-symbols-check-box-outline-blank /></button>
+          <button v-if="checkedIdSet.has(product.id)" @click="uncheckeItem(product.id)">
+            <icon-material-symbols-check-box-outline />
+          </button>
+          <button v-else @click="checkeItem(product.id)">
+            <icon-material-symbols-check-box-outline-blank />
+          </button>
         </div>
-        <div class="product-name" @click="handleClickProduct(product.productId)">
+        <div class="product-name" @click="handleClickProduct(product.productId, product.categoryId, product.subCategoryId)">
           <img class="product-img" :src="getPublicImgSrc(product.image)" alt="">
           {{ product.name }}
         </div>
         <div class="product-spec product-else">
-          {{ product.specification === null ? '無' : getProductSpec(product.productId, product.specification) }}
+          {{ product.specificationName }}
         </div>
         <div class="product-price product-else">
           NT$ {{ product.price }}
         </div>
         <div class="product-amount product-else">
-          <input v-model="product.amount" type="number" min="1" max="100">
+          <input v-model="product.amount" type="number" min="1" max="10" @click="updateCartItemAmount(product.id, product.amount)">
         </div>
         <div class="product-total product-else">
           NT$ {{ product.amount * product.price }}
         </div>
         <div class="product-rwd">
-          <img class="product-img" :src="getPublicImgSrc(product.image)" alt="" @click="handleClickProduct(product.productId)">
+          <img class="product-img" :src="getPublicImgSrc(product.image)" alt="" @click="handleClickProduct(product.productId, product.categoryId, product.subCategoryId)">
           <div class="product-rwd-else">
             <div>{{ product.name }}</div>
             <div>
-              規格：{{ product.specification === null ? '無' : getProductSpec(product.productId, product.specification) }}
+              規格：{{ product.specificationName }}
             </div>
             <div>單價：NT$ {{ product.price }}</div>
             <div>
-              數量：<input v-model="product.amount" type="number" min="1" max="100">
+              數量：<input v-model="product.amount" type="number" min="1" max="10" @click="updateCartItemAmount(product.id, product.amount)">
             </div>
             <div class="product-total">
               小計：NT$ {{ product.amount * product.price }}
@@ -112,7 +199,7 @@ function handleClickProduct(productId: number) {
           </div>
         </div>
         <div class="product-delete">
-          <button @click="removeProductInShoppingCart(product.id)">
+          <button @click="handleClickDelete(product.id)">
             <icon-bi-cart-x />
           </button>
         </div>
@@ -164,6 +251,25 @@ function handleClickProduct(productId: number) {
       width: 100%;
       display: flex;
       justify-content: start;
+      align-items: center;
+      gap: 1rem;
+
+      .all-delete-btn {
+        padding: 0.3rem;
+        background-color: var(--match-color);
+        font-size: 1rem;
+        color: var(--white-color);
+        box-shadow: 1px 1px 1px 0px rgba($color: #000000, $alpha: 0.3);
+
+        &:hover {
+          opacity: 0.8;
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: default;
+        }
+      }
     }
 
     .cart-bar {

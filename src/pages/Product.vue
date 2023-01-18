@@ -1,63 +1,124 @@
 <script lang="ts" setup>
 import { RouterLink } from 'vue-router'
 import router from '@/router'
-import type { BtnType, InfoType, Product, SlideType } from '@/types/index'
+import type { BtnType, InfoType, SlideType } from '@/types/index'
 import { getPublicImgSrc } from '@/utils/index'
-import PButton from '@/components/PButton.vue'
 import ProductBox from '@/components/ProductBox.vue'
+import PButton from '@/components/PButton.vue'
 import InfoDialog from '@/components/InfoDialog.vue'
 import Slide from '@/components/Slide.vue'
 
-import { useProductsStore } from '@/stores/product'
-import { useFollowedProductsStore } from '@/stores/followedProduct'
-import { useCategoriesStore } from '@/stores/category'
 import { useShoppingCartStore } from '@/stores/shoppingCart'
 import IconCartPlus from '~icons/bi/cart-plus'
 import IconCartCheckFill from '~icons/bi/cart-check-fill'
 
-const { getProductById } = useProductsStore()
-const { products } = storeToRefs(useProductsStore())
+import { getProduct } from '@/api/products/getProduct'
+import type { GetProductResponseData } from '@/api/products/getProduct'
+import { getProductSpecificationsByProductId } from '@/api/productSpecifications/getProductSpecificationsByProductId'
+import type { GetProductSpecificationsByProductIdResponseData } from '@/api/productSpecifications/getProductSpecificationsByProductId'
+import { getProductImagesByProductId } from '@/api/productImages/getProductImagesByProductId'
+import type { GetProductImagesByProductIdResponseData } from '@/api/productImages/getProductImagesByProductId'
+import { getProductDescriptionByProductId } from '@/api/productDescription/getProductDescriptionByProductId'
+import type { GetProductDescriptionByProductIdResponseData } from '@/api/productDescription/getProductDescriptionByProductId'
+import { getCategory } from '@/api/categories/getCategory'
+import type { GetCategoryResponseData } from '@/api/categories/getCategory'
+import { getSubCategory } from '@/api/subCategories/getSubCategory'
+import type { GetSubCategoryResponseData } from '@/api/subCategories/getSubCategory'
+import { getRecommendProductList } from '@/api/products/getRecommendProductList'
+import { getProductListFromFollowingByUserId } from '@/api/followItems/getProductListFromFollowingByUserId'
+import type { getProductListFromFollowingByUserIdResponseData } from '@/api/followItems/getProductListFromFollowingByUserId'
+import { addProductToFollowing } from '@/api/followItems/addProductToFollowing'
+import { deleteProductFromFollowing } from '@/api/followItems/deleteProductFromFollowing'
+
 const route = useRoute()
 const productId = computed(() => route.params.productId)
-const product = ref<Product | null>(null)
+const product = ref<GetProductResponseData | null>(null)
+const productSpec = ref<GetProductSpecificationsByProductIdResponseData[]>([])
+const productImages = ref<GetProductImagesByProductIdResponseData[]>([])
+const productDescription = ref<GetProductDescriptionByProductIdResponseData[]>([])
+const category = ref<GetCategoryResponseData | null>(null)
+const subCategory = ref<GetSubCategoryResponseData | null>(null)
+const recommendProductList = ref<GetProductResponseData[]>([])
+const followProductList = ref<getProductListFromFollowingByUserIdResponseData[]>([])
 
-watch(productId, () => {
-  const temp = getProductById(Number(productId.value))
-  if (temp == null) {
-    product.value = null
+async function fetchProduct() {
+  product.value = (await getProduct({ id: Number(productId.value) })).data
+}
+
+async function fetchProductSpec() {
+  productSpec.value = (await getProductSpecificationsByProductId({ productId: Number(productId.value) })).data
+}
+
+async function fetchProductImages() {
+  productImages.value = (await getProductImagesByProductId({ productId: Number(productId.value) })).data
+}
+
+async function fetchProductDescription() {
+  productDescription.value = (await getProductDescriptionByProductId({ productId: Number(productId.value) })).data
+}
+
+async function fetchCategory() {
+  if (product.value == null)
     return
+  category.value = (await getCategory({ id: Number(product.value.categoryId) })).data
+}
+
+async function fetchSubCategory() {
+  if (product.value == null)
+    return
+  subCategory.value = (await getSubCategory({ id: Number(product.value.subCategoryId) })).data
+}
+
+async function fetchRecommendProductList() {
+  if (product.value == null)
+    return
+  recommendProductList.value = (await getRecommendProductList({ productId: product.value.id, categoryId: Number(product.value.categoryId), subCategoryId: Number(product.value.subCategoryId) })).data
+}
+
+async function fetchFollowProductList() {
+  followProductList.value = (await getProductListFromFollowingByUserId({ userId: 1 })).data
+}
+
+watch(productId, async () => {
+  await fetchProduct()
+  fetchProductSpec()
+  fetchProductImages()
+  fetchProductDescription()
+  fetchCategory()
+  fetchSubCategory()
+  fetchRecommendProductList()
+  fetchFollowProductList()
+})
+
+onMounted(async () => {
+  await fetchProduct()
+  fetchProductSpec()
+  fetchProductImages()
+  fetchProductDescription()
+  fetchCategory()
+  fetchSubCategory()
+  fetchRecommendProductList()
+  fetchFollowProductList()
+})
+
+const followingList = computed(() => {
+  return new Set(followProductList.value.map(item => item.productId))
+})
+
+async function handleFollowedProducts() {
+  const p = product.value
+  if (p == null)
+    return
+
+  if (followingList.value.has(p.id)) {
+    const followItem = followProductList.value.find(item => item.productId === p.id)
+    if (followItem != null)
+      await deleteProductFromFollowing({ id: followItem.id })
   }
-  product.value = temp
-}, { immediate: true })
-
-const { getCategoryById, getSubCategoryById } = useCategoriesStore()
-
-const category = computed(() => {
-  if (product.value == null)
-    return null
-
-  else
-    return getCategoryById(product.value.categoryId) ?? null
-})
-
-const subCategory = computed(() => {
-  if (product.value == null)
-    return null
-
-  else
-    return getSubCategoryById(product.value.categoryId, product.value.subCategoryId) ?? null
-})
-
-const { addFollowedProduct, removeFollowedProduct, isInFollowedProducts } = useFollowedProductsStore()
-
-function handleFollowedProducts() {
-  if (product.value == null)
-    throw new Error('product is null')
-
-  if (isInFollowedProducts(product.value))
-    removeFollowedProduct(product.value)
-  else
-    addFollowedProduct(product.value)
+  else {
+    await addProductToFollowing({ data: { productId: p.id, userId: 1 } })
+  }
+  fetchFollowProductList()
 }
 
 const activeImageIndex = ref(0)
@@ -67,19 +128,11 @@ const hasSpecifications = computed(() => {
     return false
 
   else
-    return product.value.specifications.length > 0
+    return productSpec.value.length > 0
 })
 const amountOfProduct = ref(1)
 
 const showTab = ref<'image' | 'info'>('image')
-
-const recommendProducts = computed<Product[]>(() => {
-  const theProduct = product.value
-  if (theProduct == null)
-    return []
-  else
-    return products.value.filter(p => p.categoryId === theProduct.categoryId && p.subCategoryId === theProduct.subCategoryId && p.id !== theProduct.id)
-})
 
 const textInBtnToAddCart: BtnType = {
   text: '加入購物車',
@@ -132,43 +185,68 @@ const slideImgs = computed(() => {
     return null
 
   else
-    return product.value.images ?? null
+    return productImages.value.map(img => img.image) ?? null
 })
 
-const slidesConfig: SlideType = {
-  slides: slideImgs.value ?? [],
-  height: '100%',
-  hasPage: false,
-  hasTimeInterval: false,
-  btnColor: 'black',
-}
+const slidesConfig = computed<SlideType>(() => {
+  return {
+    slides: slideImgs.value ?? [],
+    height: '100%',
+    hasPage: false,
+    hasTimeInterval: false,
+    btnColor: 'black',
+  }
+})
 </script>
 
 <template>
   <div v-if="product != null" class="product-container">
     <div class="breadcrumb">
       <RouterLink
-        class="home-btn" :to="{
+        class="link-btn" :to="{
           name: 'home',
         }"
       >
         <icon-mdi-home-variant />
       </RouterLink>
-      <span>/</span>{{ category?.name }}<span>/</span>{{ subCategory?.name }}
+      <span>/</span><RouterLink
+        v-if="category != null"
+        class="link-btn"
+        :to="{
+          name: 'categories',
+          params: {
+            categoryId: category.id,
+          },
+        }"
+      >
+        {{ category.name }}
+      </RouterLink><span>/</span><RouterLink
+        v-if="subCategory != null && category != null"
+        class="link-btn"
+        :to="{
+          name: 'subCategories',
+          params: {
+            categoryId: category.id,
+            subCategoryId: subCategory.id,
+          },
+        }"
+      >
+        {{ subCategory.name }}
+      </RouterLink>
     </div>
     <div class="product-main-container">
       <div v-if="slidesConfig.slides != null" class="image-block">
         <Slide v-model:selectedPage="activeImageIndex" :slides-config="slidesConfig" />
         <div class="product-images-list">
           <label
-            v-for="(image, i) in product.images" :key="`image-${i}`" :class="{
+            v-for="(imgObj, i) in productImages" :key="`image-${i}`" :class="{
               active: activeImageIndex === i,
             }" class="product-image-radio"
           >
             <input
               v-model="activeImageIndex" class="hidden" type="radio" name="product-image" :value="i"
             >
-            <img class="product-image" :src="getPublicImgSrc(image)">
+            <img class="product-image" :src="getPublicImgSrc(imgObj.image)">
           </label>
         </div>
       </div>
@@ -177,13 +255,13 @@ const slidesConfig: SlideType = {
           {{ product.name }}
         </div>
         <div class="description">
-          <div v-for="(decsLine, i) in product.description" :key="`decs-${i}`">
-            {{ decsLine }}
+          <div v-for="(decsLineObj, i) in productDescription" :key="`decs-${i}`">
+            {{ decsLineObj.description }}
           </div>
         </div>
         <div class="follow-price">
           <button @click="handleFollowedProducts">
-            <icon-icon-park-solid-like v-if="isInFollowedProducts(product)" /><icon-icon-park-outline-like v-else />
+            <icon-icon-park-solid-like v-if="followingList.has(product.id)" /><icon-icon-park-outline-like v-else />
           </button>
           <div class="price">
             NT$ {{ product.price }}
@@ -195,13 +273,13 @@ const slidesConfig: SlideType = {
               規格
             </div>
             <div class="spec-subblock">
-              <label v-for="(spec, i) in product.specifications" :key="`spec-${i}`" class="spec-label" :class="{ 'spec-active': specPicked === i }">
+              <label v-for="(spec, i) in productSpec" :key="`spec-${i}`" class="spec-label" :class="{ 'spec-active': specPicked === i }">
                 <input
                   v-model="specPicked" class="spec-radio hidden"
                   type="radio" name="specifications"
                   :value="i"
                 >
-                {{ spec }}
+                {{ spec.specName }}
               </label>
               <label v-if="!hasSpecifications" class="spec-label spec-active">
                 <input
@@ -274,65 +352,65 @@ const slidesConfig: SlideType = {
       </div>
       <div class="line" />
       <div v-if="showTab === 'image'" class="info-images">
-        <img v-for="(img, i) in product.images" :key="`main-image-${i}`" :src="getPublicImgSrc(img)" alt="">
+        <img v-for="(imgObj, i) in productImages" :key="`main-image-${i}`" :src="getPublicImgSrc(imgObj.image)" alt="">
       </div>
       <div v-if="showTab === 'info'" class="info-detail">
-        <div v-if="product.details.size != null" class="info-line">
+        <div v-if="product.size != null" class="info-line">
           <div class="info-subtitle">
             商品尺寸
           </div>
           <div class="info-content">
-            {{ product.details.size }}
+            {{ product.size }}
           </div>
         </div>
-        <div v-if="product.details.wrapSize != null" class="info-line">
+        <div v-if="product.wrapSize != null" class="info-line">
           <div class="info-subtitle">
             包裝尺寸
           </div>
           <div class="info-content">
-            {{ product.details.wrapSize }}
+            {{ product.wrapSize }}
           </div>
         </div>
-        <div v-if="product.details.origin != null" class="info-line">
+        <div v-if="product.origin != null" class="info-line">
           <div class="info-subtitle">
             產地
           </div>
           <div class="info-content">
-            {{ product.details.origin }}
+            {{ product.origin }}
           </div>
         </div>
-        <div v-if="product.details.material != null" class="info-line">
+        <div v-if="product.material != null" class="info-line">
           <div class="info-subtitle">
             材質
           </div>
           <div class="info-content">
-            {{ product.details.material }}
+            {{ product.material }}
           </div>
         </div>
-        <div v-if="product.details.content != null" class="info-line">
+        <div v-if="product.content != null" class="info-line">
           <div class="info-subtitle">
             內容物
           </div>
           <div class="info-content">
-            {{ product.details.content }}
+            {{ product.content }}
           </div>
         </div>
-        <div v-if="product.details.weight != null" class="info-line">
+        <div v-if="product.weight != null" class="info-line">
           <div class="info-subtitle">
             重量
           </div>
           <div class="info-content">
-            {{ product.details.weight }}
+            {{ product.weight }}
           </div>
         </div>
       </div>
     </div>
-    <div v-if="recommendProducts.length > 0" class="else-products">
+    <div v-if="recommendProductList.length > 0" class="else-products">
       <div class="else-title">
         推薦商品
       </div>
       <div class="products">
-        <ProductBox v-for="(p, i) in recommendProducts" :key="`recommend-product-${i}`" :product="p" />
+        <ProductBox v-for="(rp, i) in recommendProductList" :key="`recommend-product-${i}`" :product="rp" />
       </div>
     </div>
   </div>
@@ -343,6 +421,10 @@ const slidesConfig: SlideType = {
 .hidden {
   width: 0.1px;
   height: 0.1px;
+}
+
+a {
+  text-decoration: none;
 }
 
   .product-container {
@@ -357,7 +439,7 @@ const slidesConfig: SlideType = {
       color: var(--main-color);
       padding-left: 2rem;
 
-      .home-btn {
+      .link-btn {
         color: var(--main-color);
         display: flex;
       }
@@ -646,6 +728,7 @@ const slidesConfig: SlideType = {
 
     .else-products {
       margin: 2rem auto;
+      overflow-x: auto;
       .else-title {
         padding: 0.5rem 1.6rem;
         border-radius: 2rem;

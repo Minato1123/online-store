@@ -3,6 +3,9 @@ import PCheckoutLayout from '@/components/PCheckoutLayout.vue'
 import PButton from '@/components/PButton.vue'
 import IconShoppingBasketLine from '~icons/ri/shopping-basket-line'
 
+const route = useRoute()
+const orderId = computed(() => route.params.orderId)
+
 const textInGoShoppingBtn = {
   text: '繼續購物',
   color: 'match-color',

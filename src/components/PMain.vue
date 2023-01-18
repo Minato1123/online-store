@@ -3,11 +3,14 @@ import _ from 'lodash-es'
 import { RouterLink } from 'vue-router'
 import type { PropType } from 'vue'
 import ProductBox from '../components/ProductBox.vue'
-import { useCategoriesStore } from '../stores/category'
 import type { Product } from '@/types'
 import CategoryMenuMobile from '@/components/CategoryMenuMobile.vue'
 import { getIconComponent } from '@/utils'
 import type { Pagination } from '@/utils/request'
+import type { GetCategoryResponseData } from '@/api/categories/getCategory'
+import { getCategoryList } from '@/api/categories/getCategoryList'
+import type { GetSubCategoryResponseData } from '@/api/subCategories/getSubCategory'
+import { getSubCategoryList } from '@/api/subCategories/getSubCategoryList'
 
 const props = defineProps({
   productList: {
@@ -45,6 +48,10 @@ const props = defineProps({
   linkSubCategoryId: {
     type: Number,
   },
+  hasPageAttr: {
+    type: Boolean,
+    required: true,
+  },
 })
 
 const emit = defineEmits(['update:currentPage', 'update:pageSize', 'update:sortBy', 'update:orderBy'])
@@ -72,7 +79,38 @@ watch(methodOfSort, () => {
 })
 
 // 商品種類
-const { categories } = storeToRefs(useCategoriesStore())
+const categoryList = ref<GetCategoryResponseData[]>([])
+async function fetchCategoryList() {
+  categoryList.value = (await getCategoryList()).data
+}
+
+const currentCategoryList = ref<{
+  id: number
+  name: string
+  icon: string
+  subCategoryList: GetSubCategoryResponseData[]
+}[]>([])
+
+async function fetchCurrentCategoryList() {
+  currentCategoryList.value = await Promise.all(
+    (categoryList.value ?? []).map(async (item) => {
+      const subCategoryList = (await getSubCategoryList({ categoryId: item.id })).data
+      return {
+        id: item.id,
+        name: item.name,
+        icon: item.icon,
+        subCategoryList,
+      }
+    }),
+  )
+}
+
+onMounted(async () => {
+  await fetchCategoryList()
+  await fetchCurrentCategoryList()
+})
+
+const isOpenList = ref([...Array(categoryList.value.length)].map(() => false))
 
 // 視窗寬度
 const windowWidth = ref(window.innerWidth)
@@ -153,7 +191,7 @@ function handleThePage(page: number) {
 
 <template>
   <div class="products-block">
-    <div class="products-header">
+    <div v-if="hasPageAttr" class="products-header">
       <div class="produts-intro-title">
         <button @click="isOpenCategoryMenu = !isOpenCategoryMenu">
           <span>商品分類</span>
@@ -180,8 +218,8 @@ function handleThePage(page: number) {
       </select>
     </div>
     <div class="products-content">
-      <ul class="categories-block">
-        <li v-for="category in categories" :key="`category-${category.id}`" class="categories-list">
+      <ul v-if="hasPageAttr" class="categories-block">
+        <li v-for="(category, i) in currentCategoryList" :key="`category-${i}`" class="categories-list">
           <div
             class="categories-title"
           >
@@ -198,32 +236,34 @@ function handleThePage(page: number) {
               <Component :is="getIconComponent(category.icon)" />
               <div>{{ category.name }}</div>
             </RouterLink>
-            <span v-show="!category.isOpen" class="open-subcategories-btn" @click="category.isOpen = true">
+            <span v-show="!isOpenList[i]" class="open-subcategories-btn" @click="isOpenList[i] = true">
               <icon-ic-outline-keyboard-arrow-right />
             </span>
-            <span v-show="category.isOpen" class="open-subcategories-btn" @click="category.isOpen = false">
+            <span v-show="isOpenList[i]" class="open-subcategories-btn" @click="isOpenList[i] = false">
               <icon-ic-baseline-keyboard-arrow-down />
             </span>
           </div>
-          <ul v-show="category.isOpen" class="subCategory-block">
-            <li v-for="subCategory in category.subCategories" :key="`subCategory-${subCategory.id}`" class="subCategories-list">
-              <RouterLink
-                :class="{
-                  active: linkCategoryId === category.id && linkSubCategoryId === subCategory.id,
-                }"
-                class="subcategories-link"
-                :to="{
-                  name: 'subCategories',
-                  params: {
-                    categoryId: category.id,
-                    subCategoryId: subCategory.id,
-                  },
-                }"
-              >
-                {{ subCategory.name }}
-              </RouterLink>
-            </li>
-          </ul>
+          <Transition>
+            <ul v-show="isOpenList[i]" class="subCategory-block">
+              <li v-for="subCategory in category.subCategoryList" :key="`subCategory-${subCategory.id}`" class="subCategories-list">
+                <RouterLink
+                  :class="{
+                    active: linkCategoryId === category.id && linkSubCategoryId === subCategory.id,
+                  }"
+                  class="subcategories-link"
+                  :to="{
+                    name: 'subCategories',
+                    params: {
+                      categoryId: category.id,
+                      subCategoryId: subCategory.id,
+                    },
+                  }"
+                >
+                  {{ subCategory.name }}
+                </RouterLink>
+              </li>
+            </ul>
+          </Transition>
         </li>
       </ul>
       <div v-if="productList.length > 0" class="products-list-pages">
@@ -253,7 +293,7 @@ function handleThePage(page: number) {
           </div>
         </div>
       </div>
-      <div v-else class="no-products">
+      <div v-if="pagination == null && productList.length <= 0 && hasPageAttr" class="no-products">
         目前沒有商品喔～ 去看看其他分類吧！
       </div>
     </div>
@@ -262,6 +302,19 @@ function handleThePage(page: number) {
 </template>
 
 <style scoped lang="scss">
+.v-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.v-leave-active {
+  transition: all 0.5s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.v-enter-from,
+.v-leave-to {
+  transform: translateY(-10px);
+  opacity: 0;
+}
 .products-block {
   display: flex;
   flex-direction: column;

@@ -69,6 +69,7 @@ onMounted(() => {
       :product-list="productListByCategory.data"
       :total-num-of-products="totalNumOfProductsByCategory"
       :pagination="productListByCategory.pagination"
+      :has-page-attr="true"
     />
   </div>
 </template>

@@ -6,17 +6,12 @@ export interface Product {
   categoryId: number
   subCategoryId: number
   price: number
-  description: string[]
-  images: string[]
-  specifications: string[]
-  details: {
-    size: string | null
-    wrapSize: string | null
-    origin: string | null
-    material: string | null
-    content: string | null
-    weight: string | null
-  }
+  size: string | null
+  wrapSize: string | null
+  origin: string | null
+  material: string | null
+  content: string | null
+  weight: string | null
 }
 
 export interface Category {
@@ -35,10 +30,13 @@ export interface Category {
 export interface ProductInCart {
   id: number
   productId: number
+  categoryId: number
+  subCategoryId: number
   name: string
   price: number
   image: string
-  specification: number | null
+  specificationId: number | null
+  specificationName: string | null
   amount: number
 }
 
@@ -51,10 +49,9 @@ export interface ProductBought {
   specification: string | null
   amount: number
   price: number
-  dateOfPurchase: string
-  timeOfPurchase: string
-  status: 'prepared' | 'shipped' | 'completed'
 }
+
+export type { OrderPayment, OrderDelivery, OrderData } from '@/api/boughtItems/addOrder'
 
 export interface BtnType {
   text: string

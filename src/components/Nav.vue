@@ -2,12 +2,21 @@
 import { type RouteLocationRaw, RouterLink } from 'vue-router'
 import SearchBarMobile from '@/components/SearchBarMobile.vue'
 import { useUsersStore } from '@/stores/user'
-import { useShoppingCartStore } from '@/stores/shoppingCart'
+import { getTotalNumOfProductFromCartByUserId } from '@/api/cartItems/getTotalNumOfProductsFromCartByUserId'
+import router from '@/router'
 
 defineEmits(['toggleMenu'])
 
+const totalNumOfCartItems = ref<number>(0)
+async function fetchTotalNumOfProductsFromCartByUserId() {
+  totalNumOfCartItems.value = await getTotalNumOfProductFromCartByUserId({ userId: 1 })
+}
+
+onMounted(() => {
+  fetchTotalNumOfProductsFromCartByUserId()
+})
+
 const { getLoginStatus, getCurrentUser, userLogout } = useUsersStore()
-const { getNumOfCartProducts } = useShoppingCartStore()
 const currentUser = computed(() => {
   const user = getCurrentUser()
   if (user != null)
@@ -30,6 +39,15 @@ const userPageRoute = computed<RouteLocationRaw>(() => {
 })
 
 const searchBtnRef = ref<HTMLElement | null>(null)
+const searchText = ref<string>('')
+function handleSearch() {
+  router.push({ name: 'search', query: { keyword: searchText.value } })
+}
+
+function handleEnter(e: KeyboardEvent) {
+  if (!e.isComposing)
+    handleSearch()
+}
 </script>
 
 <template>
@@ -52,8 +70,10 @@ const searchBtnRef = ref<HTMLElement | null>(null)
         </div>
       </RouterLink>
       <div class="search-bar">
-        <input type="text" placeholder="Search...">
-        <button><icon-ic-baseline-search /></button>
+        <input v-model="searchText" type="text" placeholder="Search..." @keydown.enter="handleEnter">
+        <button @click="handleSearch">
+          <icon-ic-baseline-search />
+        </button>
       </div>
       <div class="nav-btns">
         <button class="btn-bell">
@@ -115,8 +135,8 @@ const searchBtnRef = ref<HTMLElement | null>(null)
           >
             <icon-ph-shopping-cart-simple-bold />
           </RouterLink>
-          <div v-if="getNumOfCartProducts() > 0" class="num-of-cart">
-            {{ getNumOfCartProducts() }}
+          <div v-if="totalNumOfCartItems > 0" class="num-of-cart">
+            {{ totalNumOfCartItems }}
           </div>
         </button>
       </div>

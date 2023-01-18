@@ -7,6 +7,11 @@ import { useShoppingCartStore } from '../stores/shoppingCart'
 import PButton from './PButton.vue'
 import InfoDialog from '@/components/InfoDialog.vue'
 import IconCartCheckFill from '~icons/bi/cart-check-fill'
+import { getProductImagesByProductId } from '@/api/productImages/getProductImagesByProductId'
+import type { GetProductImagesByProductIdResponseData } from '@/api/productImages/getProductImagesByProductId'
+import { getProductSpecificationsByProductId } from '@/api/productSpecifications/getProductSpecificationsByProductId'
+import type { GetProductSpecificationsByProductIdResponseData } from '@/api/productSpecifications/getProductSpecificationsByProductId'
+import { addProductToShoppingCart } from '@/api/cartItems/addProductToShoppingCart'
 
 const props = defineProps({
   product: {
@@ -17,6 +22,26 @@ const props = defineProps({
 
 const emit = defineEmits(['closeProductQuickPage'])
 
+const productImages = ref<GetProductImagesByProductIdResponseData[]>([])
+const productSpec = ref<GetProductSpecificationsByProductIdResponseData[]>([])
+
+async function fetchProductImages() {
+  productImages.value = (await getProductImagesByProductId({ productId: props.product.id })).data
+}
+async function fetchProductSpec() {
+  productSpec.value = (await getProductSpecificationsByProductId({ productId: props.product.id })).data
+}
+
+watch(props, async () => {
+  await fetchProductImages()
+  await fetchProductSpec()
+})
+
+onMounted(() => {
+  fetchProductImages()
+  fetchProductSpec()
+})
+
 const { addShoppingCart } = useShoppingCartStore()
 
 const numOfProduct = ref(1)
@@ -26,10 +51,10 @@ function closeProductQuickPage() {
 }
 
 const specPicked = ref<null | number>(null)
-if (props.product.specifications.length > 0)
+if (productSpec.value.length > 0)
   specPicked.value = 0
 
-const hasSpecifications = computed(() => props.product.specifications.length > 0)
+const hasSpecifications = computed(() => productSpec.value.length > 0)
 
 const textInBtnAddCart = {
   text: '加入購物車',
@@ -43,8 +68,15 @@ window.addEventListener('keydown', (e) => {
 }, false)
 
 const isOpenDialogAddCart = ref(false)
-function submitAddCart() {
-  addShoppingCart(props.product.id, specPicked.value, numOfProduct.value)
+async function submitAddCart() {
+  await addProductToShoppingCart({
+    data: {
+      userId: 1,
+      productId: props.product.id,
+      specificationId: specPicked.value,
+      amount: numOfProduct.value,
+    },
+  })
   isOpenDialogAddCart.value = true
   window.setTimeout(() => {
     isOpenDialogAddCart.value = false
@@ -85,8 +117,8 @@ onBeforeUnmount(() => {
               <Icon-material-symbols-close />
             </button>
           </div>
-          <div class="product-img">
-            <img :src="getPublicImgSrc(product.images[0])" alt="">
+          <div v-if="productImages[0] != null" class="product-img">
+            <img :src="getPublicImgSrc(productImages[0].image)" alt="">
           </div>
           <form @submit.prevent="submitAddCart">
             <div class="spec-num">
@@ -95,13 +127,13 @@ onBeforeUnmount(() => {
                   規格
                 </div>
                 <div class="spec-subblock">
-                  <label v-for="(spec, i) in product.specifications" :key="`specifications-${i}`" class="spec-label" :class="{ active: specPicked === i }">
+                  <label v-for="(spec, i) in productSpec" :key="`specifications-${i}`" class="spec-label" :class="{ active: specPicked === spec.id }">
                     <input
                       v-model="specPicked" class="spec-radio"
                       type="radio" name="specifications"
-                      :value="i"
+                      :value="spec.id"
                     >
-                    {{ spec }}
+                    {{ spec.specName }}
                   </label>
                   <label v-if="!hasSpecifications" class="active">
                     <input

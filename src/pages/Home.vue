@@ -96,6 +96,7 @@ const slidesConfig = computed<SlideType>(() => {
       :product-list="productList.data"
       :total-num-of-products="totalNumOfProducts"
       :pagination="productList.pagination"
+      :has-page-attr="true"
     />
   </div>
 </template>

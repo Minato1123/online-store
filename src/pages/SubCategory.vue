@@ -7,6 +7,8 @@ import { getProductListBySubCategory } from '@/api/products/getProductListBySubC
 import { getTotalNumOfProductsBySubCategory } from '@/api/products/getTotalNumOfProductsBySubCategory'
 import type { GetProductBySubCategoryRequestData } from '@/api/products/getProductListBySubCategory'
 import type { GetProductResponseData } from '@/api/products/getProduct'
+import { getSubCategory } from '@/api/subCategories/getSubCategory'
+import type { GetSubCategoryResponseData } from '@/api/subCategories/getSubCategory'
 
 const route = useRoute()
 const categoryId = computed(() => route.params.categoryId)
@@ -15,7 +17,7 @@ const subCategoryId = computed(() => route.params.subCategoryId)
 const productListBySubCategory = ref<Response<GetProductResponseData[]>>()
 const totalNumOfProductsBySubCategory = ref<number>()
 const category = ref<GetCategoryResponseData>()
-const subcategory = computed(() => category.value?.subCategories[+subCategoryId.value - 1])
+const subcategory = ref<GetSubCategoryResponseData>()
 const fetchProductListBySubCategoryParams = ref<GetProductBySubCategoryRequestData>({
   currentPage: 1,
   pageSize: 6,
@@ -33,12 +35,16 @@ async function fetchTotalNumOfProductsByCategory() {
 async function fetchCategory() {
   category.value = (await getCategory({ id: +categoryId.value })).data
 }
+async function fetchSubCategory() {
+  subcategory.value = (await getSubCategory({ id: +subCategoryId.value })).data
+}
 
 watch([categoryId, subCategoryId], async () => {
   fetchProductListBySubCategoryParams.value.categoryId = +categoryId.value
   fetchProductListBySubCategoryParams.value.subCategoryId = +subCategoryId.value
   await fetchProductListByCategory()
   await fetchCategory()
+  await fetchSubCategory()
   await fetchTotalNumOfProductsByCategory()
   window.scrollTo({ top: 0, behavior: 'smooth' })
 })
@@ -46,6 +52,7 @@ watch([categoryId, subCategoryId], async () => {
 watch(fetchProductListBySubCategoryParams, async () => {
   await fetchProductListByCategory()
   await fetchCategory()
+  await fetchSubCategory()
   await fetchTotalNumOfProductsByCategory()
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }, { deep: true })
@@ -53,6 +60,7 @@ watch(fetchProductListBySubCategoryParams, async () => {
 onMounted(() => {
   fetchProductListByCategory()
   fetchCategory()
+  fetchSubCategory()
   fetchTotalNumOfProductsByCategory()
 })
 </script>
@@ -73,6 +81,7 @@ onMounted(() => {
       :product-list="productListBySubCategory.data"
       :total-num-of-products="totalNumOfProductsBySubCategory"
       :pagination="productListBySubCategory.pagination"
+      :has-page-attr="true"
     />
   </div>
 </template>
