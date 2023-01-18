@@ -1,0 +1,588 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "email": "pochacco@example.com",
+      "password": "pochacco229",
+      "name": "帕恰狗",
+      "birthday": "2000-02-29",
+      "mobile": "0901234567",
+      "createAt": 1673426646210
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "包包、時尚小物",
+      "icon": "bagsFashion"
+    },
+    {
+      "id": 2,
+      "name": "個人、美妝用品",
+      "icon": "personalBeauty"
+    },
+    {
+      "id": 3,
+      "name": "文具",
+      "icon": "stationery"
+    },
+    {
+      "id": 4,
+      "name": "絨毛、趣味玩具",
+      "icon": "toys"
+    }
+  ],
+  "subCategories": [
+    {
+      "categoryId": 1,
+      "name": "合成皮革包袋",
+      "id": 1
+    },
+    {
+      "categoryId": 1,
+      "name": "托特包、手提包",
+      "id": 2
+    },
+    {
+      "categoryId": 1,
+      "name": "肩包、斜背包",
+      "id": 3
+    },
+    {
+      "categoryId": 2,
+      "name": "化妝品",
+      "id": 4
+    },
+    {
+      "categoryId": 2,
+      "name": "身體乳、護手霜、護唇膏",
+      "id": 5
+    },
+    {
+      "categoryId": 2,
+      "name": "鏡子、梳子",
+      "id": 6
+    },
+    {
+      "categoryId": 3,
+      "name": "便條紙、信紙",
+      "id": 7
+    },
+    {
+      "categoryId": 3,
+      "name": "貼紙、紙膠帶",
+      "id": 8
+    },
+    {
+      "categoryId": 3,
+      "name": "筆類",
+      "id": 9
+    },
+    {
+      "categoryId": 4,
+      "name": "絨毛娃娃",
+      "id": 10
+    },
+    {
+      "categoryId": 4,
+      "name": "玩偶、吊鏈",
+      "id": 11
+    },
+    {
+      "categoryId": 4,
+      "name": "紓壓小物",
+      "id": 12
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "name": "帕恰狗日製迷你便條本（悠閒生活）",
+      "categoryId": 3,
+      "subCategoryId": 7,
+      "price": 50,
+      "size": "6.8 * 8.8 cm",
+      "wrapSize": "7 * 1 * 9 cm",
+      "origin": "日本",
+      "material": "紙",
+      "content": "兩款圖案、各 50 枚，共 100 枚",
+      "weight": "45 g"
+    },
+    {
+      "id": 2,
+      "name": "帕恰狗 10mm 紙膠帶（快樂下午茶）",
+      "categoryId": 3,
+      "subCategoryId": 8,
+      "price": 75,
+      "size": "膠帶尺寸 ─ 寬 1 cm * 長 10 m",
+      "wrapSize": "5 * 1.5 * 6.5 cm",
+      "origin": "中國大陸",
+      "material": "紙",
+      "content": null,
+      "weight": "10 g"
+    },
+    {
+      "id": 3,
+      "name": "帕恰狗 15mm 紙膠帶（悠閒生活）",
+      "categoryId": 3,
+      "subCategoryId": 8,
+      "price": 95,
+      "size": "膠帶尺寸─寬 1.5 cm * 長 10 m",
+      "wrapSize": "5.5 * 2*7 cm",
+      "origin": "中國大陸",
+      "material": "紙",
+      "content": null,
+      "weight": "14 g"
+    },
+    {
+      "id": 4,
+      "name": "帕恰狗 PU皮革迷你斜背提包（俏皮姿態）",
+      "categoryId": 1,
+      "subCategoryId": 1,
+      "price": 890,
+      "size": "17 * 10 * 15.5 cm - 不含提把長 34 cm、可調式背帶長 70 ~ 132 cm",
+      "wrapSize": "20 * 12 * 18 cm",
+      "origin": "中國大陸",
+      "material": "PU 皮革",
+      "content": "內部收納格、外側收納格（開口為拉鍊式）",
+      "weight": "172 g"
+    },
+    {
+      "id": 5,
+      "name": "帕恰狗鉛筆風原子筆組（永遠在一起）",
+      "categoryId": 3,
+      "subCategoryId": 9,
+      "price": 280,
+      "size": "單支直徑約 0.8 * 16.5 cm、收納袋約 4 * 0.9 * 17.9 cm",
+      "wrapSize": "4.5 * 1 * 18.3 cm",
+      "origin": "中國大陸",
+      "material": "塑膠 - ABS, PVC",
+      "content": "1 組 2 支入（0.5 mm 黑色、0.5 mm 紅色）",
+      "weight": "18 g"
+    },
+    {
+      "id": 6,
+      "name": "帕恰狗與好朋友絨毛娃娃組（盎然春意）",
+      "categoryId": 4,
+      "subCategoryId": 10,
+      "price": 1850,
+      "size": "帕恰狗：約 19 * 14 * 20cm；ピーちゃん：約 9 * 6.5 * 7.5 cm；兔兔：約 8 * 8 * 15 cm",
+      "wrapSize": "25 * 14.7 * 22.2 cm",
+      "origin": "中國大陸",
+      "material": "棉、丙烯酸",
+      "content": null,
+      "weight": "314 g"
+    },
+    {
+      "id": 7,
+      "name": "帕恰狗絨毛娃娃（圓茸療癒）",
+      "categoryId": 4,
+      "subCategoryId": 10,
+      "price": 1024,
+      "size": "33 * 14 * 32.5 cm",
+      "wrapSize": "34 * 15 * 34 cm",
+      "origin": "中國",
+      "material": "棉、丙烯酸",
+      "content": null,
+      "weight": "378 g"
+    },
+    {
+      "id": 8,
+      "name": "帕恰狗隨身雙面鏡（美麗彩櫻Ⅱ）",
+      "categoryId": 2,
+      "subCategoryId": 6,
+      "price": 295,
+      "size": "7.3 * 7.5 * 1.5 cm、鏡面大小約 6 * 6 cm",
+      "wrapSize": "9 * 8 * 1.8 cm",
+      "origin": "中國大陸",
+      "material": "塑膠 - ABS, 玻璃 鏡尺寸：6 * 6 cm",
+      "content": null,
+      "weight": "58 g"
+    }
+  ],
+  "productDescription": [
+    {
+      "productId": 1,
+      "description": "日本製造 Sanrio 文具雜貨",
+      "id": 1
+    },
+    {
+      "productId": 1,
+      "description": "2 款彩色內頁的迷你便條本",
+      "id": 2
+    },
+    {
+      "productId": 1,
+      "description": "留言記事便利又可愛",
+      "id": 3
+    },
+    {
+      "productId": 2,
+      "description": "Sanrio 文具雜貨",
+      "id": 4
+    },
+    {
+      "productId": 2,
+      "description": "圖案豐富，寬度10mm細版紙膠帶",
+      "id": 5
+    },
+    {
+      "productId": 2,
+      "description": "好撕貼，細小範圍也能漂亮黏貼",
+      "id": 6
+    },
+    {
+      "productId": 3,
+      "description": "Sanrio 文具雜貨",
+      "id": 7
+    },
+    {
+      "productId": 3,
+      "description": "圖案豐富的 15mm 標準寬度紙膠帶",
+      "id": 8
+    },
+    {
+      "productId": 3,
+      "description": "好撕貼，隨處裝飾都可愛",
+      "id": 9
+    },
+    {
+      "productId": 4,
+      "description": "Sanrio 生活雜貨",
+      "id": 10
+    },
+    {
+      "productId": 4,
+      "description": "PU 皮革材質的斜背小提包",
+      "id": 11
+    },
+    {
+      "productId": 4,
+      "description": "外出手機卡片現金攜帶好方便",
+      "id": 12
+    },
+    {
+      "productId": 5,
+      "description": "Sanrio 文具雜貨",
+      "id": 13
+    },
+    {
+      "productId": 5,
+      "description": "復古鉛筆外型的黑色 & 紅色原子筆組",
+      "id": 14
+    },
+    {
+      "productId": 5,
+      "description": "書寫筆記、重點標示都清晰便利",
+      "id": 15
+    },
+    {
+      "productId": 6,
+      "description": "Sanrio 生活雜貨",
+      "id": 16
+    },
+    {
+      "productId": 6,
+      "description": "內含帕恰狗與好朋友的 3 入 1 組絨毛娃娃",
+      "id": 17
+    },
+    {
+      "productId": 6,
+      "description": "附透明收納盒，展示也方便不染灰塵",
+      "id": 18
+    },
+    {
+      "productId": 7,
+      "description": "Sanrio 生活雜貨",
+      "id": 19
+    },
+    {
+      "productId": 7,
+      "description": "帶有秋季霧色的絨毛娃娃",
+      "id": 20
+    },
+    {
+      "productId": 7,
+      "description": "戴著彩色的大領巾好時尚",
+      "id": 21
+    },
+    {
+      "productId": 7,
+      "description": "圓滾滾剪影外型、細緻毛茸茸觸感",
+      "id": 22
+    },
+    {
+      "productId": 7,
+      "description": "居家擺放做為靠墊使用",
+      "id": 23
+    },
+    {
+      "productId": 7,
+      "description": "或是懷中擁抱，都超療癒又可愛",
+      "id": 24
+    },
+    {
+      "productId": 7,
+      "description": "附透明收納盒，展示也方便不染灰塵",
+      "id": 25
+    },
+    {
+      "productId": 8,
+      "description": "Sanrio 生活雜貨",
+      "id": 26
+    },
+    {
+      "productId": 8,
+      "description": "內夾櫻花飾片裝飾的隨身雙面鏡",
+      "id": 27
+    },
+    {
+      "productId": 8,
+      "description": "一面是放大鏡面 細微處可看得更清楚",
+      "id": 28
+    }
+  ],
+  "productImages": [
+    {
+      "productId": 1,
+      "image": "/images/products/product-1-1.jpeg",
+      "id": 1
+    },
+    {
+      "productId": 1,
+      "image": "/images/products/product-1-2.jpeg",
+      "id": 2
+    },
+    {
+      "productId": 1,
+      "image": "/images/products/product-1-3.jpeg",
+      "id": 3
+    },
+    {
+      "productId": 1,
+      "image": "/images/products/product-1-4.jpeg",
+      "id": 4
+    },
+    {
+      "productId": 2,
+      "image": "/images/products/product-2-1.jpeg",
+      "id": 5
+    },
+    {
+      "productId": 3,
+      "image": "/images/products/product-3-1.jpeg",
+      "id": 6
+    },
+    {
+      "productId": 3,
+      "image": "/images/products/product-3-2.jpeg",
+      "id": 7
+    },
+    {
+      "productId": 3,
+      "image": "/images/products/product-3-3.jpeg",
+      "id": 8
+    },
+    {
+      "productId": 3,
+      "image": "/images/products/product-3-4.jpeg",
+      "id": 9
+    },
+    {
+      "productId": 3,
+      "image": "/images/products/product-3-5.jpeg",
+      "id": 10
+    },
+    {
+      "productId": 3,
+      "image": "/images/products/product-3-6.jpeg",
+      "id": 11
+    },
+    {
+      "productId": 4,
+      "image": "/images/products/product-4-1.jpeg",
+      "id": 12
+    },
+    {
+      "productId": 4,
+      "image": "/images/products/product-4-2.jpeg",
+      "id": 13
+    },
+    {
+      "productId": 4,
+      "image": "/images/products/product-4-3.jpeg",
+      "id": 14
+    },
+    {
+      "productId": 4,
+      "image": "/images/products/product-4-4.jpeg",
+      "id": 15
+    },
+    {
+      "productId": 4,
+      "image": "/images/products/product-4-5.jpeg",
+      "id": 16
+    },
+    {
+      "productId": 4,
+      "image": "/images/products/product-4-6.jpeg",
+      "id": 17
+    },
+    {
+      "productId": 5,
+      "image": "/images/products/product-5-1.jpeg",
+      "id": 18
+    },
+    {
+      "productId": 5,
+      "image": "/images/products/product-5-2.jpeg",
+      "id": 19
+    },
+    {
+      "productId": 5,
+      "image": "/images/products/product-5-3.jpeg",
+      "id": 20
+    },
+    {
+      "productId": 5,
+      "image": "/images/products/product-5-4.jpeg",
+      "id": 21
+    },
+    {
+      "productId": 5,
+      "image": "/images/products/product-5-5.jpeg",
+      "id": 22
+    },
+    {
+      "productId": 6,
+      "image": "/images/products/product-6-1.jpeg",
+      "id": 23
+    },
+    {
+      "productId": 6,
+      "image": "/images/products/product-6-2.jpeg",
+      "id": 24
+    },
+    {
+      "productId": 6,
+      "image": "/images/products/product-6-3.jpeg",
+      "id": 25
+    },
+    {
+      "productId": 6,
+      "image": "/images/products/product-6-4.jpeg",
+      "id": 26
+    },
+    {
+      "productId": 6,
+      "image": "/images/products/product-6-5.jpeg",
+      "id": 27
+    },
+    {
+      "productId": 6,
+      "image": "/images/products/product-6-6.jpeg",
+      "id": 28
+    },
+    {
+      "productId": 6,
+      "image": "/images/products/product-6-7.jpeg",
+      "id": 29
+    },
+    {
+      "productId": 7,
+      "image": "/images/products/product-7-1.jpeg",
+      "id": 30
+    },
+    {
+      "productId": 7,
+      "image": "/images/products/product-7-2.jpeg",
+      "id": 31
+    },
+    {
+      "productId": 7,
+      "image": "/images/products/product-7-3.jpeg",
+      "id": 32
+    },
+    {
+      "productId": 7,
+      "image": "/images/products/product-7-4.jpeg",
+      "id": 33
+    },
+    {
+      "productId": 8,
+      "image": "/images/products/product-8-1.jpeg",
+      "id": 34
+    },
+    {
+      "productId": 8,
+      "image": "/images/products/product-8-2.jpeg",
+      "id": 35
+    },
+    {
+      "productId": 8,
+      "image": "/images/products/product-8-3.jpeg",
+      "id": 36
+    },
+    {
+      "productId": 8,
+      "image": "/images/products/product-8-4.jpeg",
+      "id": 37
+    },
+    {
+      "productId": 8,
+      "image": "/images/products/product-8-5.jpeg",
+      "id": 38
+    }
+  ],
+  "productSpecifications": [
+    {
+      "productId": 1,
+      "specName": "小",
+      "id": 1
+    },
+    {
+      "productId": 1,
+      "specName": "中",
+      "id": 2
+    },
+    {
+      "productId": 1,
+      "specName": "大",
+      "id": 3
+    }
+  ],
+  "cartItems": [
+    {
+      "userId": 1,
+      "productId": 6,
+      "specificationId": null,
+      "amount": 5,
+      "id": 2
+    }
+  ],
+  "followItems": [],
+  "orders": [
+  ],
+  "boughtItems": [
+  ],
+  "slides": [
+    {
+      "id": 1,
+      "imageUrl": "/images/slides/slide-1.jpeg",
+      "imageTabletUrl": "/images/slides/slide-tablet-1.jpeg",
+      "imageMobileUrl": "/images/slides/slide-mobile-1.jpeg"
+    },
+    {
+      "id": 2,
+      "imageUrl": "/images/slides/slide-2.jpeg",
+      "imageTabletUrl": "/images/slides/slide-tablet-2.jpeg",
+      "imageMobileUrl": "/images/slides/slide-mobile-2.jpeg"
+    },
+    {
+      "id": 3,
+      "imageUrl": "/images/slides/slide-3.jpeg",
+      "imageTabletUrl": "/images/slides/slide-tablet-3.jpeg",
+      "imageMobileUrl": "/images/slides/slide-mobile-3.jpeg"
+    }
+  ]
+}
