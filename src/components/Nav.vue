@@ -3,16 +3,21 @@ import { type RouteLocationRaw, RouterLink } from 'vue-router'
 import SearchBarMobile from '@/components/SearchBarMobile.vue'
 import { useUsersStore } from '@/stores/user'
 import { getTotalNumOfProductFromCartByUserId } from '@/api/cartItems/getTotalNumOfProductsFromCartByUserId'
+import { useCartUpdatedEventBus } from '@/composables/useCartUpdatedEventBus'
 import router from '@/router'
 
 defineEmits(['toggleMenu'])
-
+const { on: onCartUpdated } = useCartUpdatedEventBus()
 const totalNumOfCartItems = ref<number>(0)
 async function fetchTotalNumOfProductsFromCartByUserId() {
   totalNumOfCartItems.value = await getTotalNumOfProductFromCartByUserId({ userId: 1 })
 }
 
 onMounted(() => {
+  fetchTotalNumOfProductsFromCartByUserId()
+})
+
+onCartUpdated(() => {
   fetchTotalNumOfProductsFromCartByUserId()
 })
 

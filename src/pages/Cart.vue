@@ -13,6 +13,9 @@ import { getProductSpecificationsByProductId } from '@/api/productSpecifications
 import type { ProductInCart } from '@/types'
 import { deleteProductFromCart } from '@/api/cartItems/deleteProductFromCart'
 import { updateProductToShoppingCart } from '@/api/cartItems/updateProductToShoppingCart'
+import { useCartUpdatedEventBus } from '@/composables/useCartUpdatedEventBus'
+
+const { emit: emitCartUpdated } = useCartUpdatedEventBus()
 
 const shoppingCartList = ref<getProductListFromShoppingCartByUserIdResponseData[]>()
 async function fetchCartItemsByUserId() {
@@ -87,6 +90,7 @@ async function handleDeleteCheckedItems() {
   checkedIdSet.value.clear()
   await fetchCartItemsByUserId()
   await fetchCartProductList()
+  emitCartUpdated()
 }
 
 function handleCheckout() {
@@ -108,6 +112,7 @@ async function handleClickDelete(id: number) {
   await deleteProductFromCart({ id })
   await fetchCartItemsByUserId()
   await fetchCartProductList()
+  emitCartUpdated()
 }
 
 async function updateCartItemAmount(id: number, amount: number) {
@@ -119,6 +124,7 @@ async function updateCartItemAmount(id: number, amount: number) {
   })
   await fetchCartItemsByUserId()
   await fetchCartProductList()
+  emitCartUpdated()
 }
 </script>
 

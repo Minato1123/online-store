@@ -12,6 +12,7 @@ import type { GetProductImagesByProductIdResponseData } from '@/api/productImage
 import { getProductSpecificationsByProductId } from '@/api/productSpecifications/getProductSpecificationsByProductId'
 import type { GetProductSpecificationsByProductIdResponseData } from '@/api/productSpecifications/getProductSpecificationsByProductId'
 import { addProductToShoppingCart } from '@/api/cartItems/addProductToShoppingCart'
+import { useCartUpdatedEventBus } from '@/composables/useCartUpdatedEventBus'
 
 const props = defineProps({
   product: {
@@ -21,6 +22,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['closeProductQuickPage'])
+const { emit: emitCartUpdated } = useCartUpdatedEventBus()
 
 const productImages = ref<GetProductImagesByProductIdResponseData[]>([])
 const productSpec = ref<GetProductSpecificationsByProductIdResponseData[]>([])
@@ -77,6 +79,7 @@ async function submitAddCart() {
       amount: numOfProduct.value,
     },
   })
+  emitCartUpdated()
   isOpenDialogAddCart.value = true
   window.setTimeout(() => {
     isOpenDialogAddCart.value = false
