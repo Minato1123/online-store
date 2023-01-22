@@ -46,7 +46,7 @@ export interface ProductBought {
   productId: number
   name: string
   image: string
-  specification: string | null
+  specificationName: string | null
   amount: number
   price: number
 }

@@ -6,7 +6,7 @@ import IconShoppingBasketLine from '~icons/ri/shopping-basket-line'
 import router from '@/router/index'
 import IconCashRegister from '~icons/fa-solid/cash-register'
 import { getProductListFromShoppingCartByUserId } from '@/api/cartItems/getProductListFromShoppingCartByUserId'
-import type { getProductListFromShoppingCartByUserIdResponseData } from '@/api/cartItems/getProductListFromShoppingCartByUserId'
+import type { GetProductListFromShoppingCartByUserIdResponseData } from '@/api/cartItems/getProductListFromShoppingCartByUserId'
 import { getProduct } from '@/api/products/getProduct'
 import { getProductImagesByProductId } from '@/api/productImages/getProductImagesByProductId'
 import { getProductSpecificationsByProductId } from '@/api/productSpecifications/getProductSpecificationsByProductId'
@@ -17,7 +17,7 @@ import { useCartUpdatedEventBus } from '@/composables/useCartUpdatedEventBus'
 
 const { emit: emitCartUpdated } = useCartUpdatedEventBus()
 
-const shoppingCartList = ref<getProductListFromShoppingCartByUserIdResponseData[]>()
+const shoppingCartList = ref<GetProductListFromShoppingCartByUserIdResponseData[]>()
 async function fetchCartItemsByUserId() {
   shoppingCartList.value = (await getProductListFromShoppingCartByUserId({ userId: 1 })).data
 }
