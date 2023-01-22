@@ -2,21 +2,33 @@
 import PUserLayout from '@/components/PUserLayout.vue'
 import PButton from '@/components/PButton.vue'
 import InfoDialog from '@/components/InfoDialog.vue'
+import { type GetCurrentUserResponseData, getCurrentUser } from '@/api/users/getCurrentUser'
 import { useUsersStore } from '@/stores/user'
 import IconCheckCircleRounded from '~icons/material-symbols/check-circle-rounded'
 import IconCrossCircle from '~icons/gridicons/cross-circle'
 
-const { getCurrentUser } = useUsersStore()
-const user = getCurrentUser()
+const user = ref<GetCurrentUserResponseData>()
+async function fetchCurrentUser() {
+  user.value = (await getCurrentUser({ id: 1 })).data
+}
+
+onMounted(() => {
+  fetchCurrentUser()
+})
+
 const isDialogOpen = ref(false)
 const isSaveSuccess = ref(true)
 
-const editProfile = ref({
-  name: user?.name,
-  birthday: user?.birthday,
-  email: user?.email,
-  mobile: user?.mobile,
-  address: user?.address,
+const editProfile = computed(() => {
+  if (user.value == null)
+    return
+  return {
+    name: user.value.name,
+    birthday: user.value.birthday,
+    email: user.value.email,
+    mobile: user.value.mobile,
+    address: user.value.address,
+  }
 })
 
 const saveBtnContent = {
@@ -56,32 +68,32 @@ const saveBtnFailDialog = {
           <div class="sub-title">
             姓名
           </div>
-          <input v-model="editProfile.name" type="text" class="name-input">
+          <input v-if="editProfile" v-model="editProfile.name" type="text" class="name-input">
         </div>
         <div class="birthday-block">
           <div class="sub-title">
             生日
           </div>
-          <input v-model="editProfile.birthday" type="date" class="birthday-input">
+          <input v-if="editProfile" v-model="editProfile.birthday" type="date" class="birthday-input">
         </div>
       </div>
       <div class="email-block">
         <div class="sub-title">
           電子信箱
         </div>
-        <input v-model="editProfile.email" type="email">
+        <input v-if="editProfile" v-model="editProfile.email" type="email">
       </div>
       <div class="tel-block">
         <div class="sub-title">
           手機號碼
         </div>
-        <input v-model="editProfile.mobile" type="tel">
+        <input v-if="editProfile" v-model="editProfile.mobile" type="tel">
       </div>
       <div class="address-block">
         <div class="sub-title">
           送件地址
         </div>
-        <input v-model="editProfile.address" type="text">
+        <input v-if="editProfile" v-model="editProfile.address" type="text">
       </div>
       <div class="save-button">
         <PButton class="save-btn" :content="saveBtnContent" @click="isDialogOpen = true">
