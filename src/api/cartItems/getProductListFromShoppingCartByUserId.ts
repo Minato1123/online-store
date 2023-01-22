@@ -1,10 +1,10 @@
 import { http } from '@/utils/request'
 
-export interface getProductListFromShoppingCartByUserIdRequestData {
+export interface GetProductListFromShoppingCartByUserIdRequestData {
   userId: number
 }
 
-export interface getProductListFromShoppingCartByUserIdResponseData {
+export interface GetProductListFromShoppingCartByUserIdResponseData {
   id: number
   userId: number
   productId: number
@@ -12,8 +12,8 @@ export interface getProductListFromShoppingCartByUserIdResponseData {
   amount: number
 }
 
-export function getProductListFromShoppingCartByUserId({ userId }: getProductListFromShoppingCartByUserIdRequestData) {
-  return http.get<getProductListFromShoppingCartByUserIdResponseData[]>({
+export function getProductListFromShoppingCartByUserId({ userId }: GetProductListFromShoppingCartByUserIdRequestData) {
+  return http.get<GetProductListFromShoppingCartByUserIdResponseData[]>({
     url: '/cartItems',
     params: {
       userId,

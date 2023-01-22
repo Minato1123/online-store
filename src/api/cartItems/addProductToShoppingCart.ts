@@ -1,6 +1,6 @@
 import { http } from '@/utils/request'
 
-export interface addProductToShoppingCartRequestData {
+export interface AddProductToShoppingCartRequestData {
   data: {
     userId: number
     productId: number
@@ -10,11 +10,11 @@ export interface addProductToShoppingCartRequestData {
 }
 
 // 沒有自行改寫 json-server 處理程序，所以這會是 json-server 回傳的資料的型別
-export type AddProductToShoppingCartResponseData = addProductToShoppingCartRequestData['data'] & {
+export type AddProductToShoppingCartResponseData = AddProductToShoppingCartRequestData['data'] & {
   id: number
 }
 
-export function addProductToShoppingCart({ data }: addProductToShoppingCartRequestData) {
+export function addProductToShoppingCart({ data }: AddProductToShoppingCartRequestData) {
   return http.post<AddProductToShoppingCartResponseData>({
     url: '/cartItems',
     data,

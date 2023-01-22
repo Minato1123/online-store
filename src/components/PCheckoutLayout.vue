@@ -1,58 +1,119 @@
 <script lang="ts" setup>
-import { sum } from 'lodash-es'
 import { getPublicImgSrc } from '../utils/index'
-import type { OrdererData, ProductBought, ProductInCart } from '@/types/index'
-import { useProductsStore } from '@/stores/product'
-import { useShoppingCartStore } from '@/stores/shoppingCart'
-import { useProductBoughtListStore } from '@/stores/productBought'
+import type { ProductInCart } from '@/types/index'
+import { getProductListFromShoppingCartByUserId } from '@/api/cartItems/getProductListFromShoppingCartByUserId'
+import type { GetProductListFromShoppingCartByUserIdResponseData } from '@/api/cartItems/getProductListFromShoppingCartByUserId'
+import { getProduct } from '@/api/products/getProduct'
+import { getProductImagesByProductId } from '@/api/productImages/getProductImagesByProductId'
+import { getProductSpecificationsByProductId } from '@/api/productSpecifications/getProductSpecificationsByProductId'
+import { getProductListFromBoughtByOrderId } from '@/api/boughtItems/getProductListFromBoughtByOrderId'
+import type { GetProductListFromBoughtByOrderIdResponseData } from '@/api/boughtItems/getProductListFromBoughtByOrderId'
+import type { GetOrderByOrderIdResponseData } from '@/api/orders/getOrder'
+import { getOrderByOrderId } from '@/api/orders/getOrder'
 
 const props = defineProps({
   target: {
     type: String,
     require: true,
   },
-})
-
-const { shoppingCartList } = storeToRefs(useShoppingCartStore())
-const { productBoughtList } = storeToRefs(useProductBoughtListStore())
-const { getProductSpec } = useProductsStore()
-
-const ordererData = ref<OrdererData>({
-  name: '',
-  mobile: '',
-  email: '',
-  payment: {
-    method: 'credit-card',
-    cardNumber: '',
-    cardOwner: '',
-    cardValidDate: '',
-    cardValidCode: '',
-  },
-  delivery: {
-    method: 'delivery',
-    county: '',
-    address: '',
+  orderId: {
+    type: String,
   },
 })
 
-const productsInCurrentPage = computed<ProductInCart[] | ProductBought[]>(() => {
-  if (props.target === 'completed')
-    return productBoughtList.value.filter(product => product.groupId === productBoughtList.value[productBoughtList.value.length - 1].groupId)
-  else
-    return shoppingCartList.value
-})
-
-function handleSpecToString(id: number, spec: number | null | string) {
-  if (spec === null)
-    return '無'
-  else if (typeof spec === 'string')
-    return spec
-  else
-    return getProductSpec(id, spec)
+const cartList = ref<GetProductListFromShoppingCartByUserIdResponseData[]>([])
+const cartProductList = ref<ProductInCart[]>([])
+const order = ref<GetOrderByOrderIdResponseData>()
+const boughtProductList = ref<GetProductListFromBoughtByOrderIdResponseData[]>([])
+async function fetchCartList() {
+  cartList.value = (await getProductListFromShoppingCartByUserId({ userId: 1 })).data
 }
 
-const numOfproductCart = computed(() => sum(productsInCurrentPage.value.map(({ amount }) => amount)))
-const total = computed(() => sum(productsInCurrentPage.value.map(({ amount, price }) => amount * price)))
+async function fetchCartProductList() {
+  cartProductList.value = await Promise.all(cartList.value.map(async (item) => {
+    const product = (await getProduct({ id: item.productId })).data
+    const productImage = (await getProductImagesByProductId({ productId: item.productId })).data
+    const productSpec = (await getProductSpecificationsByProductId({ productId: item.productId })).data
+
+    return {
+      id: item.id,
+      productId: item.productId,
+      categoryId: product.categoryId,
+      subCategoryId: product.subCategoryId,
+      name: product.name,
+      image: productImage[0].image,
+      price: product.price,
+      amount: item.amount,
+      specificationId: item.specificationId,
+      specificationName: productSpec.find(spec => spec.id === item.specificationId)?.specName ?? '無',
+    }
+  }))
+}
+
+async function fetchOrder() {
+  if (props.orderId == null)
+    return
+  order.value = (await getOrderByOrderId({ serialNumber: props.orderId })).data[0]
+}
+
+async function fetchBoughtProductList() {
+  if (props.orderId == null)
+    return
+  boughtProductList.value = (await getProductListFromBoughtByOrderId({ userId: 1, orderId: props.orderId })).data
+}
+
+onMounted(async () => {
+  if (props.target === 'completed') {
+    await fetchBoughtProductList()
+    fetchOrder()
+  }
+  else {
+    await fetchCartList()
+    fetchCartProductList()
+  }
+})
+
+watch(props, () => {
+  if (props.target === 'completed') {
+    fetchBoughtProductList()
+    fetchOrder()
+  }
+  else {
+    fetchCartList()
+    fetchCartProductList()
+  }
+}, { deep: true })
+
+const productsInCurrentPage = computed(() => {
+  if (props.target === 'completed')
+    return boughtProductList.value
+  else
+    return cartProductList.value
+})
+
+const totalPrice = computed(() => {
+  if (props.target === 'completed') {
+    if (order.value == null)
+      return
+
+    return order.value.totalPrice
+  }
+  else {
+    return cartProductList.value.reduce((acc, cur) => acc + cur.price * cur.amount, 0)
+  }
+})
+
+const totalNum = computed(() => {
+  if (props.target === 'completed') {
+    if (order.value == null)
+      return
+
+    return order.value.totalAmount
+  }
+  else {
+    return cartProductList.value.reduce((acc, cur) => acc + cur.amount, 0)
+  }
+})
 </script>
 
 <template>
@@ -112,7 +173,7 @@ const total = computed(() => sum(productsInCurrentPage.value.map(({ amount, pric
           {{ product.name }}
         </div>
         <div class="product-spec product-else">
-          {{ handleSpecToString(product.productId, product.specification) }}
+          {{ product.specificationName }}
         </div>
         <div class="product-price product-else">
           NT$ {{ product.price }}
@@ -128,7 +189,7 @@ const total = computed(() => sum(productsInCurrentPage.value.map(({ amount, pric
           <div class="product-rwd-else">
             <div>{{ product.name }}</div>
             <div>
-              規格：{{ handleSpecToString(product.productId, product.specification) }}
+              規格：{{ product.specificationName }}
             </div>
             <div>單價：NT$ {{ product.price }}</div>
             <div>
@@ -141,7 +202,7 @@ const total = computed(() => sum(productsInCurrentPage.value.map(({ amount, pric
         </div>
       </div>
     </div>
-    <slot :num="numOfproductCart" :total="total" />
+    <slot :num="totalNum" :total="totalPrice" />
   </div>
 </template>
 

@@ -1,17 +1,23 @@
 <script lang="ts" setup>
 import PButton from '@/components/PButton.vue'
 import InfoDialog from '@/components/InfoDialog.vue'
-import { useShoppingCartStore } from '@/stores/shoppingCart'
 import router from '@/router'
 import PCheckoutLayout from '@/components/PCheckoutLayout.vue'
 import IconMoneyDollarCircleLine from '~icons/ri/money-dollar-circle-line'
 import IconCheckCircleRounded from '~icons/material-symbols/check-circle-rounded'
 import IconCrossCircle from '~icons/gridicons/cross-circle'
+import { useOrderDataStore } from '@/stores/orderData'
+import { addOrder } from '@/api/boughtItems/addOrder'
+import type { AddOrderResponseData, BoughtItem } from '@/api/boughtItems/addOrder'
+import { type GetProductListFromShoppingCartByUserIdResponseData, getProductListFromShoppingCartByUserId } from '@/api/cartItems/getProductListFromShoppingCartByUserId'
+import { getProduct } from '@/api/products/getProduct'
+import { getProductImagesByProductId } from '@/api/productImages/getProductImagesByProductId'
+import { getProductSpecificationsByProductId } from '@/api/productSpecifications/getProductSpecificationsByProductId'
+import { deleteProductFromCart } from '@/api/cartItems/deleteProductFromCart'
+import { useCartUpdatedEventBus } from '@/composables/useCartUpdatedEventBus'
 
-const paymentMethod = ref('credit')
-const delievryMethod = ref('homeDelivery')
-
-const { cancelShoppingCart, updateProductsToBought } = useShoppingCartStore()
+const { orderData } = storeToRefs(useOrderDataStore())
+const { emit: emitCartUpdated } = useCartUpdatedEventBus()
 
 const textInSureCheckoutBtn = {
   text: '確認付款',
@@ -47,15 +53,63 @@ const taiwanCounty = [
 const isDialogOpen = ref(false)
 const isSaveSuccess = ref(true)
 
-function handleCheckout() {
+const addedOrderData = ref<AddOrderResponseData>()
+const cartList = ref<GetProductListFromShoppingCartByUserIdResponseData[]>()
+const toBuyProductList = ref<BoughtItem[]>()
+
+async function fetchCartList() {
+  cartList.value = (await getProductListFromShoppingCartByUserId({ userId: 1 })).data
+}
+
+async function fetchToBuyProductList() {
+  if (cartList.value == null)
+    return
+
+  toBuyProductList.value = await Promise.all(cartList.value.map(async (item) => {
+    const product = (await getProduct({ id: item.productId })).data
+    const productImages = (await getProductImagesByProductId({ productId: item.productId })).data
+    const productSpecList = (await getProductSpecificationsByProductId({ productId: item.productId })).data
+    const productSpec = productSpecList.find(spec => spec.id === item.specificationId)
+
+    return {
+      productId: item.productId,
+      name: product.name,
+      image: productImages[0].image,
+      specificationName: productSpec == null ? null : productSpec.specName,
+      amount: item.amount,
+      price: product.price,
+    }
+  }),
+
+  )
+}
+
+async function handleCheckout() {
   isDialogOpen.value = false
+  if (toBuyProductList.value == null)
+    return
   if (isSaveSuccess.value === true) {
-    router.replace({ name: 'completed', params: { orderId: '123456789' } })
-    updateProductsToBought()
-    cancelShoppingCart()
+    if (cartList.value == null)
+      return
+    await Promise.all(cartList.value.map(async (item) => {
+      await deleteProductFromCart({ id: item.id })
+    }))
+    emitCartUpdated()
+    addedOrderData.value = (await addOrder({
+      data: {
+        orderData: orderData.value,
+        boughtItems: toBuyProductList.value,
+      },
+    })).data
+    router.replace({ name: 'completed', params: { orderId: addedOrderData.value.serialNumber } })
   }
   else { router.replace({ name: 'cart' }) }
 }
+
+onMounted(async () => {
+  await fetchCartList()
+  fetchToBuyProductList()
+})
 
 const orderSuccessDialog = {
   iconBeforeText: IconCheckCircleRounded,
@@ -93,34 +147,34 @@ const orderFailDialog = {
             付款方式
           </div>
           <div class="payment-block block">
-            <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="paymentMethod !== 'credit'" /><icon-ic-baseline-radio-button-checked v-show="paymentMethod === 'credit'" /><input v-model="paymentMethod" class="input-radio" value="credit" type="radio" name="payment">信用卡／金融卡</label>
-            <form v-show="paymentMethod === 'credit'" class="sub-content payment-credit-block">
+            <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="orderData.paymentType !== 'credit-card'" /><icon-ic-baseline-radio-button-checked v-show="orderData.paymentType === 'credit-card'" /><input v-model="orderData.paymentType" class="input-radio" value="credit-card" type="radio" name="payment">信用卡／金融卡</label>
+            <form v-show="orderData.paymentType === 'credit-card'" class="sub-content payment-credit-block">
               <div class="credit-input-block">
                 <div class="credit-title">
                   卡號
                 </div>
-                <input type="text">
+                <input v-model="orderData.cardNumber" type="text">
               </div>
               <div class="credit-input-block">
                 <div class="credit-title">
                   持卡人姓名
                 </div>
-                <input type="text">
+                <input v-model="orderData.cardOwner" type="text">
               </div>
               <div class="credit-input-block">
                 <div class="credit-title">
                   有效期
                 </div>
-                <input type="text" placeholder="MM/YY">
+                <input v-model="orderData.cardValidDate" type="text" placeholder="MM/YY">
               </div>
               <div class="credit-input-block">
                 <div class="credit-title">
                   安全碼
                 </div>
-                <input type="text" maxlength="3">
+                <input v-model="orderData.cardValidCode" type="text" maxlength="3">
               </div>
             </form>
-            <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="paymentMethod !== 'cashOnDelivery'" /><icon-ic-baseline-radio-button-checked v-show="paymentMethod === 'cashOnDelivery'" /><input v-model="paymentMethod" class="input-radio" value="cashOnDelivery" type="radio" name="payment">貨到付款</label>
+            <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="orderData.paymentType !== 'cash-on-delivery'" /><icon-ic-baseline-radio-button-checked v-show="orderData.paymentType === 'cash-on-delivery'" /><input v-model="orderData.paymentType" class="input-radio" value="cash-on-delivery" type="radio" name="payment">貨到付款</label>
           </div>
         </div>
         <div class="delivery-container">
@@ -128,20 +182,20 @@ const orderFailDialog = {
             收件資料
           </div>
           <div class="block">
-            <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="delievryMethod !== 'homeDelivery'" /><icon-ic-baseline-radio-button-checked v-show="delievryMethod === 'homeDelivery'" /><input v-model="delievryMethod" class="input-radio" value="homeDelivery" type="radio" name="delivery">宅配</label>
-            <form v-show="delievryMethod === 'homeDelivery'" class="sub-content delivery-block">
-              <select class="delivery-dropdown" name="county">
-                <option>
+            <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="orderData.deliveryType !== 'delivery'" /><icon-ic-baseline-radio-button-checked v-show="orderData.deliveryType === 'delivery'" /><input v-model="orderData.deliveryType" class="input-radio" value="delivery" type="radio" name="delivery">宅配</label>
+            <form v-show="orderData.deliveryType === 'delivery'" class="sub-content delivery-block">
+              <select v-model="orderData.county" class="delivery-dropdown" name="county">
+                <option :value="null">
                   縣市
                 </option>
-                <option v-for="(county, i) in taiwanCounty" :key="`county-${i}`" :value="i">
+                <option v-for="(county, i) in taiwanCounty" :key="`county-${i}`" :value="county">
                   {{ county }}
                 </option>
               </select>
-              <input type="text" name="address">
+              <input v-model="orderData.address" type="text" name="address">
             </form>
-            <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="delievryMethod !== 'convienceStore'" /><icon-ic-baseline-radio-button-checked v-show="delievryMethod === 'convienceStore'" /><input v-model="delievryMethod" class="input-radio" value="convienceStore" type="radio" name="delivery">超商取貨</label>
-            <div v-show="delievryMethod === 'convienceStore'" class="sub-content convience-block">
+            <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="orderData.deliveryType !== 'self-pickup'" /><icon-ic-baseline-radio-button-checked v-show="orderData.deliveryType === 'self-pickup'" /><input v-model="orderData.deliveryType" class="input-radio" value="self-pickup" type="radio" name="delivery">超商取貨</label>
+            <div v-show="orderData.deliveryType === 'self-pickup'" class="sub-content convience-block">
               <button class="select-btn">
                 選取超商
               </button>

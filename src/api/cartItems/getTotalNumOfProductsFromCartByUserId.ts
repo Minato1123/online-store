@@ -1,12 +1,12 @@
 import { http } from '@/utils/request'
-import type { getProductListFromShoppingCartByUserIdResponseData } from '@/api/cartItems/getProductListFromShoppingCartByUserId'
+import type { GetProductListFromShoppingCartByUserIdResponseData } from '@/api/cartItems/getProductListFromShoppingCartByUserId'
 
-export interface getTotalNumOfProductFromCartByUserIdRequestData {
+export interface GetTotalNumOfProductFromCartByUserIdRequestData {
   userId: number
 }
 
-export async function getTotalNumOfProductFromCartByUserId({ userId }: getTotalNumOfProductFromCartByUserIdRequestData) {
-  const { data: items } = await http.get<getProductListFromShoppingCartByUserIdResponseData[]>({
+export async function getTotalNumOfProductFromCartByUserId({ userId }: GetTotalNumOfProductFromCartByUserIdRequestData) {
+  const { data: items } = await http.get<GetProductListFromShoppingCartByUserIdResponseData[]>({
     url: '/cartItems',
     params: {
       userId,

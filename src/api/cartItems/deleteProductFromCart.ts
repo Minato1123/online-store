@@ -1,10 +1,10 @@
 import { http } from '@/utils/request'
 
-export interface deleteProductFromCartRequestData {
+export interface DeleteProductFromCartRequestData {
   id: number
 }
 
-export interface deleteProductFromCartResponseData {
+export interface DeleteProductFromCartResponseData {
   id: number
   userId: number
   productId: number
@@ -12,8 +12,8 @@ export interface deleteProductFromCartResponseData {
   amount: number
 }
 
-export function deleteProductFromCart({ id }: deleteProductFromCartRequestData) {
-  return http.delete<deleteProductFromCartResponseData>({
+export function deleteProductFromCart({ id }: DeleteProductFromCartRequestData) {
+  return http.delete<DeleteProductFromCartResponseData>({
     url: `/cartItems/${id}`,
   })
 }

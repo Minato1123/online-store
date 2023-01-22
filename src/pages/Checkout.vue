@@ -2,9 +2,41 @@
 import PButton from '@/components/PButton.vue'
 import PCheckoutLayout from '@/components/PCheckoutLayout.vue'
 import router from '@/router'
+import { useOrderDataStore } from '@/stores/orderData'
+import { getCurrentUser } from '@/api/users/getCurrentUser'
+import type { GetCurrentUserResponseData } from '@/api/users/getCurrentUser'
 
 const isOpenDiscount = ref(false)
 const codeForDiscount = ref('')
+
+const { resetOrderData } = useOrderDataStore()
+const { orderData } = storeToRefs(useOrderDataStore())
+const currentUser = ref<GetCurrentUserResponseData>()
+
+async function fetchCurrentUser() {
+  currentUser.value = (await getCurrentUser({ id: 1 })).data
+}
+
+onMounted(() => {
+  fetchCurrentUser()
+})
+
+const isSameWithUser = ref(false)
+function handleSameUserBtnClick() {
+  if (currentUser.value == null)
+    return
+  if (isSameWithUser.value) {
+    orderData.value.name = ''
+    orderData.value.mobile = ''
+    orderData.value.email = ''
+  }
+  else {
+    orderData.value.name = currentUser.value.name
+    orderData.value.mobile = currentUser.value.mobile
+    orderData.value.email = currentUser.value.email
+  }
+  isSameWithUser.value = !isSameWithUser.value
+}
 
 const textInCheckoutBtn = {
   text: '確認結帳',
@@ -22,22 +54,22 @@ function handleSubmit() {
       <div class="accept-container">
         <div class="title">
           收件資料
-          <button class="same-user-btn">
-            <icon-material-symbols-check-box-outline-blank />同使用者資料
+          <button class="same-user-btn" @click="handleSameUserBtnClick">
+            <icon-material-symbols-check-box-outline v-if="isSameWithUser" /><icon-material-symbols-check-box-outline-blank v-else />同使用者資料
           </button>
         </div>
         <div class="data-block">
           <div class="data-item">
             <div>姓名</div>
-            <input type="text">
+            <input v-model="orderData.name" type="text">
           </div>
           <div class="data-item">
             <div>電話</div>
-            <input type="text">
+            <input v-model="orderData.mobile" type="text">
           </div>
           <div class="data-item">
             <div>電子信箱</div>
-            <input type="text">
+            <input v-model="orderData.email" type="text">
           </div>
         </div>
       </div>

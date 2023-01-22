@@ -1,38 +1,38 @@
 <script lang="ts" setup>
+import { RouterLink } from 'vue-router'
 import PCheckoutLayout from '@/components/PCheckoutLayout.vue'
 import PButton from '@/components/PButton.vue'
 import IconShoppingBasketLine from '~icons/ri/shopping-basket-line'
+import { type GetOrderByOrderIdResponseData, getOrderByOrderId } from '@/api/orders/getOrder'
 
 const route = useRoute()
-const orderId = computed(() => route.params.orderId)
+const orderId = computed(() => String(route.params.orderId))
+
+const order = ref<GetOrderByOrderIdResponseData>()
+
+async function fetchBoughtList() {
+  order.value = (await getOrderByOrderId({ serialNumber: orderId.value })).data[0]
+}
+
+onMounted(() => {
+  fetchBoughtList()
+})
 
 const textInGoShoppingBtn = {
   text: '繼續購物',
   color: 'match-color',
   afterTextIcon: IconShoppingBasketLine,
 }
-
-const ordererData = {
-  name: '王小明',
-  mobile: '0912345678',
-  email: 'pochacco229@example.com',
-}
-
-const receiveInfo = {
-  address: '台北市信義區松壽路 123 號 1 樓',
-  paymentStatus: '已付款',
-  productStatus: '準備中',
-}
 </script>
 
 <template>
-  <PCheckoutLayout v-slot="slotProps" target="completed">
+  <PCheckoutLayout v-slot="slotProps" target="completed" :order-id="orderId">
     <div class="container">
       <div class="detail">
         共 {{ slotProps.num }} 件商品｜總金額 NT$ {{ slotProps.total }}
       </div>
       <div class="data-container">
-        <div class="orderer-data-container">
+        <div v-if="order" class="orderer-data-container">
           <div class="title">
             個人資料
           </div>
@@ -42,7 +42,7 @@ const receiveInfo = {
                 姓名
               </div>
               <div class="sub-content">
-                {{ ordererData.name }}
+                {{ order.name }}
               </div>
             </div>
             <div class="item">
@@ -50,7 +50,7 @@ const receiveInfo = {
                 電話
               </div>
               <div class="sub-content">
-                {{ ordererData.mobile }}
+                {{ order.mobile }}
               </div>
             </div>
             <div class="item">
@@ -58,12 +58,12 @@ const receiveInfo = {
                 電子信箱
               </div>
               <div class="sub-content">
-                {{ ordererData.email }}
+                {{ order.email }}
               </div>
             </div>
           </div>
         </div>
-        <div class="receive-info-container">
+        <div v-if="order" class="receive-info-container">
           <div class="title">
             收件資料
           </div>
@@ -73,7 +73,7 @@ const receiveInfo = {
                 宅配地址
               </div>
               <div class="sub-content">
-                {{ receiveInfo.address }}
+                <span>{{ order.county }}</span>{{ order.address }}
               </div>
             </div>
             <div class="item">
@@ -81,7 +81,7 @@ const receiveInfo = {
                 付款狀態
               </div>
               <div class="sub-content">
-                {{ receiveInfo.paymentStatus }}
+                {{ order.paymentStatus }}
               </div>
             </div>
             <div class="item">
@@ -89,7 +89,7 @@ const receiveInfo = {
                 商品狀態
               </div>
               <div class="sub-content">
-                {{ receiveInfo.productStatus }}
+                {{ order.status }}
               </div>
             </div>
           </div>
