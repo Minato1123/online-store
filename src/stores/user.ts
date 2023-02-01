@@ -1,52 +1,222 @@
-import { StorageSerializers, useLocalStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
-import type { User } from '@/types/index'
-import userList from '@/assets/json/users.json'
+import { StorageSerializers } from '@vueuse/core'
+import { useForm } from 'vee-validate'
+import router from '@/router'
+import { useCartStore } from '@/stores/shoppingCart'
+import { logout } from '@/api/login/logout'
+import { useLoginStatusUpdatedEventBus } from '@/composables/useLoginStatusUpdatedEventBus'
+import { login, type loginResponseData } from '@/api/login/login'
+import { type AddUserRequestData, addUser } from '@/api/users/addUser'
 
 export const useUsersStore = defineStore('users', () => {
-  const currentUser = useLocalStorage<User | null>('user', null, { serializer: StorageSerializers.object })
-  const users = ref<User[]>(userList)
+  const { updateLocalCartToDB } = useCartStore()
+  const userToken = useLocalStorage<string>('user-token', null, { serializer: StorageSerializers.string })
+  const userId = useLocalStorage<number>('user-id', null, { serializer: StorageSerializers.number })
+  const email = useLocalStorage<string>('user-email', null, { serializer: StorageSerializers.string })
+  const password = useLocalStorage<string>('user-password', null, { serializer: StorageSerializers.string })
 
-  function addUser(user: User): void {
-    const lastId = users.value[users.value.length - 1].id
-    user.id = lastId + 1
-    users.value.push(user)
-  }
+  const { emit: emitLoginStatusUpdated } = useLoginStatusUpdatedEventBus()
+  const userData = ref<loginResponseData>()
 
-  function hasUser(email: string): boolean {
-    return users.value.some(user => user.email === email)
-  }
+  const loginSchema = {
+    email(value: string) {
+      if (!value)
+        return '請輸入電子信箱'
 
-  function isloginVaild(email: string, password: string): boolean {
-    return users.value.some(user => user.email === email && user.password === password)
-  }
+      if (value.includes(' '))
+        return '信箱不可包含空白'
 
-  function getLoginStatus() {
-    if (currentUser.value != null)
+      if (!value.includes('@') || !value.includes('.'))
+        return '請輸入正確的電子信箱'
+
       return true
+    },
+    password(value: string) {
+      if (!value)
+        return '請輸入密碼'
 
-    else
+      if (value.includes(' '))
+        return '密碼不可包含空白'
+
+      if (value.length < 8)
+        return '密碼長度至少為 8 個字元'
+
+      if (!value.match(/[a-z]/))
+        return '密碼至少包含一個小寫字母'
+
+      if (!value.match(/[0-9]/))
+        return '密碼至少包含一個數字'
+
+      return true
+    },
+  }
+
+  const registerSchema = {
+    email(value: string) {
+      if (!value)
+        return '請輸入電子信箱'
+
+      if (value.includes(' '))
+        return '信箱不可包含空白'
+
+      if (!value.includes('@') || !value.includes('.'))
+        return '請輸入正確的電子信箱'
+
+      return true
+    },
+    password(value: string) {
+      if (!value)
+        return '請輸入密碼'
+
+      if (value.includes(' '))
+        return '密碼不可包含空白'
+
+      if (value.length < 8)
+        return '密碼長度至少為 8 個字元'
+
+      if (!value.match(/[a-z]/))
+        return '密碼至少包含一個小寫字母'
+
+      if (!value.match(/[0-9]/))
+        return '密碼至少包含一個數字'
+
+      return true
+    },
+    name(value: string) {
+      if (!value || value.trim() === '')
+        return '請輸入姓名'
+
+      return true
+    },
+    birthday(value: string) {
+      if (!value)
+        return '請輸入生日'
+
+      return true
+    },
+    mobile(value: string) {
+      if (!value)
+        return '請輸入手機號碼'
+
+      if (value.includes(' '))
+        return '手機號碼不可包含空白'
+
+      if (!value.match(/^[0-9]+$/))
+        return '手機號碼只能包含數字'
+
+      if (value.length !== 10)
+        return '手機號碼長度為 10 個字元'
+
+      return true
+    },
+  }
+
+  const { errors: loginErrors, useFieldModel: useLoginFieldModel, handleSubmit: handleLoginSubmit } = useForm({
+    validationSchema: loginSchema,
+  })
+
+  const [loginEmail, loginPassword] = useLoginFieldModel(['email', 'password'])
+
+  const handleLogin = handleLoginSubmit(async (values) => {
+    userData.value = (await login({
+      data: {
+        email: values.email,
+        password: values.password,
+      },
+    })).data
+    userToken.value = userData.value.token
+    userId.value = userData.value.userId
+
+    emitLoginStatusUpdated()
+    await nextTick()
+    await updateLocalCartToDB(userId.value)
+    router.replace({ name: 'home' })
+  })
+
+  const { errors: registerErrors, useFieldModel: useRegisterFieldModel, handleSubmit: handleRegisterSubmit, resetForm } = useForm({
+    validationSchema: registerSchema,
+  })
+
+  const [registerEmail, registerPassword, registerName, registerBirthday, registerMobile] = useRegisterFieldModel(['email', 'password', 'name', 'birthday', 'mobile'])
+
+  const handleRegister = handleRegisterSubmit(async (values, { resetForm }) => {
+    const newUser: AddUserRequestData = {
+      data: {
+        name: values.name,
+        email: values.email,
+        password: values.password,
+        birthday: values.birthday,
+        mobile: values.mobile,
+      },
+    }
+    await addUser(newUser)
+    router.replace({ name: 'login' })
+
+    resetForm({
+      values: {
+        email: '',
+        password: '',
+        name: '',
+        birthday: '',
+        mobile: '',
+      },
+    })
+  })
+
+  const isLoggedIn = computed(() => {
+    if (userId.value == null || userToken.value == null)
       return false
+    return true
+  })
+
+  async function userLogout(): Promise<void> {
+    await logout()
+    userToken.value = null
+    userId.value = null
+    emitLoginStatusUpdated()
+    router.replace({ name: 'home' })
   }
 
-  function getUserByEmail(email: string): User | null {
-    return users.value.find(user => user.email === email) ?? null
+  function forcedLogout() {
+    userToken.value = null
+    userId.value = null
+    emitLoginStatusUpdated()
+    router.replace({ name: 'login' })
   }
 
-  function userLogin(user: User): void {
-    currentUser.value = user
+  function rememberAccount() {
+    if (loginEmail.value == null || loginPassword.value == null)
+      return
+    email.value = loginEmail.value
+    password.value = btoa(loginPassword.value)
   }
 
-  function getCurrentUser(): User | null {
-    if (currentUser.value != null)
-      return currentUser.value
-    else
-      return null
+  function forgetAccount() {
+    email.value = null
+    password.value = null
   }
 
-  function userLogout(): void {
-    currentUser.value = null
+  return {
+    userToken,
+    userId,
+    handleLogin,
+    loginErrors,
+    loginEmail,
+    loginPassword,
+    handleRegister,
+    registerErrors,
+    registerEmail,
+    registerPassword,
+    registerName,
+    registerBirthday,
+    registerMobile,
+    resetForm,
+    isLoggedIn,
+    userLogout,
+    forcedLogout,
+    email,
+    password,
+    rememberAccount,
+    forgetAccount,
   }
-
-  return { users, addUser, hasUser, isloginVaild, getLoginStatus, getUserByEmail, userLogin, getCurrentUser, userLogout }
 })

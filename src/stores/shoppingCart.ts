@@ -1,79 +1,109 @@
 import { defineStore } from 'pinia'
 import { useLocalStorage } from '@vueuse/core'
 import type { ProductInCart } from '@/types/index'
-import { useProductsStore } from '@/stores/product'
-import { useProductBoughtListStore } from '@/stores/productBought'
+import { getProduct } from '@/api/products/getProduct'
+import { getProductImagesByProductId } from '@/api/productImages/getProductImagesByProductId'
+import { getProductSpecificationsByProductId } from '@/api/productSpecifications/getProductSpecificationsByProductId'
+import { addProductToShoppingCart } from '@/api/cartItems/addProductToShoppingCart'
 
-let cartId = 0
+let cartId = 1
 
-export const useShoppingCartStore = defineStore('shoppingCart', () => {
-  const { getProductById, getProductSpec } = useProductsStore()
-  const { addProductBought, addGroupId } = useProductBoughtListStore()
-  const shoppingCartList = useLocalStorage<ProductInCart[]>('shopping-cart', [])
+export const useCartStore = defineStore('cart', () => {
+  const cartList = useLocalStorage<ProductInCart[]>('cart', [])
 
-  if (shoppingCartList.value.length !== 0)
-    cartId = shoppingCartList.value[shoppingCartList.value.length - 1].id
+  if (cartList.value.length !== 0)
+    cartId = cartList.value[cartList.value.length - 1].id
 
-  function addShoppingCart(productId: number, specification: number | null, amount: number) {
-    const p = getProductById(productId)
+  async function addLocalCart(productId: number, specification: number | null, amount: number) {
+    const product = (await getProduct({ id: productId })).data
+    const productImage = (await getProductImagesByProductId({ productId })).data
+    const productSpec = (await getProductSpecificationsByProductId({ productId })).data
 
-    if (p == null)
-      return
-
-    const product: ProductInCart = {
+    const tempProduct: ProductInCart = {
       id: cartId,
       productId,
-      name: p.name,
-      price: p.price,
-      image: p.images[0],
-      specification,
+      categoryId: product.categoryId,
+      subCategoryId: product.subCategoryId,
+      name: product.name,
+      price: product.price,
+      image: productImage[0].image,
+      specificationId: specification,
+      specificationName: productSpec.find(s => s.id === specification)?.specName ?? null,
       amount,
     }
-    const indexes: number[] = shoppingCartList.value.reduce((acc: number[], cur, index) => {
+
+    const indexes: number[] = cartList.value.reduce((acc: number[], cur, index) => {
       if (cur.productId === productId)
         acc.push(index)
 
       return acc
     }, [])
+
     if (indexes.length > 0) { // 已經有相同的商品
-      const index = indexes.findIndex(i => shoppingCartList.value[i].specification === specification)
-      if (index !== -1) { shoppingCartList.value[index].amount += amount }
+      const index = indexes.findIndex(i => cartList.value[i].specificationId === specification)
+      if (index !== -1) { cartList.value[index].amount += amount }
 
       else {
         cartId++
-        shoppingCartList.value.push(product)
+        cartList.value.push(tempProduct)
       }
     }
     else { // 找不到相同的商品
       cartId++
-      shoppingCartList.value.push(product)
+      cartList.value.push(tempProduct)
     }
   }
 
-  function removeProductInShoppingCart(id: number) {
-    const index = shoppingCartList.value.findIndex(p => p.id === id) // 找有無相同商品
+  // 更新數量
+  function updateAmountOfProductInLocalCart(id: number, amount: number) {
+    const theProduct = cartList.value.find(p => p.id === id) // 找有無相同商品
+    if (theProduct != null) {
+      if (theProduct.specificationId == null) { // 沒有規格
+        theProduct.amount = amount
+      }
+      else {
+        const theSpecProduct = cartList.value.find(p => p.specificationId === theProduct.specificationId)
+        if (theSpecProduct == null)
+          return
+        theSpecProduct.amount = amount
+      }
+    }
+  }
+
+  // 刪除商品
+  function removeProductInLocalCart(id: number) {
+    const index = cartList.value.findIndex(p => p.id === id) // 找有無相同商品
     if (index !== -1) { // 找到相同的商品
-      shoppingCartList.value.splice(index, 1)
+      cartList.value.splice(index, 1)
     }
   }
 
-  function cancelShoppingCart() {
-    shoppingCartList.value = []
-    cartId = 0
+  // 清空購物車
+  function deleteAllLocalCart() {
+    cartList.value = []
+    cartId = 1
   }
 
-  function updateProductsToBought() {
-    shoppingCartList.value.forEach((p) => {
-      const specName = getProductSpec(p.productId, p.specification)
-      if (specName != null)
-        addProductBought(p.productId, p.name, p.image, specName, p.amount, p.price)
-    })
-    addGroupId()
+  // 將購物車內容更新到資料庫
+  async function updateLocalCartToDB(userId: number) {
+    if (userId == null)
+      return
+    await Promise.all(cartList.value.map(async (p) => {
+      await addProductToShoppingCart({
+        data: {
+          userId,
+          productId: p.productId,
+          specificationId: p.specificationId,
+          amount: p.amount,
+        },
+      })
+    }))
+    deleteAllLocalCart()
   }
 
-  function getNumOfCartProducts(): number {
-    return shoppingCartList.value.reduce((acc, cur) => acc + cur.amount, 0)
+  function getNumOfLocalCart(): number {
+    return cartList.value.reduce((acc, cur) => acc + cur.amount, 0)
   }
 
-  return { shoppingCartList, addShoppingCart, removeProductInShoppingCart, cancelShoppingCart, updateProductsToBought, getNumOfCartProducts }
+  return { cartList, addLocalCart, updateAmountOfProductInLocalCart, removeProductInLocalCart, deleteAllLocalCart, updateLocalCartToDB, getNumOfLocalCart }
 })

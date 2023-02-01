@@ -5,10 +5,11 @@ const server = jsonServer.create()
 const router = jsonServer.router(path.join(__dirname, '../public/db.json'))
 const middlewares = jsonServer.defaults()
 
-const tokenMap = new Map([['pochacco', 1]])
+const tokenMap = new Map([])
 const regexpForPassword = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/
 const regexpForBirthday = /^\d{4}-\d{2}-\d{2}$/
 const regexpForMobile = /^09\d{8}$/
+let islogin = false
 
 function getTimeStamp() {
   return Date.now()
@@ -20,35 +21,82 @@ function getUserIdByToken(accessToken) {
 
 server.use(middlewares)
 
+server.use((req, res, next) => {
+  // 判斷是否維持登入
+  const theToken = req.headers['access-token']
+  const userId = getUserIdByToken(theToken)
+  if (userId == null) {
+    islogin = false
+    tokenMap.delete(theToken)
+  }
+  else {
+    islogin = true
+  }
+
+  // 如果沒登入
+  if (!islogin) {
+    if (/^\/((follow|cart|bought)Items|orders)/.test(req.url)) {
+      res.status(401).jsonp({
+        message: 'Please login first',
+      })
+    }
+    else {
+      next()
+    }
+  }
+  else {
+    next()
+  }
+})
 server.use(jsonServer.bodyParser)
 server.post('/login', (req, res) => {
   const { email, password } = req.body
   const users = router.db.get('users').value()
   const user = users.find(u => u.email === email && u.password === password)
   if (user) {
-    for (const [key, value] of tokenMap) {
-      if (value === user.id) {
-        tokenMap.delete(key)
-        break
+    if (!islogin) {
+      for (const [key, value] of tokenMap) {
+        if (value === user.id) {
+          tokenMap.delete(key)
+          break
+        }
       }
-    }
 
-    const token = `${Date.now()}`
-    tokenMap.set(token, user.id)
-    res.locals.data = {
-      token,
-      userId: user.id,
-      ...res.locals.data,
+      const token = `${Date.now()}`
+      tokenMap.set(token, user.id)
+      islogin = true
+      res.locals.data = {
+        token,
+        userId: user.id,
+        ...res.locals.data,
+      }
+      res.jsonp(
+        res.locals.data,
+      )
     }
-    res.jsonp(
-      res.locals.data,
-    )
+    else {
+      res.status(401).jsonp({
+        message: 'You are already logged in',
+      })
+    }
   }
   else {
+    islogin = false
     res.status(401).jsonp({
       message: 'Invalid email or password',
     })
   }
+})
+
+server.post('/logout', (req, res) => {
+  const theToken = req.headers['access-token']
+  tokenMap.delete(theToken)
+  islogin = false
+  res.status(200).jsonp(
+    {
+      message: 'logout success',
+    },
+  )
 })
 
 server.post('/users', (req, res) => {
@@ -84,6 +132,7 @@ server.post('/users', (req, res) => {
         birthday,
         mobile,
         createAt: getTimeStamp(),
+        address: '',
       }
       const result = router.db.get('users').insert(user).value()
       router.db.write()
@@ -102,7 +151,6 @@ server.post('/cartItems', (req, res, next) => {
   const { body } = req
   const { userId, productId, specificationId, amount } = body
   const cartItems = router.db.get('cartItems').value()
-  console.log(specificationId)
   const existedCartItem = cartItems.find(p => p.userId === userId && p.productId === productId && p.specificationId === specificationId)
   if (existedCartItem != null) {
     req.method = 'PATCH'
@@ -116,8 +164,7 @@ server.post('/cartItems', (req, res, next) => {
 })
 
 server.post('/orders', (req, res) => {
-  const userId = getUserIdByToken(req.headers.access_token)
-
+  const userId = getUserIdByToken(req.headers['access-token'])
   const { orderData, boughtItems } = req.body
   const createdTime = getTimeStamp()
   const totalAmount = boughtItems.reduce((acc, item) => acc + item.amount, 0)
@@ -134,10 +181,12 @@ server.post('/orders', (req, res) => {
   }).value()
 
   const addedBoughtItems = boughtItems.map((item) => {
-    item.userId = userId
-    item.orderId = addedOrderData.orderId
-    item.purchaseTime = createdTime
-    return router.db.get('boughtItems').insert(item).value()
+    return router.db.get('boughtItems').insert({
+      userId,
+      orderId: addedOrderData.serialNumber,
+      purchaseTime: createdTime,
+      ...item,
+    }).value()
   })
 
   router.db.write()
