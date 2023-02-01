@@ -6,20 +6,22 @@ import type { GetProductListFromBoughtInShippedResponseData } from '@/api/bought
 import { getProductListFromBoughtInShipped } from '@/api/boughtItems/getProductListFromBoughtInShipped'
 import type { GetProductListFromBoughtInCompletedResponseData } from '@/api/boughtItems/getProductListFromBoughtInCompleted'
 import { getProductListFromBoughtInCompleted } from '@/api/boughtItems/getProductListFromBoughtInCompleted'
+import { useUsersStore } from '@/stores/user'
+const { userId, isLoggedIn } = storeToRefs(useUsersStore())
 
 const boughtItemsInPrepared = ref<GetProductListFromBoughtInPreparedResponseData[]>([])
 const boughtItemsInShipped = ref<GetProductListFromBoughtInShippedResponseData[]>([])
 const boughtItemsInCompleted = ref<GetProductListFromBoughtInCompletedResponseData[]>([])
 async function fetchBoughtItemsInPrepared() {
-  boughtItemsInPrepared.value = (await getProductListFromBoughtInPrepared({ userId: 1 })).data
+  boughtItemsInPrepared.value = (await getProductListFromBoughtInPrepared({ userId: userId.value })).data
 }
 
 async function fetchBoughtItemsInShipped() {
-  boughtItemsInShipped.value = (await getProductListFromBoughtInShipped({ userId: 1 })).data
+  boughtItemsInShipped.value = (await getProductListFromBoughtInShipped({ userId: userId.value })).data
 }
 
 async function fetchBoughtItemsInCompleted() {
-  boughtItemsInCompleted.value = (await getProductListFromBoughtInCompleted({ userId: 1 })).data
+  boughtItemsInCompleted.value = (await getProductListFromBoughtInCompleted({ userId: userId.value })).data
 }
 
 onMounted(() => {
@@ -31,7 +33,7 @@ onMounted(() => {
 
 <template>
   <PUserLayout>
-    <div class="purchase-list-container">
+    <div v-if="isLoggedIn" class="purchase-list-container">
       <div class="order-prepared-block block">
         <div class="subtitle">
           訂單準備中

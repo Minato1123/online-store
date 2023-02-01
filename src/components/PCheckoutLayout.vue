@@ -9,6 +9,7 @@ import { getProductSpecificationsByProductId } from '@/api/productSpecifications
 import { getProductListFromBoughtByOrderId } from '@/api/boughtItems/getProductListFromBoughtByOrderId'
 import type { GetProductListFromBoughtByOrderIdResponseData } from '@/api/boughtItems/getProductListFromBoughtByOrderId'
 import type { GetOrderByOrderIdResponseData } from '@/api/orders/getOrder'
+import { useUsersStore } from '@/stores/user'
 import { getOrderByOrderId } from '@/api/orders/getOrder'
 
 const props = defineProps({
@@ -21,12 +22,13 @@ const props = defineProps({
   },
 })
 
+const { userId } = storeToRefs(useUsersStore())
 const cartList = ref<GetProductListFromShoppingCartByUserIdResponseData[]>([])
 const cartProductList = ref<ProductInCart[]>([])
 const order = ref<GetOrderByOrderIdResponseData>()
 const boughtProductList = ref<GetProductListFromBoughtByOrderIdResponseData[]>([])
 async function fetchCartList() {
-  cartList.value = (await getProductListFromShoppingCartByUserId({ userId: 1 })).data
+  cartList.value = (await getProductListFromShoppingCartByUserId({ userId: userId.value })).data
 }
 
 async function fetchCartProductList() {
@@ -59,7 +61,7 @@ async function fetchOrder() {
 async function fetchBoughtProductList() {
   if (props.orderId == null)
     return
-  boughtProductList.value = (await getProductListFromBoughtByOrderId({ userId: 1, orderId: props.orderId })).data
+  boughtProductList.value = (await getProductListFromBoughtByOrderId({ userId: userId.value, orderId: props.orderId })).data
 }
 
 onMounted(async () => {

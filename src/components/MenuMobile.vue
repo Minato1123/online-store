@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import { type GetCurrentUserResponseData, getCurrentUser } from '@/api/users/getCurrentUser'
+import { useLoginStatusUpdatedEventBus } from '@/composables/useLoginStatusUpdatedEventBus'
+import router from '@/router'
+import { useUsersStore } from '@/stores/user'
+
 defineProps({
   isOpenMenu: {
     type: Boolean,
@@ -6,7 +11,41 @@ defineProps({
   },
 })
 
-defineEmits(['closeMenu'])
+const emit = defineEmits(['closeMenu'])
+const { userLogout } = useUsersStore()
+const { userId, isLoggedIn } = storeToRefs(useUsersStore())
+
+const { on: onLoginStatusUpdated } = useLoginStatusUpdatedEventBus()
+const user = ref<GetCurrentUserResponseData | null>()
+
+async function fetchCurrentUser() {
+  if (isLoggedIn.value)
+    user.value = (await getCurrentUser({ id: userId.value })).data
+  else
+    user.value = null
+}
+
+onMounted(async () => {
+  await fetchCurrentUser()
+})
+
+onLoginStatusUpdated(async () => {
+  await fetchCurrentUser()
+})
+
+function handleMenuBtnClick(target: string) {
+  if (isLoggedIn.value) {
+    router.push({
+      name: target,
+    })
+  }
+  else {
+    router.push({
+      name: 'login',
+    })
+  }
+  emit('closeMenu')
+}
 </script>
 
 <template>
@@ -23,33 +62,35 @@ defineEmits(['closeMenu'])
       }"
     >
       <div class="user-container">
-        <div class="user-name">
-          嗨，使用者！
+        <div v-if="user != null" class="user-name">
+          嗨，{{ user.name }}！
         </div>
-        <button class="log-btn">
+        <button
+          v-if="!isLoggedIn" class="log-btn" @click="$router.push({
+            name: 'login',
+          })"
+          @click.self="$emit('closeMenu')"
+        >
+          登入
+        </button>
+        <button v-else class="log-btn" @click="userLogout" @click.self="$emit('closeMenu')">
           登出
         </button>
       </div>
       <ul class="about-container">
         <li>
-          <RouterLink
-            :to="{
-              name: 'profile',
-            }"
-            @click.self="$emit('closeMenu')"
+          <button
+            @click="handleMenuBtnClick('profile')"
           >
             我的帳戶
-          </RouterLink>
+          </button>
         </li>
         <li>
-          <RouterLink
-            :to="{
-              name: 'following',
-            }"
-            @click.self="$emit('closeMenu')"
+          <button
+            @click="handleMenuBtnClick('following')"
           >
             追蹤清單
-          </RouterLink>
+          </button>
         </li>
         <li><button>關於帕恰</button></li>
         <li><button>客服中心</button></li>

@@ -7,9 +7,7 @@ export interface UpdateProductToShoppingCartRequestData {
   }
 }
 
-export type UpdateProductToShoppingCartResponseData = UpdateProductToShoppingCartRequestData['data'] & {
-  id: number
-}
+export type UpdateProductToShoppingCartResponseData = UpdateProductToShoppingCartRequestData['data']
 
 export function updateProductToShoppingCart({ data }: UpdateProductToShoppingCartRequestData) {
   return http.patch<UpdateProductToShoppingCartResponseData>({

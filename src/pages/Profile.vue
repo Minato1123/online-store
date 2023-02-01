@@ -3,13 +3,17 @@ import PUserLayout from '@/components/PUserLayout.vue'
 import PButton from '@/components/PButton.vue'
 import InfoDialog from '@/components/InfoDialog.vue'
 import { type GetCurrentUserResponseData, getCurrentUser } from '@/api/users/getCurrentUser'
-import { useUsersStore } from '@/stores/user'
+import { updateUserData } from '@/api/users/updateUserData'
 import IconCheckCircleRounded from '~icons/material-symbols/check-circle-rounded'
 import IconCrossCircle from '~icons/gridicons/cross-circle'
+import { useUsersStore } from '@/stores/user'
 
+const { userId, isLoggedIn } = storeToRefs(useUsersStore())
 const user = ref<GetCurrentUserResponseData>()
 async function fetchCurrentUser() {
-  user.value = (await getCurrentUser({ id: 1 })).data
+  if (!isLoggedIn.value)
+    return
+  user.value = (await getCurrentUser({ id: userId.value })).data
 }
 
 onMounted(() => {
@@ -30,6 +34,19 @@ const editProfile = computed(() => {
     address: user.value.address,
   }
 })
+
+async function submitUpdateProfile() {
+  if (editProfile.value == null)
+    return
+  await updateUserData({
+    data: {
+      id: 1,
+      ...editProfile.value,
+    },
+  })
+  isSaveSuccess.value = true
+  isDialogOpen.value = true
+}
 
 const saveBtnContent = {
   text: '儲存',
@@ -62,7 +79,7 @@ const saveBtnFailDialog = {
 
 <template>
   <PUserLayout>
-    <form class="profile-container" @submit.prevent="">
+    <form class="profile-container" @submit.prevent="submitUpdateProfile">
       <div class="name-birthday-container">
         <div class="name-block">
           <div class="sub-title">
@@ -96,7 +113,7 @@ const saveBtnFailDialog = {
         <input v-if="editProfile" v-model="editProfile.address" type="text">
       </div>
       <div class="save-button">
-        <PButton class="save-btn" :content="saveBtnContent" @click="isDialogOpen = true">
+        <PButton class="save-btn" :content="saveBtnContent">
           儲存
         </PButton>
         <InfoDialog v-if="isDialogOpen && isSaveSuccess" :text-in-dialog="saveBtnSuccessDialog" @close-info-dialog="isDialogOpen = false" />

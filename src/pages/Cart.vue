@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { RouterLink } from 'vue-router'
 import { getPublicImgSrc } from '../utils/index'
+import { useUsersStore } from '@/stores/user'
 import PButton from '@/components/PButton.vue'
 import IconShoppingBasketLine from '~icons/ri/shopping-basket-line'
 import router from '@/router/index'
@@ -14,35 +15,46 @@ import type { ProductInCart } from '@/types'
 import { deleteProductFromCart } from '@/api/cartItems/deleteProductFromCart'
 import { updateProductToShoppingCart } from '@/api/cartItems/updateProductToShoppingCart'
 import { useCartUpdatedEventBus } from '@/composables/useCartUpdatedEventBus'
+import { useCartStore } from '@/stores/shoppingCart'
+
+const { updateAmountOfProductInLocalCart, deleteAllLocalCart, removeProductInLocalCart } = useCartStore()
+const { cartList } = storeToRefs(useCartStore())
+const { userId, isLoggedIn } = storeToRefs(useUsersStore())
 
 const { emit: emitCartUpdated } = useCartUpdatedEventBus()
 
 const shoppingCartList = ref<GetProductListFromShoppingCartByUserIdResponseData[]>()
 async function fetchCartItemsByUserId() {
-  shoppingCartList.value = (await getProductListFromShoppingCartByUserId({ userId: 1 })).data
+  if (isLoggedIn.value)
+    shoppingCartList.value = (await getProductListFromShoppingCartByUserId({ userId: userId.value })).data
 }
 
 const cartProductList = ref<ProductInCart[]>([])
 async function fetchCartProductList() {
-  cartProductList.value = await Promise.all(
-    (shoppingCartList.value ?? []).map(async (item) => {
-      const product = (await getProduct({ id: item.productId })).data
-      const productImage = (await getProductImagesByProductId({ productId: item.productId })).data
-      const productSpec = (await getProductSpecificationsByProductId({ productId: item.productId })).data
-      return {
-        id: item.id,
-        productId: item.productId,
-        categoryId: product.categoryId,
-        subCategoryId: product.subCategoryId,
-        name: product.name,
-        image: productImage[0].image,
-        price: product.price,
-        amount: item.amount,
-        specificationId: item.specificationId,
-        specificationName: productSpec.find(spec => spec.id === item.specificationId)?.specName ?? '無',
-      }
-    }),
-  )
+  if (isLoggedIn.value) {
+    cartProductList.value = await Promise.all(
+      (shoppingCartList.value ?? []).map(async (item) => {
+        const product = (await getProduct({ id: item.productId })).data
+        const productImage = (await getProductImagesByProductId({ productId: item.productId })).data
+        const productSpec = (await getProductSpecificationsByProductId({ productId: item.productId })).data
+        return {
+          id: item.id,
+          productId: item.productId,
+          categoryId: product.categoryId,
+          subCategoryId: product.subCategoryId,
+          name: product.name,
+          image: productImage[0].image,
+          price: product.price,
+          amount: item.amount,
+          specificationId: item.specificationId,
+          specificationName: productSpec.find(spec => spec.id === item.specificationId)?.specName ?? '無',
+        }
+      }),
+    )
+  }
+  else {
+    cartProductList.value = cartList.value ?? []
+  }
 }
 
 onMounted(async () => {
@@ -86,10 +98,18 @@ function uncheckAllItems() {
 }
 
 async function handleDeleteCheckedItems() {
-  await Promise.all(Array.from(checkedIdSet.value).map(id => deleteProductFromCart({ id })))
-  checkedIdSet.value.clear()
+  if (isLoggedIn.value) {
+    await Promise.all(Array.from(checkedIdSet.value).map(id => deleteProductFromCart({ id })))
+  }
+  else {
+    checkedIdSet.value.forEach((id) => {
+      removeProductInLocalCart(id)
+    })
+  }
+
   await fetchCartItemsByUserId()
   await fetchCartProductList()
+  checkedIdSet.value.clear()
   emitCartUpdated()
 }
 
@@ -109,19 +129,28 @@ function handleClickProduct(productId: number, categoryId: number, subCategoryId
 }
 
 async function handleClickDelete(id: number) {
-  await deleteProductFromCart({ id })
+  if (isLoggedIn.value)
+    await deleteProductFromCart({ id })
+  else
+    removeProductInLocalCart(id)
+
   await fetchCartItemsByUserId()
   await fetchCartProductList()
   emitCartUpdated()
 }
 
 async function updateCartItemAmount(id: number, amount: number) {
-  await updateProductToShoppingCart({
-    data: {
-      id,
-      amount,
-    },
-  })
+  if (isLoggedIn.value) {
+    await updateProductToShoppingCart({
+      data: {
+        id,
+        amount,
+      },
+    })
+  }
+  else {
+    updateAmountOfProductInLocalCart(id, amount)
+  }
   await fetchCartItemsByUserId()
   await fetchCartProductList()
   emitCartUpdated()

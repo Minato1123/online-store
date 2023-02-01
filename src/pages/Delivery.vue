@@ -14,9 +14,11 @@ import { getProduct } from '@/api/products/getProduct'
 import { getProductImagesByProductId } from '@/api/productImages/getProductImagesByProductId'
 import { getProductSpecificationsByProductId } from '@/api/productSpecifications/getProductSpecificationsByProductId'
 import { deleteProductFromCart } from '@/api/cartItems/deleteProductFromCart'
+import { useUsersStore } from '@/stores/user'
 import { useCartUpdatedEventBus } from '@/composables/useCartUpdatedEventBus'
 
 const { orderData } = storeToRefs(useOrderDataStore())
+const { userId } = storeToRefs(useUsersStore())
 const { emit: emitCartUpdated } = useCartUpdatedEventBus()
 
 const textInSureCheckoutBtn = {
@@ -58,7 +60,7 @@ const cartList = ref<GetProductListFromShoppingCartByUserIdResponseData[]>()
 const toBuyProductList = ref<BoughtItem[]>()
 
 async function fetchCartList() {
-  cartList.value = (await getProductListFromShoppingCartByUserId({ userId: 1 })).data
+  cartList.value = (await getProductListFromShoppingCartByUserId({ userId: userId.value })).data
 }
 
 async function fetchToBuyProductList() {

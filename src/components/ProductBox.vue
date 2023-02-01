@@ -9,6 +9,7 @@ import type { GetProductImagesByProductIdResponseData } from '@/api/productImage
 import { getProductListFromFollowingByUserId, type getProductListFromFollowingByUserIdResponseData } from '@/api/followItems/getProductListFromFollowingByUserId'
 import { addProductToFollowing } from '@/api/followItems/addProductToFollowing'
 import { deleteProductFromFollowing } from '@/api/followItems/deleteProductFromFollowing'
+import { useUsersStore } from '@/stores/user'
 
 const props = defineProps({
   product: {
@@ -16,6 +17,8 @@ const props = defineProps({
     required: true,
   },
 })
+
+const { userId, isLoggedIn } = storeToRefs(useUsersStore())
 
 const productImages = ref<GetProductImagesByProductIdResponseData[]>([])
 const followProductList = ref<getProductListFromFollowingByUserIdResponseData[]>([])
@@ -25,7 +28,11 @@ async function fetchProductImages() {
 }
 
 async function fetchFollowProductList() {
-  followProductList.value = (await getProductListFromFollowingByUserId({ userId: 1 })).data
+  if (isLoggedIn.value)
+    followProductList.value = (await getProductListFromFollowingByUserId({ userId: userId.value })).data
+
+  else
+    followProductList.value = []
 }
 
 watch(props, async () => {
@@ -43,6 +50,8 @@ const followingList = computed(() => {
 })
 
 async function handleFollowedProducts() {
+  if (isLoggedIn.value === false)
+    return
   const p = props.product
   if (p == null)
     return
@@ -53,7 +62,7 @@ async function handleFollowedProducts() {
       await deleteProductFromFollowing({ id: followItem.id })
   }
   else {
-    await addProductToFollowing({ data: { productId: p.id, userId: 1 } })
+    await addProductToFollowing({ data: { productId: p.id, userId: userId.value } })
   }
   fetchFollowProductList()
 }

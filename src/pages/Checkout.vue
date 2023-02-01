@@ -4,17 +4,19 @@ import PCheckoutLayout from '@/components/PCheckoutLayout.vue'
 import router from '@/router'
 import { useOrderDataStore } from '@/stores/orderData'
 import { getCurrentUser } from '@/api/users/getCurrentUser'
+import { useUsersStore } from '@/stores/user'
 import type { GetCurrentUserResponseData } from '@/api/users/getCurrentUser'
 
 const isOpenDiscount = ref(false)
 const codeForDiscount = ref('')
 
 const { resetOrderData } = useOrderDataStore()
+const { userId } = storeToRefs(useUsersStore())
 const { orderData } = storeToRefs(useOrderDataStore())
 const currentUser = ref<GetCurrentUserResponseData>()
 
 async function fetchCurrentUser() {
-  currentUser.value = (await getCurrentUser({ id: 1 })).data
+  currentUser.value = (await getCurrentUser({ id: userId.value })).data
 }
 
 onMounted(() => {

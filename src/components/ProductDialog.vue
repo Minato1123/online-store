@@ -3,8 +3,9 @@ import { type PropType, Teleport } from 'vue'
 import { OnClickOutside } from '@vueuse/components'
 import type { InfoType, Product } from '../types/index'
 import { getPublicImgSrc } from '../utils/index'
-import { useShoppingCartStore } from '../stores/shoppingCart'
+import { useCartStore } from '../stores/shoppingCart'
 import PButton from './PButton.vue'
+import { useUsersStore } from '@/stores/user'
 import InfoDialog from '@/components/InfoDialog.vue'
 import IconCartCheckFill from '~icons/bi/cart-check-fill'
 import { getProductImagesByProductId } from '@/api/productImages/getProductImagesByProductId'
@@ -22,6 +23,9 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['closeProductQuickPage'])
+
+const { userId, isLoggedIn } = storeToRefs(useUsersStore())
+
 const { emit: emitCartUpdated } = useCartUpdatedEventBus()
 
 const productImages = ref<GetProductImagesByProductIdResponseData[]>([])
@@ -44,7 +48,7 @@ onMounted(() => {
   fetchProductSpec()
 })
 
-const { addShoppingCart } = useShoppingCartStore()
+const { addLocalCart } = useCartStore()
 
 const numOfProduct = ref(1)
 const subtotal = computed(() => numOfProduct.value * props.product.price)
@@ -71,14 +75,23 @@ window.addEventListener('keydown', (e) => {
 
 const isOpenDialogAddCart = ref(false)
 async function submitAddCart() {
-  await addProductToShoppingCart({
-    data: {
-      userId: 1,
-      productId: props.product.id,
-      specificationId: specPicked.value,
-      amount: numOfProduct.value,
-    },
-  })
+  if (isLoggedIn.value) {
+    await addProductToShoppingCart({
+      data: {
+        userId: userId.value,
+        productId: props.product.id,
+        specificationId: specPicked.value,
+        amount: numOfProduct.value,
+      },
+    })
+  }
+  else {
+    addLocalCart(
+      props.product.id,
+      specPicked.value,
+      numOfProduct.value,
+    )
+  }
   emitCartUpdated()
   isOpenDialogAddCart.value = true
   window.setTimeout(() => {
@@ -367,12 +380,6 @@ onBeforeUnmount(() => {
           width: 50%;
         }
       }
-    }
-  }
-
-  @media screen and (min-width: 577px) {
-    .product-container {
-
     }
   }
 

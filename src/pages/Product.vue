@@ -8,9 +8,10 @@ import PButton from '@/components/PButton.vue'
 import InfoDialog from '@/components/InfoDialog.vue'
 import Slide from '@/components/Slide.vue'
 
-import { useShoppingCartStore } from '@/stores/shoppingCart'
+import { useCartStore } from '@/stores/shoppingCart'
 import IconCartPlus from '~icons/bi/cart-plus'
 import IconCartCheckFill from '~icons/bi/cart-check-fill'
+import { useUsersStore } from '@/stores/user'
 
 import { getProduct } from '@/api/products/getProduct'
 import type { GetProductResponseData } from '@/api/products/getProduct'
@@ -40,6 +41,9 @@ const category = ref<GetCategoryResponseData | null>(null)
 const subCategory = ref<GetSubCategoryResponseData | null>(null)
 const recommendProductList = ref<GetProductResponseData[]>([])
 const followProductList = ref<getProductListFromFollowingByUserIdResponseData[]>([])
+
+const { userId, isLoggedIn } = storeToRefs(useUsersStore())
+const { addLocalCart } = useCartStore()
 
 async function fetchProduct() {
   product.value = (await getProduct({ id: Number(productId.value) })).data
@@ -76,7 +80,10 @@ async function fetchRecommendProductList() {
 }
 
 async function fetchFollowProductList() {
-  followProductList.value = (await getProductListFromFollowingByUserId({ userId: 1 })).data
+  if (isLoggedIn.value)
+    followProductList.value = (await getProductListFromFollowingByUserId({ userId: userId.value })).data
+  else
+    followProductList.value = []
 }
 
 watch(productId, async () => {
@@ -106,6 +113,8 @@ const followingList = computed(() => {
 })
 
 async function handleFollowedProducts() {
+  if (isLoggedIn.value === false)
+    return
   const p = product.value
   if (p == null)
     return
@@ -116,7 +125,7 @@ async function handleFollowedProducts() {
       await deleteProductFromFollowing({ id: followItem.id })
   }
   else {
-    await addProductToFollowing({ data: { productId: p.id, userId: 1 } })
+    await addProductToFollowing({ data: { productId: p.id, userId: userId.value } })
   }
   fetchFollowProductList()
 }
@@ -153,15 +162,13 @@ const textInDialogAddCart: InfoType = {
 }
 const isOpenDialogAddCart = ref(false)
 
-const { addShoppingCart } = useShoppingCartStore()
-
 function handleAddCart() {
   if (product.value == null)
     return
 
   const pId = product.value.id
   if (pId != null) {
-    addShoppingCart(pId, specPicked.value, amountOfProduct.value)
+    addLocalCart(pId, specPicked.value, amountOfProduct.value)
     isOpenDialogAddCart.value = true
     window.setTimeout(() => {
       isOpenDialogAddCart.value = false
@@ -175,7 +182,7 @@ function handleCheckout() {
 
   const pId = product.value.id
   if (pId != null) {
-    addShoppingCart(pId, specPicked.value, amountOfProduct.value)
+    addLocalCart(pId, specPicked.value, amountOfProduct.value)
     router.push({ name: 'cart' })
   }
 }

@@ -4,8 +4,10 @@ import type { Pagination, Response } from '@/utils/request'
 import { getProductListFromFollowingByUserIdHasPage, type getProductListFromFollowingByUserIdHasPageRequestData } from '@/api/followItems/getProductListFromFollowingByUserIdHasPage'
 import type { getProductListFromFollowingByUserIdResponseData } from '@/api/followItems/getProductListFromFollowingByUserId'
 import type { GetProductResponseData } from '@/api/products/getProduct'
+import { useUsersStore } from '@/stores/user'
 import { getProduct } from '@/api/products/getProduct'
 
+const { userId } = storeToRefs(useUsersStore())
 const currentPageFollowingItemList = ref<Response<getProductListFromFollowingByUserIdResponseData[]>>()
 const productList = ref<GetProductResponseData[]>([])
 const paramsInFetchFollowingList = ref<getProductListFromFollowingByUserIdHasPageRequestData>({
@@ -13,7 +15,7 @@ const paramsInFetchFollowingList = ref<getProductListFromFollowingByUserIdHasPag
   pageSize: 6,
   sortBy: 'id',
   orderBy: 'asc',
-  userId: 1,
+  userId: userId.value,
 })
 
 async function fetchCurrentPageFollowingItemList() {

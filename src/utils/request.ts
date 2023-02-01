@@ -1,3 +1,5 @@
+import { useUsersStore } from '@/stores/user'
+
 export type Pagination = Partial<Record<'first' | 'prev' | 'next' | 'last', {
   page: number
   limit: number
@@ -25,6 +27,7 @@ async function request<T>(config: {
     method: config.method,
     headers: {
       'Content-Type': 'application/json',
+      'access-token': localStorage.getItem('user-token') ?? '',
     },
     body: JSON.stringify(config.data),
   })
@@ -54,6 +57,9 @@ async function request<T>(config: {
         })),
     }
   }
+
+  if (response.status === 401)
+    useUsersStore().forcedLogout()
 
   throw new Error(response.statusText)
 }

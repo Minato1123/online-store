@@ -1,19 +1,43 @@
 <script setup lang="ts">
 import { type RouteLocationRaw, RouterLink } from 'vue-router'
 import SearchBarMobile from '@/components/SearchBarMobile.vue'
-import { useUsersStore } from '@/stores/user'
 import { getTotalNumOfProductFromCartByUserId } from '@/api/cartItems/getTotalNumOfProductsFromCartByUserId'
 import { useCartUpdatedEventBus } from '@/composables/useCartUpdatedEventBus'
+import { getCurrentUser } from '@/api/users/getCurrentUser'
+import type { GetCurrentUserResponseData } from '@/api/users/getCurrentUser'
+import { useUsersStore } from '@/stores/user'
+import { useLoginStatusUpdatedEventBus } from '@/composables/useLoginStatusUpdatedEventBus'
 import router from '@/router'
 
 defineEmits(['toggleMenu'])
+
 const { on: onCartUpdated } = useCartUpdatedEventBus()
+const { on: onLoginStatusUpdated } = useLoginStatusUpdatedEventBus()
 const totalNumOfCartItems = ref<number>(0)
+const { userId, isLoggedIn } = storeToRefs(useUsersStore())
+const { userLogout } = useUsersStore()
+const user = ref<GetCurrentUserResponseData | null>()
+
 async function fetchTotalNumOfProductsFromCartByUserId() {
-  totalNumOfCartItems.value = await getTotalNumOfProductFromCartByUserId({ userId: 1 })
+  if (user.value == null)
+    return totalNumOfCartItems.value = 0
+  totalNumOfCartItems.value = await getTotalNumOfProductFromCartByUserId({ userId: user.value.id })
 }
 
-onMounted(() => {
+async function fetchCurrentUser() {
+  if (isLoggedIn.value)
+    user.value = (await getCurrentUser({ id: userId.value })).data
+  else
+    user.value = null
+}
+
+async function logout() {
+  await userLogout()
+  user.value = null
+}
+
+onMounted(async () => {
+  await fetchCurrentUser()
   fetchTotalNumOfProductsFromCartByUserId()
 })
 
@@ -21,22 +45,15 @@ onCartUpdated(() => {
   fetchTotalNumOfProductsFromCartByUserId()
 })
 
-const { getLoginStatus, getCurrentUser, userLogout } = useUsersStore()
-const currentUser = computed(() => {
-  const user = getCurrentUser()
-  if (user != null)
-    return user
-  return null
+onLoginStatusUpdated(async () => {
+  await fetchCurrentUser()
+  fetchTotalNumOfProductsFromCartByUserId()
 })
 
 const isOpenSearchBar = ref(false)
 
-const loginStatus = computed(() => {
-  return getLoginStatus()
-})
-
 const userPageRoute = computed<RouteLocationRaw>(() => {
-  if (loginStatus.value === true)
+  if (user.value != null)
     return { name: 'profile' }
 
   else
@@ -93,12 +110,12 @@ function handleEnter(e: KeyboardEvent) {
             </RouterLink>
           </button>
           <template #popper>
-            <div v-if="!loginStatus" class="hello-user">
+            <div v-if="user == null" class="hello-user">
               尚未登入！
             </div>
             <div v-else>
-              <div v-if="currentUser != null" class="hello-user line">
-                哈囉，{{ currentUser.name }}！
+              <div v-if="user.name != null" class="hello-user line">
+                哈囉，{{ user.name }}！
               </div>
               <div class="user-btns">
                 <button>
@@ -119,11 +136,11 @@ function handleEnter(e: KeyboardEvent) {
                     追蹤清單
                   </RouterLink>
                 </button>
-                <button>
+                <button @click="logout">
                   <RouterLink
                     class="btn" :to="{
                       name: 'home',
-                    }" @click="userLogout"
+                    }"
                   >
                     登出
                   </RouterLink>
