@@ -8,7 +8,7 @@ const route = useRoute()
 const queryKeyword = computed(() => String(route.query.keyword))
 
 const productList = ref<Response<GetProductResponseData[]>>()
-const paramsInFetchFollowingList = ref<GetProductListBySearchRequestData>({
+const paramsInFetchProductListBySearch = ref<GetProductListBySearchRequestData>({
   currentPage: 1,
   pageSize: 6,
   query: queryKeyword.value,
@@ -17,11 +17,11 @@ const paramsInFetchFollowingList = ref<GetProductListBySearchRequestData>({
 })
 
 async function fetchCurrentPageProductListBySearch() {
-  productList.value = (await getProductListListBySearch(paramsInFetchFollowingList.value))
+  productList.value = (await getProductListListBySearch(paramsInFetchProductListBySearch.value))
 }
 
-watch([paramsInFetchFollowingList, queryKeyword], async () => {
-  paramsInFetchFollowingList.value.query = queryKeyword.value
+watch([paramsInFetchProductListBySearch, queryKeyword], async () => {
+  paramsInFetchProductListBySearch.value.query = queryKeyword.value
   await fetchCurrentPageProductListBySearch()
 }, { deep: true })
 
@@ -33,14 +33,14 @@ onMounted(() => {
 <template>
   <div class="follow-container">
     <div class="follow-bar">
-      {{ paramsInFetchFollowingList.query }} 的搜尋結果：
+      {{ paramsInFetchProductListBySearch.query }} 的搜尋結果：
     </div>
     <PMain
       v-if="productList != null && productList.data.length > 0"
-      v-model:current-page="paramsInFetchFollowingList.currentPage"
-      v-model:page-size="paramsInFetchFollowingList.pageSize"
-      v-model:sort-by="paramsInFetchFollowingList.sortBy"
-      v-model:order-by="paramsInFetchFollowingList.orderBy"
+      v-model:current-page="paramsInFetchProductListBySearch.currentPage"
+      v-model:page-size="paramsInFetchProductListBySearch.pageSize"
+      v-model:sort-by="paramsInFetchProductListBySearch.sortBy"
+      v-model:order-by="paramsInFetchProductListBySearch.orderBy"
       :product-list="productList.data"
       :total-num-of-products="10"
       :pagination="productList.pagination"
