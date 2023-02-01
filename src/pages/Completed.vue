@@ -9,6 +9,28 @@ const route = useRoute()
 const orderId = computed(() => String(route.params.orderId))
 
 const order = ref<GetOrderByOrderIdResponseData>()
+const paymentStatus = computed(() => {
+  if (order.value == null)
+    return
+  if (order.value.paymentStatus === 'paid')
+    return '已付款'
+
+  else if (order.value.paymentStatus === 'unpaid')
+    return '未付款'
+})
+
+const status = computed(() => {
+  if (order.value == null)
+    return
+  if (order.value.status === 'prepared')
+    return '準備中'
+
+  else if (order.value.status === 'shipped')
+    return '已出貨'
+
+  else if (order.value.status === 'completed')
+    return '訂單已完成'
+})
 
 async function fetchBoughtList() {
   order.value = (await getOrderByOrderId({ serialNumber: orderId.value })).data[0]
@@ -81,7 +103,7 @@ const textInGoShoppingBtn = {
                 付款狀態
               </div>
               <div class="sub-content">
-                {{ order.paymentStatus }}
+                {{ paymentStatus }}
               </div>
             </div>
             <div class="item">
@@ -89,7 +111,7 @@ const textInGoShoppingBtn = {
                 商品狀態
               </div>
               <div class="sub-content">
-                {{ order.status }}
+                {{ status }}
               </div>
             </div>
           </div>
