@@ -29,7 +29,7 @@ window.addEventListener('keydown', (e) => {
 
 const searchText = ref<string>('')
 function handleSearch() {
-  router.push({ name: 'search', params: { keyword: searchText.value } })
+  router.push({ name: 'search', query: { keyword: searchText.value } })
 }
 </script>
 
