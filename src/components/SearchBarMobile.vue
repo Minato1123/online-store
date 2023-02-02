@@ -29,7 +29,13 @@ window.addEventListener('keydown', (e) => {
 
 const searchText = ref<string>('')
 function handleSearch() {
+  searchText.value = searchText.value.trim()
   router.push({ name: 'search', query: { keyword: searchText.value } })
+}
+
+function handleEnter(e: KeyboardEvent) {
+  if (!e.isComposing)
+    handleSearch()
 }
 </script>
 
@@ -41,7 +47,7 @@ function handleSearch() {
     }" @trigger="closeSearchBar"
   >
     <div class="search-bar">
-      <input v-model="searchText" type="text" placeholder="Search" @keyup.enter="handleSearch">
+      <input v-model="searchText" type="text" placeholder="Search" @keydown.enter="handleEnter">
       <button @click="handleSearch">
         搜尋
       </button>

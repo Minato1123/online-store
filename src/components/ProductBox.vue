@@ -35,7 +35,7 @@ async function fetchFollowProductList() {
     followProductList.value = []
 }
 
-watch(props, async () => {
+watch([props, isLoggedIn], async () => {
   await fetchProductImages()
   fetchFollowProductList()
 })

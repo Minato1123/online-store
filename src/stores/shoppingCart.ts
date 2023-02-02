@@ -101,9 +101,9 @@ export const useCartStore = defineStore('cart', () => {
     deleteAllLocalCart()
   }
 
-  function getNumOfLocalCart(): number {
+  const numOfLocalCart = computed<number>(() => {
     return cartList.value.reduce((acc, cur) => acc + cur.amount, 0)
-  }
+  })
 
-  return { cartList, addLocalCart, updateAmountOfProductInLocalCart, removeProductInLocalCart, deleteAllLocalCart, updateLocalCartToDB, getNumOfLocalCart }
+  return { cartList, addLocalCart, updateAmountOfProductInLocalCart, removeProductInLocalCart, deleteAllLocalCart, updateLocalCartToDB, numOfLocalCart }
 })

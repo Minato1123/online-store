@@ -8,6 +8,7 @@ import type { GetCurrentUserResponseData } from '@/api/users/getCurrentUser'
 import { useUsersStore } from '@/stores/user'
 import { useLoginStatusUpdatedEventBus } from '@/composables/useLoginStatusUpdatedEventBus'
 import router from '@/router'
+import { useCartStore } from '@/stores/shoppingCart'
 
 defineEmits(['toggleMenu'])
 
@@ -16,12 +17,14 @@ const { on: onLoginStatusUpdated } = useLoginStatusUpdatedEventBus()
 const totalNumOfCartItems = ref<number>(0)
 const { userId, isLoggedIn } = storeToRefs(useUsersStore())
 const { userLogout } = useUsersStore()
+const { numOfLocalCart } = storeToRefs(useCartStore())
 const user = ref<GetCurrentUserResponseData | null>()
 
 async function fetchTotalNumOfProductsFromCartByUserId() {
   if (user.value == null)
-    return totalNumOfCartItems.value = 0
-  totalNumOfCartItems.value = await getTotalNumOfProductFromCartByUserId({ userId: user.value.id })
+    totalNumOfCartItems.value = numOfLocalCart.value
+  else
+    totalNumOfCartItems.value = await getTotalNumOfProductFromCartByUserId({ userId: user.value.id })
 }
 
 async function fetchCurrentUser() {
@@ -63,6 +66,9 @@ const userPageRoute = computed<RouteLocationRaw>(() => {
 const searchBtnRef = ref<HTMLElement | null>(null)
 const searchText = ref<string>('')
 function handleSearch() {
+  searchText.value = searchText.value.trim()
+  if (searchText.value === '')
+    return
   router.push({ name: 'search', query: { keyword: searchText.value } })
 }
 

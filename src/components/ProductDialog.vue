@@ -86,7 +86,7 @@ async function submitAddCart() {
     })
   }
   else {
-    addLocalCart(
+    await addLocalCart(
       props.product.id,
       specPicked.value,
       numOfProduct.value,

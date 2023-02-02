@@ -114,7 +114,10 @@ async function handleDeleteCheckedItems() {
 }
 
 function handleCheckout() {
-  router.push({ name: 'checkout' })
+  if (isLoggedIn.value)
+    router.push({ name: 'checkout' })
+  else
+    router.push({ name: 'login' })
 }
 
 function handleClickProduct(productId: number, categoryId: number, subCategoryId: number) {
