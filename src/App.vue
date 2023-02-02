@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
 import Nav from './components/Nav.vue'
 import MenuMobile from './components/MenuMobile.vue'
 import Footer from './components/Footer.vue'
+import Top from './components/Top.vue'
 
 const isOpenMenu = ref(false)
 </script>
@@ -14,6 +15,7 @@ const isOpenMenu = ref(false)
     <RouterView />
   </div>
   <Footer class="footer" />
+  <Top class="top" />
 </template>
 
 <style scoped lang="scss">
@@ -32,6 +34,13 @@ const isOpenMenu = ref(false)
   justify-content: center;
   align-items: center;
   background-color: #FFFBF4;
+}
+
+.top {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 2;
 }
 
 @media screen and (max-width: 1090px) {
