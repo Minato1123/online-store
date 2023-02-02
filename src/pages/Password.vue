@@ -4,9 +4,12 @@ import PButton from '@/components/PButton.vue'
 import InfoDialog from '@/components/InfoDialog.vue'
 import IconCheckCircleRounded from '~icons/material-symbols/check-circle-rounded'
 import IconCrossCircle from '~icons/gridicons/cross-circle'
+import { updateUserPasswordData } from '@/api/users/updateUserPassword'
+import { useUsersStore } from '@/stores/user'
 
 const isDialogOpen = ref(false)
 const isSaveSuccess = ref(true)
+const { userId } = storeToRefs(useUsersStore())
 
 const saveBtnContent = {
   text: '儲存',
@@ -35,11 +38,33 @@ const saveBtnFailDialog = {
     color: 'main-product-color',
   },
 }
+
+const oldPassword = ref<string>('')
+const newPassword = ref<string>('')
+const confirmNewPassword = ref<string>('')
+
+async function updatePassword() {
+  if (newPassword.value !== confirmNewPassword.value) {
+    isSaveSuccess.value = false
+    return
+  }
+  await updateUserPasswordData({
+    data: {
+      id: userId.value,
+      oldPassword: oldPassword.value,
+      newPassword: newPassword.value,
+    },
+  })
+  isSaveSuccess.value = true
+  oldPassword.value = ''
+  newPassword.value = ''
+  confirmNewPassword.value = ''
+}
 </script>
 
 <template>
   <PUserLayout>
-    <form class="pw-container" @submit.prevent="">
+    <form class="pw-container" @submit.prevent="updatePassword">
       <div class="outer-block">
         <div class="pw-blocks">
           <div class="pw-block">
@@ -49,19 +74,19 @@ const saveBtnFailDialog = {
                 忘記密碼？
               </button>
             </div>
-            <input type="password" autocomplete="off">
+            <input v-model="oldPassword" type="password" autocomplete="off">
           </div>
           <div class="pw-block">
             <div class="subtitle">
               新密碼
             </div>
-            <input type="password" autocomplete="off">
+            <input v-model="newPassword" type="password" autocomplete="off">
           </div>
           <div class="pw-block">
             <div class="subtitle">
               確認新密碼
             </div>
-            <input type="password" autocomplete="off">
+            <input v-model="confirmNewPassword" type="password" autocomplete="off">
           </div>
         </div>
       </div>

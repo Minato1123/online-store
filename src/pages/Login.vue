@@ -26,13 +26,18 @@ const isRememberAccount = computed(() => {
     return true
 })
 
-function switchRemeberAccount() {
+function toggleRemeberAccount() {
   if (!isRememberAccount.value)
     rememberAccount()
 
   else
     forgetAccount()
 }
+
+watch([loginEmail, loginPassword], () => {
+  if (isRememberAccount.value)
+    rememberAccount()
+})
 </script>
 
 <template>
@@ -72,7 +77,7 @@ function switchRemeberAccount() {
         </div>
       </div>
       <div class="account-setup">
-        <label class="remember-password" @click.self="switchRemeberAccount">
+        <label class="remember-password" @click.self="toggleRemeberAccount">
           <input class="hidden" type="checkbox">
           <icon-material-symbols-check-box-outline v-if="isRememberAccount" />
           <icon-material-symbols-check-box-outline-blank v-else />

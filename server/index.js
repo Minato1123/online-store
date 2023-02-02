@@ -147,6 +147,40 @@ server.post('/users', (req, res) => {
   }
 })
 
+server.patch('/users/:id', (req, res, next) => {
+  if (req.body.password != null) {
+    const id = Number(req.params.id)
+    const { oldPassword, newPassword } = req.body
+    const users = router.db.get('users').value()
+    const user = users.find(u => u.id === id)
+    console.log(user)
+    if (user == null) {
+      res.status(400).jsonp({
+        message: 'User not found',
+      })
+    }
+    else if (user.password !== oldPassword) {
+      console.log(user.password, oldPassword)
+      res.status(400).jsonp({
+        message: 'Old password is incorrect',
+      })
+    }
+    else if (oldPassword === newPassword) {
+      res.status(400).jsonp({
+        message: 'New password cannot be the same as the old password',
+      })
+    }
+    else {
+      req.body.password = newPassword
+      req.body.data = undefined
+      next()
+    }
+  }
+  else {
+    next()
+  }
+})
+
 server.post('/cartItems', (req, res, next) => {
   const { body } = req
   const { userId, productId, specificationId, amount } = body
