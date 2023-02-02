@@ -40,7 +40,7 @@ async function submitUpdateProfile() {
     return
   await updateUserData({
     data: {
-      id: 1,
+      id: userId.value,
       ...editProfile.value,
     },
   })
