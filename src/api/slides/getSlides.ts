@@ -1,6 +1,6 @@
 import { http } from '@/utils/request'
 
-export interface getSlideListResponseData {
+export interface GetSlideListResponseData {
   id: number
   imageUrl: string
   imageTabletUrl: string
@@ -8,7 +8,7 @@ export interface getSlideListResponseData {
 }
 
 export function getSlides() {
-  return http.get<getSlideListResponseData[]>({
+  return http.get<GetSlideListResponseData[]>({
     url: '/slides',
   })
 }

@@ -119,16 +119,14 @@ export const useUsersStore = defineStore('users', () => {
 
   const handleLogin = handleLoginSubmit(async (values) => {
     userData.value = (await login({
-      data: {
-        email: values.email,
-        password: values.password,
-      },
+      email: values.email,
+      password: values.password,
     })).data
     userToken.value = userData.value.token
     userId.value = userData.value.userId
 
-    emitLoginStatusUpdated()
     await nextTick()
+    emitLoginStatusUpdated()
     await updateLocalCartToDB(userId.value)
     router.replace({ name: 'home' })
   })
@@ -141,13 +139,11 @@ export const useUsersStore = defineStore('users', () => {
 
   const handleRegister = handleRegisterSubmit(async (values, { resetForm }) => {
     const newUser: AddUserRequestData = {
-      data: {
-        name: values.name,
-        email: values.email,
-        password: values.password,
-        birthday: values.birthday,
-        mobile: values.mobile,
-      },
+      name: values.name,
+      email: values.email,
+      password: values.password,
+      birthday: values.birthday,
+      mobile: values.mobile,
     }
     await addUser(newUser)
     router.replace({ name: 'login' })

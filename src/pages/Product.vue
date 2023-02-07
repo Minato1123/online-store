@@ -27,9 +27,11 @@ import { getSubCategory } from '@/api/subCategories/getSubCategory'
 import type { GetSubCategoryResponseData } from '@/api/subCategories/getSubCategory'
 import { getRecommendProductList } from '@/api/products/getRecommendProductList'
 import { getProductListFromFollowingByUserId } from '@/api/followItems/getProductListFromFollowingByUserId'
-import type { getProductListFromFollowingByUserIdResponseData } from '@/api/followItems/getProductListFromFollowingByUserId'
+import type { GetProductListFromFollowingByUserIdResponseData } from '@/api/followItems/getProductListFromFollowingByUserId'
 import { addProductToFollowing } from '@/api/followItems/addProductToFollowing'
 import { deleteProductFromFollowing } from '@/api/followItems/deleteProductFromFollowing'
+import { addProductToShoppingCart } from '@/api/cartItems/addProductToShoppingCart'
+import { useCartUpdatedEventBus } from '@/composables/useCartUpdatedEventBus'
 
 const route = useRoute()
 const productId = computed(() => route.params.productId)
@@ -40,10 +42,11 @@ const productDescription = ref<GetProductDescriptionByProductIdResponseData[]>([
 const category = ref<GetCategoryResponseData | null>(null)
 const subCategory = ref<GetSubCategoryResponseData | null>(null)
 const recommendProductList = ref<GetProductResponseData[]>([])
-const followProductList = ref<getProductListFromFollowingByUserIdResponseData[]>([])
+const followProductList = ref<GetProductListFromFollowingByUserIdResponseData[]>([])
 
 const { userId, isLoggedIn } = storeToRefs(useUsersStore())
 const { addLocalCart } = useCartStore()
+const { emit: emitCartUpdated } = useCartUpdatedEventBus()
 
 async function fetchProduct() {
   product.value = (await getProduct({ id: Number(productId.value) })).data
@@ -76,7 +79,7 @@ async function fetchSubCategory() {
 async function fetchRecommendProductList() {
   if (product.value == null)
     return
-  recommendProductList.value = (await getRecommendProductList({ productId: product.value.id, categoryId: Number(product.value.categoryId), subCategoryId: Number(product.value.subCategoryId) })).data
+  recommendProductList.value = (await getRecommendProductList({ productId: product.value.id, subCategoryId: Number(product.value.subCategoryId) })).data
 }
 
 async function fetchFollowProductList() {
@@ -125,7 +128,7 @@ async function handleFollowedProducts() {
       await deleteProductFromFollowing({ id: followItem.id })
   }
   else {
-    await addProductToFollowing({ data: { productId: p.id, userId: userId.value } })
+    await addProductToFollowing({ productId: p.id, userId: userId.value })
   }
   fetchFollowProductList()
 }
@@ -162,18 +165,28 @@ const textInDialogAddCart: InfoType = {
 }
 const isOpenDialogAddCart = ref(false)
 
-function handleAddCart() {
-  if (product.value == null)
+async function handleAddCart() {
+  const theProduct = product.value
+  if (theProduct == null)
     return
 
-  const pId = product.value.id
-  if (pId != null) {
-    addLocalCart(pId, specPicked.value, amountOfProduct.value)
-    isOpenDialogAddCart.value = true
-    window.setTimeout(() => {
-      isOpenDialogAddCart.value = false
-    }, 800)
+  if (isLoggedIn.value) {
+    await addProductToShoppingCart({
+      userId: userId.value,
+      productId: theProduct.id,
+      specificationId: specPicked.value,
+      amount: amountOfProduct.value,
+    })
   }
+  else {
+    addLocalCart(theProduct.id, specPicked.value, amountOfProduct.value)
+  }
+
+  emitCartUpdated()
+  isOpenDialogAddCart.value = true
+  window.setTimeout(() => {
+    isOpenDialogAddCart.value = false
+  }, 800)
 }
 
 function handleCheckout() {

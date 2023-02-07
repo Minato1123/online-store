@@ -1,7 +1,8 @@
-import type { getProductListFromFollowingByUserIdResponseData } from './getProductListFromFollowingByUserId'
+import type { Pagination } from '../products/getProductList'
+import type { GetProductListFromFollowingByUserIdResponseData } from './getProductListFromFollowingByUserId'
 import { http } from '@/utils/request'
 
-export interface getProductListFromFollowingByUserIdHasPageRequestData {
+export interface GetProductListFromFollowingByUserIdHasPageRequestData {
   currentPage: number
   pageSize: number
   sortBy: 'id' | 'name' | 'price'
@@ -9,14 +10,17 @@ export interface getProductListFromFollowingByUserIdHasPageRequestData {
   userId: number
 }
 
-export function getProductListFromFollowingByUserIdHasPage({ currentPage, pageSize, sortBy, orderBy, userId }: getProductListFromFollowingByUserIdHasPageRequestData) {
-  return http.get<getProductListFromFollowingByUserIdResponseData[]>({
+export function getProductListFromFollowingByUserIdHasPage({ currentPage, pageSize, sortBy, orderBy, userId }: GetProductListFromFollowingByUserIdHasPageRequestData) {
+  return http.get<{
+    productList: GetProductListFromFollowingByUserIdResponseData[]
+    pagination: Pagination
+  }>({
     url: '/followItems',
     params: {
-      _page: currentPage,
-      _limit: pageSize,
-      _sort: sortBy,
-      _order: orderBy,
+      currentPage,
+      pageSize,
+      sortBy,
+      orderBy,
       userId,
     },
   })

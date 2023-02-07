@@ -90,12 +90,10 @@ export const useCartStore = defineStore('cart', () => {
       return
     await Promise.all(cartList.value.map(async (p) => {
       await addProductToShoppingCart({
-        data: {
-          userId,
-          productId: p.productId,
-          specificationId: p.specificationId,
-          amount: p.amount,
-        },
+        userId,
+        productId: p.productId,
+        specificationId: p.specificationId,
+        amount: p.amount,
       })
     }))
     deleteAllLocalCart()

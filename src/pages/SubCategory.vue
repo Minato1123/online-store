@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import _ from 'lodash-es'
 import PMain from '@/components/PMain.vue'
-import type { Response } from '@/utils/request'
 import { type GetCategoryResponseData, getCategory } from '@/api/categories/getCategory'
 import { getProductListBySubCategory } from '@/api/products/getProductListBySubCategory'
 import { getTotalNumOfProductsBySubCategory } from '@/api/products/getTotalNumOfProductsBySubCategory'
@@ -9,28 +8,31 @@ import type { GetProductBySubCategoryRequestData } from '@/api/products/getProdu
 import type { GetProductResponseData } from '@/api/products/getProduct'
 import { getSubCategory } from '@/api/subCategories/getSubCategory'
 import type { GetSubCategoryResponseData } from '@/api/subCategories/getSubCategory'
+import type { Pagination } from '@/api/products/getProductList'
 
 const route = useRoute()
 const categoryId = computed(() => route.params.categoryId)
 const subCategoryId = computed(() => route.params.subCategoryId)
 
-const productListBySubCategory = ref<Response<GetProductResponseData[]>>()
+const productListBySubCategory = ref<GetProductResponseData[]>()
+const productListBySubCategoryPagination = ref<Pagination>()
 const totalNumOfProductsBySubCategory = ref<number>()
 const category = ref<GetCategoryResponseData>()
 const subcategory = ref<GetSubCategoryResponseData>()
 const fetchProductListBySubCategoryParams = ref<GetProductBySubCategoryRequestData>({
   currentPage: 1,
   pageSize: 6,
-  categoryId: +categoryId.value,
   subCategoryId: +subCategoryId.value,
   sortBy: 'id',
   orderBy: 'asc',
 })
 async function fetchProductListByCategory() {
-  productListBySubCategory.value = await getProductListBySubCategory(fetchProductListBySubCategoryParams.value)
+  const data = (await getProductListBySubCategory(fetchProductListBySubCategoryParams.value)).data
+  productListBySubCategory.value = data.productList
+  productListBySubCategoryPagination.value = data.pagination
 }
 async function fetchTotalNumOfProductsByCategory() {
-  totalNumOfProductsBySubCategory.value = await getTotalNumOfProductsBySubCategory({ categoryId: +categoryId.value, subCategoryId: +subCategoryId.value })
+  totalNumOfProductsBySubCategory.value = (await getTotalNumOfProductsBySubCategory({ subCategoryId: +subCategoryId.value })).data.numOfProducts
 }
 async function fetchCategory() {
   category.value = (await getCategory({ id: +categoryId.value })).data
@@ -40,7 +42,6 @@ async function fetchSubCategory() {
 }
 
 watch([categoryId, subCategoryId], async () => {
-  fetchProductListBySubCategoryParams.value.categoryId = +categoryId.value
   fetchProductListBySubCategoryParams.value.subCategoryId = +subCategoryId.value
   await fetchProductListByCategory()
   await fetchCategory()
@@ -78,9 +79,9 @@ onMounted(() => {
       v-model:order-by="fetchProductListBySubCategoryParams.orderBy"
       :link-category-id="+categoryId"
       :link-sub-category-id="+subCategoryId"
-      :product-list="productListBySubCategory.data"
+      :product-list="productListBySubCategory"
       :total-num-of-products="totalNumOfProductsBySubCategory"
-      :pagination="productListBySubCategory.pagination"
+      :pagination="productListBySubCategoryPagination"
       :has-page-attr="true"
     />
   </div>

@@ -1,10 +1,11 @@
 import { http } from '@/utils/request'
 
-export interface GetProductListFromBoughtByUserIdRequestData {
+export interface GetProductListFromBoughtByStatusRequestData {
   userId: number
+  status: 'prepared' | 'shipped' | 'completed'
 }
 
-export interface GetProductListFromBoughtByUserIdResponseData {
+export interface GetProductListFromBoughtByStatusResponseData {
   id: number
   orderId: string
   productId: number
@@ -18,11 +19,12 @@ export interface GetProductListFromBoughtByUserIdResponseData {
   status: 'prepared' | 'shipped' | 'completed'
 }
 
-export function getProductListFromBoughtByUserId({ userId }: GetProductListFromBoughtByUserIdRequestData) {
-  return http.get<GetProductListFromBoughtByUserIdResponseData[]>({
+export function getProductListFromBoughtByStatus({ userId, status }: GetProductListFromBoughtByStatusRequestData) {
+  return http.get<GetProductListFromBoughtByStatusResponseData[]>({
     url: '/boughtItems',
     params: {
       userId,
+      status,
     },
   })
 }

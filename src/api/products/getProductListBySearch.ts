@@ -1,4 +1,5 @@
 import type { GetProductResponseData } from './getProduct'
+import type { Pagination } from './getProductList'
 import { http } from '@/utils/request'
 
 export interface GetProductListBySearchRequestData {
@@ -16,14 +17,17 @@ export function getProductListListBySearch({
   sortBy,
   orderBy,
 }: GetProductListBySearchRequestData) {
-  return http.get<GetProductResponseData[]>({
+  return http.get<{
+    productList: GetProductResponseData[]
+    pagination: Pagination
+  }>({
     url: '/products',
     params: {
-      _page: currentPage,
-      _limit: pageSize,
-      name_like: query,
-      _sort: sortBy,
-      _order: orderBy,
+      currentPage,
+      pageSize,
+      query,
+      sortBy,
+      orderBy,
     },
   })
 }

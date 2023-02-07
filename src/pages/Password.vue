@@ -49,11 +49,9 @@ async function updatePassword() {
     return
   }
   await updateUserPasswordData({
-    data: {
-      id: userId.value,
-      oldPassword: oldPassword.value,
-      newPassword: newPassword.value,
-    },
+    id: userId.value,
+    oldPassword: oldPassword.value,
+    newPassword: newPassword.value,
   })
   isSaveSuccess.value = true
   oldPassword.value = ''

@@ -93,17 +93,16 @@ async function handleCheckout() {
   if (isSaveSuccess.value === true) {
     if (cartList.value == null)
       return
+
+    addedOrderData.value = (await addOrder({
+      orderData: orderData.value,
+      boughtItems: toBuyProductList.value,
+    })).data
+    router.replace({ name: 'completed', params: { orderId: addedOrderData.value.serialNumber } })
     await Promise.all(cartList.value.map(async (item) => {
       await deleteProductFromCart({ id: item.id })
     }))
     emitCartUpdated()
-    addedOrderData.value = (await addOrder({
-      data: {
-        orderData: orderData.value,
-        boughtItems: toBuyProductList.value,
-      },
-    })).data
-    router.replace({ name: 'completed', params: { orderId: addedOrderData.value.serialNumber } })
   }
   else { router.replace({ name: 'cart' }) }
 }
@@ -185,7 +184,7 @@ const orderFailDialog = {
           </div>
           <div class="block">
             <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="orderData.deliveryType !== 'delivery'" /><icon-ic-baseline-radio-button-checked v-show="orderData.deliveryType === 'delivery'" /><input v-model="orderData.deliveryType" class="input-radio" value="delivery" type="radio" name="delivery">宅配</label>
-            <form v-show="orderData.deliveryType === 'delivery'" class="sub-content delivery-block">
+            <form v-show="orderData.deliveryType === 'delivery'" class="sub-content delivery-block" @submit.prevent>
               <select v-model="orderData.county" class="delivery-dropdown" name="county">
                 <option :value="null">
                   縣市

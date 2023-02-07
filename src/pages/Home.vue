@@ -2,22 +2,22 @@
 import _ from 'lodash-es'
 import Slide from '../components/Slide.vue'
 import { getSlides } from '@/api/slides/getSlides'
-import type { getSlideListResponseData } from '@/api/slides/getSlides'
+import type { GetSlideListResponseData } from '@/api/slides/getSlides'
 import { getProductList } from '@/api/products/getProductList'
-import type { GetProductRequestData } from '@/api/products/getProductList'
+import type { GetProductRequestData, Pagination } from '@/api/products/getProductList'
 import type { SlideType } from '@/types'
-import type { Response } from '@/utils/request'
 import PMain from '@/components/PMain.vue'
 import type { GetProductResponseData } from '@/api/products/getProduct'
 import { getTotalNumOfProducts } from '@/api/products/getTotalNumOfProducts'
 
-const slideList = ref<getSlideListResponseData[]>()
+const slideList = ref<GetSlideListResponseData[]>()
 async function fetchSlides() {
   const s = await getSlides()
   slideList.value = s.data
 }
 
-const productList = ref<Response<GetProductResponseData[]>>()
+const productList = ref<GetProductResponseData[]>()
+const productPagination = ref<Pagination>()
 const totalNumOfProducts = ref<number>()
 const fetchProductListParams = ref<GetProductRequestData>({
   currentPage: 1,
@@ -26,10 +26,12 @@ const fetchProductListParams = ref<GetProductRequestData>({
   orderBy: 'asc',
 })
 async function fetchProductList() {
-  productList.value = await getProductList(fetchProductListParams.value)
+  const data = (await getProductList(fetchProductListParams.value)).data
+  productList.value = data.productList
+  productPagination.value = data.pagination
 }
 async function fetchTotalNumOfProducts() {
-  totalNumOfProducts.value = await getTotalNumOfProducts()
+  totalNumOfProducts.value = (await getTotalNumOfProducts()).data.numOfProducts
 }
 
 watch(fetchProductListParams, async () => {
@@ -93,9 +95,9 @@ const slidesConfig = computed<SlideType>(() => {
       v-model:page-size="fetchProductListParams.pageSize"
       v-model:sort-by="fetchProductListParams.sortBy"
       v-model:order-by="fetchProductListParams.orderBy"
-      :product-list="productList.data"
+      :product-list="productList"
       :total-num-of-products="totalNumOfProducts"
-      :pagination="productList.pagination"
+      :pagination="productPagination"
       :has-page-attr="true"
     />
   </div>

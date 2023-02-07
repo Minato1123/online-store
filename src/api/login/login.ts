@@ -1,10 +1,8 @@
 import { http } from '@/utils/request'
 
 export interface loginRequestData {
-  data: {
-    email: string
-    password: string
-  }
+  email: string
+  password: string
 }
 
 export interface loginResponseData {
@@ -12,7 +10,7 @@ export interface loginResponseData {
   userId: number
 }
 
-export function login({ data }: loginRequestData) {
+export function login(data: loginRequestData) {
   return http.post<loginResponseData>({
     url: '/login',
     data,

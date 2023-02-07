@@ -1,27 +1,23 @@
 <script lang="ts" setup>
 import PUserLayout from '@/components/PUserLayout.vue'
-import type { GetProductListFromBoughtInPreparedResponseData } from '@/api/boughtItems/getProductListFromBoughtInPrepared'
-import { getProductListFromBoughtInPrepared } from '@/api/boughtItems/getProductListFromBoughtInPrepared'
-import type { GetProductListFromBoughtInShippedResponseData } from '@/api/boughtItems/getProductListFromBoughtInShipped'
-import { getProductListFromBoughtInShipped } from '@/api/boughtItems/getProductListFromBoughtInShipped'
-import type { GetProductListFromBoughtInCompletedResponseData } from '@/api/boughtItems/getProductListFromBoughtInCompleted'
-import { getProductListFromBoughtInCompleted } from '@/api/boughtItems/getProductListFromBoughtInCompleted'
+import type { GetProductListFromBoughtByStatusResponseData } from '@/api/boughtItems/getProductListFromBoughtByStatus'
+import { getProductListFromBoughtByStatus } from '@/api/boughtItems/getProductListFromBoughtByStatus'
 import { useUsersStore } from '@/stores/user'
 const { userId, isLoggedIn } = storeToRefs(useUsersStore())
 
-const boughtItemsInPrepared = ref<GetProductListFromBoughtInPreparedResponseData[]>([])
-const boughtItemsInShipped = ref<GetProductListFromBoughtInShippedResponseData[]>([])
-const boughtItemsInCompleted = ref<GetProductListFromBoughtInCompletedResponseData[]>([])
+const boughtItemsInPrepared = ref<GetProductListFromBoughtByStatusResponseData[]>([])
+const boughtItemsInShipped = ref<GetProductListFromBoughtByStatusResponseData[]>([])
+const boughtItemsInCompleted = ref<GetProductListFromBoughtByStatusResponseData[]>([])
 async function fetchBoughtItemsInPrepared() {
-  boughtItemsInPrepared.value = (await getProductListFromBoughtInPrepared({ userId: userId.value })).data
+  boughtItemsInPrepared.value = (await getProductListFromBoughtByStatus({ userId: userId.value, status: 'prepared' })).data
 }
 
 async function fetchBoughtItemsInShipped() {
-  boughtItemsInShipped.value = (await getProductListFromBoughtInShipped({ userId: userId.value })).data
+  boughtItemsInShipped.value = (await getProductListFromBoughtByStatus({ userId: userId.value, status: 'shipped' })).data
 }
 
 async function fetchBoughtItemsInCompleted() {
-  boughtItemsInCompleted.value = (await getProductListFromBoughtInCompleted({ userId: userId.value })).data
+  boughtItemsInCompleted.value = (await getProductListFromBoughtByStatus({ userId: userId.value, status: 'completed' })).data
 }
 
 onMounted(() => {
@@ -41,7 +37,6 @@ onMounted(() => {
         <table v-if="boughtItemsInPrepared.length > 0" class="order-content">
           <thead>
             <tr class="item">
-              <th>編號</th>
               <th>商品名稱</th>
               <th>規格</th>
               <th>數量</th>
@@ -50,7 +45,6 @@ onMounted(() => {
           </thead>
           <tbody>
             <tr v-for="(item, i) in boughtItemsInPrepared" :key="`prepared-${i + 1}`" class="item">
-              <td>{{ i + 1 }}</td>
               <td>{{ item.name }}</td>
               <td>{{ item.specification }}</td>
               <td>{{ item.amount }}</td>

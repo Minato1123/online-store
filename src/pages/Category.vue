@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import _ from 'lodash-es'
 import PMain from '@/components/PMain.vue'
-import type { Response } from '@/utils/request'
 import { getProductListByCategory } from '@/api/products/getProductListByCategory'
-import { getTotalNumOfProductsByCatefory } from '@/api/products/getTotalNumOfProductsByCategory'
+import { getTotalNumOfProductsByCategory } from '@/api/products/getTotalNumOfProductsByCategory'
 import { getCategory } from '@/api/categories/getCategory'
 import type { GetProductByCategoryRequestData } from '@/api/products/getProductListByCategory'
 import type { GetProductResponseData } from '@/api/products/getProduct'
 import type { GetCategoryResponseData } from '@/api/categories/getCategory'
+import type { Pagination } from '@/api/products/getProductList'
 
 const route = useRoute()
 const categoryId = computed(() => route.params.categoryId)
 
-const productListByCategory = ref<Response<GetProductResponseData[]>>()
+const productListByCategory = ref<GetProductResponseData[]>()
+const productsByCategoryPagination = ref<Pagination>()
 const totalNumOfProductsByCategory = ref<number>()
 const category = ref<GetCategoryResponseData>()
 const fetchProductListByCategoryParams = ref<GetProductByCategoryRequestData>({
@@ -23,10 +24,12 @@ const fetchProductListByCategoryParams = ref<GetProductByCategoryRequestData>({
   orderBy: 'asc',
 })
 async function fetchProductListByCategory() {
-  productListByCategory.value = await getProductListByCategory(fetchProductListByCategoryParams.value)
+  const data = (await getProductListByCategory(fetchProductListByCategoryParams.value)).data
+  productListByCategory.value = data.productList
+  productsByCategoryPagination.value = data.pagination
 }
 async function fetchTotalNumOfProductsByCategory() {
-  totalNumOfProductsByCategory.value = await getTotalNumOfProductsByCatefory({ categoryId: +categoryId.value })
+  totalNumOfProductsByCategory.value = (await getTotalNumOfProductsByCategory({ categoryId: +categoryId.value })).data.numOfProducts
 }
 async function fetchCategory() {
   category.value = (await getCategory({ id: +categoryId.value })).data
@@ -66,9 +69,9 @@ onMounted(() => {
       v-model:sort-by="fetchProductListByCategoryParams.sortBy"
       v-model:order-by="fetchProductListByCategoryParams.orderBy"
       :link-category-id="+categoryId"
-      :product-list="productListByCategory.data"
+      :product-list="productListByCategory"
       :total-num-of-products="totalNumOfProductsByCategory"
-      :pagination="productListByCategory.pagination"
+      :pagination="productsByCategoryPagination"
       :has-page-attr="true"
     />
   </div>

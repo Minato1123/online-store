@@ -3,11 +3,13 @@ import PMain from '@/components/PMain.vue'
 import type { Response } from '@/utils/request'
 import { type GetProductListBySearchRequestData, getProductListListBySearch } from '@/api/products/getProductListBySearch'
 import type { GetProductResponseData } from '@/api/products/getProduct'
+import type { Pagination } from '@/api/products/getProductList'
 
 const route = useRoute()
 const queryKeyword = computed(() => String(route.query.keyword))
 
-const productList = ref<Response<GetProductResponseData[]>>()
+const productList = ref<GetProductResponseData[]>()
+const productListPagination = ref<Pagination>()
 const paramsInFetchProductListBySearch = ref<GetProductListBySearchRequestData>({
   currentPage: 1,
   pageSize: 6,
@@ -17,7 +19,9 @@ const paramsInFetchProductListBySearch = ref<GetProductListBySearchRequestData>(
 })
 
 async function fetchCurrentPageProductListBySearch() {
-  productList.value = (await getProductListListBySearch(paramsInFetchProductListBySearch.value))
+  const data = (await getProductListListBySearch(paramsInFetchProductListBySearch.value)).data
+  productList.value = data.productList
+  productListPagination.value = data.pagination
 }
 
 watch([paramsInFetchProductListBySearch, queryKeyword], async () => {
@@ -36,14 +40,14 @@ onMounted(() => {
       {{ paramsInFetchProductListBySearch.query }} 的搜尋結果：
     </div>
     <PMain
-      v-if="productList != null && productList.data.length > 0"
+      v-if="productList != null && productList.length > 0"
       v-model:current-page="paramsInFetchProductListBySearch.currentPage"
       v-model:page-size="paramsInFetchProductListBySearch.pageSize"
       v-model:sort-by="paramsInFetchProductListBySearch.sortBy"
       v-model:order-by="paramsInFetchProductListBySearch.orderBy"
-      :product-list="productList.data"
-      :total-num-of-products="10"
-      :pagination="productList.pagination"
+      :product-list="productList"
+      :total-num-of-products="0"
+      :pagination="productListPagination"
       :has-page-attr="false"
     />
     <div v-else class="empty-follow">

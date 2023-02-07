@@ -31,10 +31,8 @@ export interface BoughtItem {
 }
 
 export interface AddOrderRequestData {
-  data: {
-    orderData: OrderData
-    boughtItems: BoughtItem[]
-  }
+  orderData: OrderData
+  boughtItems: BoughtItem[]
 }
 
 export interface AddOrderResponseData {
@@ -50,7 +48,7 @@ export interface AddOrderResponseData {
   totalPrice: number
 }
 
-export function addOrder({ data }: AddOrderRequestData) {
+export function addOrder(data: AddOrderRequestData) {
   return http.post<AddOrderResponseData>({
     url: '/orders',
     data,

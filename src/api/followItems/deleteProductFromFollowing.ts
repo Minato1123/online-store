@@ -1,19 +1,11 @@
 import { http } from '@/utils/request'
 
-export interface deleteProductFromFollowingRequestData {
+export interface DeleteProductFromFollowingRequestData {
   id: number
 }
 
-export interface deleteProductFromFollowingResponseData {
-  id: number
-  userId: number
-  productId: number
-  specification: string | null
-  amount: number
-}
-
-export function deleteProductFromFollowing({ id }: deleteProductFromFollowingRequestData) {
-  return http.delete<deleteProductFromFollowingResponseData>({
+export function deleteProductFromFollowing({ id }: DeleteProductFromFollowingRequestData) {
+  return http.delete<void>({
     url: `/followItems/${id}`,
   })
 }

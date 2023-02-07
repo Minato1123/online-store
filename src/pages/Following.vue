@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import PMain from '@/components/PMain.vue'
-import type { Pagination, Response } from '@/utils/request'
-import { getProductListFromFollowingByUserIdHasPage, type getProductListFromFollowingByUserIdHasPageRequestData } from '@/api/followItems/getProductListFromFollowingByUserIdHasPage'
-import type { getProductListFromFollowingByUserIdResponseData } from '@/api/followItems/getProductListFromFollowingByUserId'
+import { type GetProductListFromFollowingByUserIdHasPageRequestData, getProductListFromFollowingByUserIdHasPage } from '@/api/followItems/getProductListFromFollowingByUserIdHasPage'
+import type { GetProductListFromFollowingByUserIdResponseData } from '@/api/followItems/getProductListFromFollowingByUserId'
 import type { GetProductResponseData } from '@/api/products/getProduct'
 import { useUsersStore } from '@/stores/user'
 import { getProduct } from '@/api/products/getProduct'
+import type { Pagination } from '@/api/products/getProductList'
 
 const { userId } = storeToRefs(useUsersStore())
-const currentPageFollowingItemList = ref<Response<getProductListFromFollowingByUserIdResponseData[]>>()
+const currentPageFollowingItemList = ref<GetProductListFromFollowingByUserIdResponseData[]>()
+const currentPageFollowingItemListPagination = ref<Pagination>()
 const productList = ref<GetProductResponseData[]>([])
-const paramsInFetchFollowingList = ref<getProductListFromFollowingByUserIdHasPageRequestData>({
+const paramsInFetchFollowingList = ref<GetProductListFromFollowingByUserIdHasPageRequestData>({
   currentPage: 1,
   pageSize: 6,
   sortBy: 'id',
@@ -19,13 +20,15 @@ const paramsInFetchFollowingList = ref<getProductListFromFollowingByUserIdHasPag
 })
 
 async function fetchCurrentPageFollowingItemList() {
-  currentPageFollowingItemList.value = (await getProductListFromFollowingByUserIdHasPage(paramsInFetchFollowingList.value))
+  const data = (await getProductListFromFollowingByUserIdHasPage(paramsInFetchFollowingList.value)).data
+  currentPageFollowingItemList.value = data.productList
+  currentPageFollowingItemListPagination.value = data.pagination
 }
 
 async function fetchCurrentPageFollowingProductList() {
   if (currentPageFollowingItemList.value == null)
     return
-  productList.value = await Promise.all(currentPageFollowingItemList.value.data.map(async (item) => {
+  productList.value = await Promise.all(currentPageFollowingItemList.value.map(async (item) => {
     const product = (await getProduct({ id: item.productId })).data
     return product
   }))
@@ -55,7 +58,7 @@ onMounted(async () => {
       v-model:order-by="paramsInFetchFollowingList.orderBy"
       :product-list="productList"
       :total-num-of-products="10"
-      :pagination="currentPageFollowingItemList.pagination"
+      :pagination="currentPageFollowingItemListPagination"
       :has-page-attr="false"
     />
     <div v-if="productList.length <= 0" class="empty-follow">

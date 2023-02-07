@@ -1,18 +1,14 @@
-import type { GetProductResponseData } from './getProduct'
 import { http } from '@/utils/request'
 
 export interface GetProductBySubCategoryRequestData {
-  categoryId: number
   subCategoryId: number
 }
 
-export async function getTotalNumOfProductsBySubCategory({ categoryId, subCategoryId }: GetProductBySubCategoryRequestData) {
-  const { data: productListBySubCategory } = await http.get<GetProductResponseData[]>({
-    url: '/products',
+export async function getTotalNumOfProductsBySubCategory({ subCategoryId }: GetProductBySubCategoryRequestData) {
+  return await http.get<{ numOfProducts: number }>({
+    url: '/numOfProducts',
     params: {
-      categoryId,
       subCategoryId,
     },
   })
-  return productListBySubCategory.length
 }

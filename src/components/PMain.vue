@@ -6,11 +6,11 @@ import ProductBox from '../components/ProductBox.vue'
 import type { Product } from '@/types'
 import CategoryMenuMobile from '@/components/CategoryMenuMobile.vue'
 import { getIconComponent } from '@/utils'
-import type { Pagination } from '@/utils/request'
 import type { GetCategoryResponseData } from '@/api/categories/getCategory'
 import { getCategoryList } from '@/api/categories/getCategoryList'
 import type { GetSubCategoryResponseData } from '@/api/subCategories/getSubCategory'
 import { getSubCategoryList } from '@/api/subCategories/getSubCategoryList'
+import type { Pagination } from '@/api/products/getProductList'
 
 const props = defineProps({
   productList: {
@@ -23,7 +23,7 @@ const props = defineProps({
     default: 0,
   },
   pagination: {
-    type: [Object, null] as PropType<Pagination | null>,
+    type: [Object, null] as PropType<Pagination | undefined>,
     required: true,
   },
   currentPage: {
@@ -145,7 +145,7 @@ const numOfPages = computed(() => {
     return 0
   if (props.pagination.last == null)
     return 0
-  return props.pagination.last.page
+  return props.pagination.last
 })
 
 // 頁碼
@@ -175,13 +175,13 @@ const pageList = computed(() => {
 function handlePrevPage() {
   if (props.pagination?.prev == null)
     return
-  currentPage.value = props.pagination.prev.page
+  currentPage.value = props.pagination.prev
 }
 
 function handleNextPage() {
   if (props.pagination?.next == null)
     return
-  currentPage.value = props.pagination.next.page
+  currentPage.value = props.pagination.next
 }
 
 function handleThePage(page: number) {
@@ -272,7 +272,7 @@ function handleThePage(page: number) {
             <ProductBox v-for="product in produntLine" :key="`product-${product.id}`" class="products" :product="product" />
           </div>
         </div>
-        <div v-if="pagination != null" class="pages-container">
+        <div v-if="pagination != null && pagination.first !== pagination.last" class="pages-container">
           <div class="pages">
             <button :disabled="currentPage === 1" class="page-btn icon-btn" @click="handlePrevPage">
               <icon-material-symbols-chevron-left-rounded />

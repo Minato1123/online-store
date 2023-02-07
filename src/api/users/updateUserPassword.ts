@@ -1,17 +1,13 @@
 import { http } from '@/utils/request'
 
 export interface UpdateUserPasswordRequestData {
-  data: {
-    id: number
-    oldPassword: string
-    newPassword: string
-  }
+  id: number
+  oldPassword: string
+  newPassword: string
 }
 
-export type UpdateUserPasswordResponseData = UpdateUserPasswordRequestData['data']
-
-export function updateUserPasswordData({ data }: UpdateUserPasswordRequestData) {
-  return http.patch<UpdateUserPasswordResponseData>({
+export function updateUserPasswordData(data: UpdateUserPasswordRequestData) {
+  return http.patch<void>({
     url: `users/${data.id}`,
     data,
   })

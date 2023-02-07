@@ -1,13 +1,7 @@
 import { useUsersStore } from '@/stores/user'
 
-export type Pagination = Partial<Record<'first' | 'prev' | 'next' | 'last', {
-  page: number
-  limit: number
-}> >
-
 export interface Response<T> {
   data: T
-  pagination: Pagination | null
 }
 
 async function request<T>(config: {
@@ -33,28 +27,8 @@ async function request<T>(config: {
   })
 
   if (response.ok) {
-    const tempLinks = response.headers.get('link')
-
     return {
-      data: (await response.json()),
-      pagination: tempLinks == null || tempLinks === ''
-        ? null
-        : Object.fromEntries(tempLinks.split(', ').map((linkString) => {
-          const temp = linkString.split('; ')
-          const rel = temp[1].split('"')[1]
-          const link = temp[0].replace(/<|>/, '')
-          const url = new URL(link)
-
-          return [
-            rel,
-            Object.fromEntries(
-              Array.from(
-                url.searchParams.entries(),
-                ([name, value]) => [name.replace('_', ''), +value],
-              ),
-            ),
-          ]
-        })),
+      data: await response.json(),
     }
   }
 

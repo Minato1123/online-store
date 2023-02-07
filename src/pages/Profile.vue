@@ -39,10 +39,8 @@ async function submitUpdateProfile() {
   if (editProfile.value == null)
     return
   await updateUserData({
-    data: {
-      id: userId.value,
-      ...editProfile.value,
-    },
+    id: userId.value,
+    ...editProfile.value,
   })
   isSaveSuccess.value = true
   isDialogOpen.value = true

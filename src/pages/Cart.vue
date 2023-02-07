@@ -145,10 +145,8 @@ async function handleClickDelete(id: number) {
 async function updateCartItemAmount(id: number, amount: number) {
   if (isLoggedIn.value) {
     await updateProductToShoppingCart({
-      data: {
-        id,
-        amount,
-      },
+      id,
+      amount,
     })
   }
   else {

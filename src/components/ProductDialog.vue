@@ -77,12 +77,10 @@ const isOpenDialogAddCart = ref(false)
 async function submitAddCart() {
   if (isLoggedIn.value) {
     await addProductToShoppingCart({
-      data: {
-        userId: userId.value,
-        productId: props.product.id,
-        specificationId: specPicked.value,
-        amount: numOfProduct.value,
-      },
+      userId: userId.value,
+      productId: props.product.id,
+      specificationId: specPicked.value,
+      amount: numOfProduct.value,
     })
   }
   else {

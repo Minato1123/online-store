@@ -1,16 +1,13 @@
 import { http } from '@/utils/request'
-import type { GetProductListFromShoppingCartByUserIdResponseData } from '@/api/cartItems/getProductListFromShoppingCartByUserId'
-
 export interface GetTotalNumOfProductFromCartByUserIdRequestData {
   userId: number
 }
 
 export async function getTotalNumOfProductFromCartByUserId({ userId }: GetTotalNumOfProductFromCartByUserIdRequestData) {
-  const { data: items } = await http.get<GetProductListFromShoppingCartByUserIdResponseData[]>({
-    url: '/cartItems',
+  return await http.get<{ numOfCartItems: number }>({
+    url: '/numOfCartItems',
     params: {
       userId,
     },
   })
-  return items.reduce((acc, item) => acc + item.amount, 0)
 }

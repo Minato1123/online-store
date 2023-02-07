@@ -16,7 +16,7 @@ export type GetOrderByOrderIdResponseData = OrderData & {
 }
 
 export function getOrderByOrderId({ serialNumber }: GetOrderByOrderIdRequestData) {
-  return http.get<GetOrderByOrderIdResponseData[]>({
+  return http.get<GetOrderByOrderIdResponseData>({
     url: '/orders',
     params: {
       serialNumber,

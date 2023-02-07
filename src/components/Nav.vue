@@ -24,7 +24,7 @@ async function fetchTotalNumOfProductsFromCartByUserId() {
   if (user.value == null)
     totalNumOfCartItems.value = numOfLocalCart.value
   else
-    totalNumOfCartItems.value = await getTotalNumOfProductFromCartByUserId({ userId: user.value.id })
+    totalNumOfCartItems.value = await (await getTotalNumOfProductFromCartByUserId({ userId: user.value.id })).data.numOfCartItems
 }
 
 async function fetchCurrentUser() {

@@ -11,6 +11,7 @@ export interface GetCurrentUserResponseData {
   birthday: string
   mobile: string
   address: string
+  createdAt: string
 }
 
 export function getCurrentUser({ id }: GetCurrentUserRequestData) {

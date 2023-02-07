@@ -6,7 +6,7 @@ import router from '@/router'
 import { getPublicImgSrc } from '@/utils/index'
 import { getProductImagesByProductId } from '@/api/productImages/getProductImagesByProductId'
 import type { GetProductImagesByProductIdResponseData } from '@/api/productImages/getProductImagesByProductId'
-import { getProductListFromFollowingByUserId, type getProductListFromFollowingByUserIdResponseData } from '@/api/followItems/getProductListFromFollowingByUserId'
+import { type GetProductListFromFollowingByUserIdResponseData, getProductListFromFollowingByUserId } from '@/api/followItems/getProductListFromFollowingByUserId'
 import { addProductToFollowing } from '@/api/followItems/addProductToFollowing'
 import { deleteProductFromFollowing } from '@/api/followItems/deleteProductFromFollowing'
 import { useUsersStore } from '@/stores/user'
@@ -21,7 +21,7 @@ const props = defineProps({
 const { userId, isLoggedIn } = storeToRefs(useUsersStore())
 
 const productImages = ref<GetProductImagesByProductIdResponseData[]>([])
-const followProductList = ref<getProductListFromFollowingByUserIdResponseData[]>([])
+const followProductList = ref<GetProductListFromFollowingByUserIdResponseData[]>([])
 
 async function fetchProductImages() {
   productImages.value = (await getProductImagesByProductId({ productId: props.product.id })).data
@@ -62,7 +62,7 @@ async function handleFollowedProducts() {
       await deleteProductFromFollowing({ id: followItem.id })
   }
   else {
-    await addProductToFollowing({ data: { productId: p.id, userId: userId.value } })
+    await addProductToFollowing({ productId: p.id, userId: userId.value })
   }
   fetchFollowProductList()
 }

@@ -1,17 +1,17 @@
 import { http } from '@/utils/request'
 
-export interface getProductListFromFollowingByUserIdRequestData {
+export interface GetProductListFromFollowingByUserIdRequestData {
   userId: number
 }
 
-export interface getProductListFromFollowingByUserIdResponseData {
+export interface GetProductListFromFollowingByUserIdResponseData {
   id: number
   userId: number
   productId: number
 }
 
-export function getProductListFromFollowingByUserId({ userId }: getProductListFromFollowingByUserIdRequestData) {
-  return http.get<getProductListFromFollowingByUserIdResponseData[]>({
+export function getProductListFromFollowingByUserId({ userId }: GetProductListFromFollowingByUserIdRequestData) {
+  return http.get<GetProductListFromFollowingByUserIdResponseData[]>({
     url: '/followItems',
     params: {
       userId,
