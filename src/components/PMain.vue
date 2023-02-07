@@ -76,6 +76,14 @@ watch(methodOfSort, () => {
     sortBy.value = 'price'
     orderBy.value = 'asc'
   }
+  else if (methodOfSort.value === 'name-asc') {
+    sortBy.value = 'name'
+    orderBy.value = 'asc'
+  }
+  else if (methodOfSort.value === 'name-desc') {
+    sortBy.value = 'name'
+    orderBy.value = 'desc'
+  }
 })
 
 // 商品種類
@@ -214,6 +222,12 @@ function handleThePage(page: number) {
         </option>
         <option value="price-low">
           價格最低
+        </option>
+        <option value="name-asc">
+          名稱順排
+        </option>
+        <option value="name-desc">
+          名稱逆排
         </option>
       </select>
     </div>
