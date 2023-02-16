@@ -33,7 +33,7 @@ const status = computed(() => {
 })
 
 async function fetchBoughtList() {
-  order.value = (await getOrderByOrderId({ serialNumber: orderId.value })).data[0]
+  order.value = (await getOrderByOrderId({ serialNumber: orderId.value })).data
 }
 
 onMounted(() => {

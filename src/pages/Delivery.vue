@@ -51,6 +51,31 @@ const taiwanCounty = [
   '金門縣',
   '連江縣',
 ]
+const paymentMethodList = [
+  {
+    label: '信用卡／金融卡',
+    value: 'credit-card',
+  },
+  {
+    label: '銀行轉帳',
+    value: 'transfer',
+  },
+  {
+    label: '貨到付款',
+    value: 'cash-on-delivery',
+  },
+]
+
+const delveryMethodList = [
+  {
+    label: '宅配',
+    value: 'home-delivery',
+  },
+  {
+    label: '超商取貨',
+    value: 'convenience-store',
+  },
+]
 
 const isDialogOpen = ref(false)
 const isSaveSuccess = ref(true)
@@ -134,87 +159,304 @@ const orderFailDialog = {
     color: 'main-product-color',
   },
 }
+
+function handleSubmit() {
+  isDialogOpen.value = true
+}
 </script>
 
 <template>
   <PCheckoutLayout v-slot="slotProps" target="delivery">
-    <div class="container">
-      <div class="detail">
-        共 {{ slotProps.num }} 件商品｜總金額 NT$ {{ slotProps.total }}
-      </div>
-      <div class="data-container">
-        <div class="payment-container">
-          <div class="title">
-            付款方式
+    <FormKit
+      form-class="$reset"
+      type="form"
+      :actions="false"
+      incomplete-message=" "
+      @submit="handleSubmit"
+      @submit-invalid="() => { return }"
+    >
+      <div class="container">
+        <div class="detail">
+          共 {{ slotProps.num }} 件商品｜總金額 NT$ {{ slotProps.total }}
+        </div>
+        <div class="data-container">
+          <div class="payment-container">
+            <FormKit
+              v-model="orderData.paymentType"
+              type="radio"
+              :options="paymentMethodList"
+              validation="required"
+              validation-visibility="live"
+              :validation-messages="{
+                required: '這是必要輸入',
+              }"
+            >
+              <!-- eslint-disable-next-line vue/no-unused-vars -->
+              <template #fieldset="context">
+                <div class="title">
+                  付款方式
+                </div>
+                <div class="payment-block block">
+                  <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="orderData.paymentType !== 'credit-card'" /><icon-ic-baseline-radio-button-checked v-show="orderData.paymentType === 'credit-card'" /><input v-model="orderData.paymentType" class="input-radio" value="credit-card" type="radio" name="payment">信用卡／金融卡</label>
+                  <Transition>
+                    <form v-if="orderData.paymentType === 'credit-card'" class="sub-content payment-credit-block" @submit.prevent>
+                      <FormKit
+                        v-model="orderData.cardNumber"
+                        type="text"
+                        validation="required|number|length:16, 16"
+                        validation-visibility="live"
+                        :validation-messages="{
+                          required: '這是必要輸入',
+                          number: '請輸入數字',
+                          length: '請輸入正確的卡號',
+                        }"
+                      >
+                        <!-- eslint-disable-next-line vue/no-unused-vars, vue/no-template-shadow -->
+                        <template #wrapper="context">
+                          <div class="credit-input-block">
+                            <div class="credit-title">
+                              卡號
+                            </div>
+                            <input v-model="orderData.cardNumber" type="text">
+                          </div>
+                        </template>
+                      </FormKit>
+                      <FormKit
+                        v-model="orderData.cardOwner"
+                        type="text"
+                        validation="required:trim"
+                        validation-visibility="live"
+                        :validation-messages="{
+                          required: '這是必要輸入',
+                        }"
+                      >
+                        <!-- eslint-disable-next-line vue/no-unused-vars, vue/no-template-shadow -->
+                        <template #wrapper="context">
+                          <div class="credit-input-block">
+                            <div class="credit-title">
+                              持卡人姓名
+                            </div>
+                            <input v-model="orderData.cardOwner" type="text">
+                          </div>
+                        </template>
+                      </FormKit>
+                      <FormKit
+                        v-model="orderData.cardValidDate"
+                        type="text"
+                        validation="required:trim|matches:/^([0-9]{2})\/([0-9]{2})$/"
+                        validation-visibility="live"
+                        :validation-messages="{
+                          required: '這是必要輸入',
+                          matches: '請輸入正確的日期',
+                        }"
+                      >
+                        <!-- eslint-disable-next-line vue/no-unused-vars, vue/no-template-shadow -->
+                        <template #wrapper="context">
+                          <div class="credit-input-block">
+                            <div class="credit-title">
+                              有效期
+                            </div>
+                            <input v-model="orderData.cardValidDate" type="text" placeholder="MM/YY">
+                          </div>
+                        </template>
+                      </FormKit>
+                      <FormKit
+                        v-model="orderData.cardValidCode"
+                        type="text"
+                        validation="required:trim|number|length:3, 3"
+                        validation-visibility="live"
+                        :validation-messages="{
+                          required: '這是必要輸入',
+                          number: '請輸入正確的安全碼',
+                          length: '請輸入正確的安全碼',
+                        }"
+                      >
+                        <!-- eslint-disable-next-line vue/no-unused-vars, vue/no-template-shadow -->
+                        <template #wrapper="context">
+                          <div class="credit-input-block">
+                            <div class="credit-title">
+                              安全碼
+                            </div>
+                            <input v-model="orderData.cardValidCode" type="text" maxlength="3">
+                          </div>
+                        </template>
+                      </FormKit>
+                    </form>
+                  </Transition>
+                  <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="orderData.paymentType !== 'transfer'" /><icon-ic-baseline-radio-button-checked v-show="orderData.paymentType === 'transfer'" /><input v-model="orderData.paymentType" class="input-radio" value="transfer" type="radio" name="payment">銀行轉帳</label>
+                  <Transition>
+                    <form v-if="orderData.paymentType === 'transfer'" class="sub-content transfer-block" @submit.prevent>
+                      <button class="account-btn">
+                        選取銀行帳戶
+                      </button>
+                      <FormKit
+                        v-model="orderData.bankCode"
+                        type="text"
+                        validation="required|number|length:3, 3"
+                        validation-visibility="live"
+                        :validation-messages="{
+                          required: '這是必要輸入',
+                          number: '請輸入數字',
+                          length: '請輸入正確的銀行代碼',
+                        }"
+                      >
+                        <!-- eslint-disable-next-line vue/no-unused-vars, vue/no-template-shadow -->
+                        <template #wrapper="context">
+                          <div class="transfer-input-block">
+                            <div class="transfer-title">
+                              銀行代碼
+                            </div>
+                            <input v-model="orderData.bankCode" type="text">
+                          </div>
+                        </template>
+                      </FormKit>
+                      <FormKit
+                        v-model="orderData.bankAccount"
+                        type="text"
+                        validation="required|number|length:10, 14"
+                        validation-visibility="live"
+                        :validation-messages="{
+                          required: '這是必要輸入',
+                          number: '請輸入數字',
+                          length: '請輸入正確的銀行代碼',
+                        }"
+                      >
+                        <!-- eslint-disable-next-line vue/no-unused-vars, vue/no-template-shadow -->
+                        <template #wrapper="context">
+                          <div class="transfer-input-block">
+                            <div class="transfer-title">
+                              帳戶號碼
+                            </div>
+                            <input v-model="orderData.bankAccount" type="text">
+                          </div>
+                        </template>
+                      </FormKit>
+                    </form>
+                  </Transition>
+                  <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="orderData.paymentType !== 'cash-on-delivery'" /><icon-ic-baseline-radio-button-checked v-show="orderData.paymentType === 'cash-on-delivery'" /><input v-model="orderData.paymentType" class="input-radio" value="cash-on-delivery" type="radio" name="payment">貨到付款</label>
+                </div>
+              </template>
+            <!-- <template #decorator="context">
+              <div class="checked-deco">
+                <icon-ic-baseline-radio-button-checked />
+              </div>
+              <div class="deco">
+                <icon-ic-baseline-radio-button-unchecked />
+              </div>
+            </template> -->
+            </FormKit>
           </div>
-          <div class="payment-block block">
-            <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="orderData.paymentType !== 'credit-card'" /><icon-ic-baseline-radio-button-checked v-show="orderData.paymentType === 'credit-card'" /><input v-model="orderData.paymentType" class="input-radio" value="credit-card" type="radio" name="payment">信用卡／金融卡</label>
-            <form v-show="orderData.paymentType === 'credit-card'" class="sub-content payment-credit-block">
-              <div class="credit-input-block">
-                <div class="credit-title">
-                  卡號
+          <div class="delivery-container">
+            <FormKit
+              v-model="orderData.deliveryType"
+              :options="delveryMethodList"
+              type="radio"
+              validation="required"
+              validation-visibility="live"
+              :validation-messages="{
+                required: '這是必要輸入',
+              }"
+            >
+              <!-- eslint-disable-next-line vue/no-unused-vars, vue/no-template-shadow -->
+              <template #fieldset="context">
+                <div class="title">
+                  收件資料
                 </div>
-                <input v-model="orderData.cardNumber" type="text">
-              </div>
-              <div class="credit-input-block">
-                <div class="credit-title">
-                  持卡人姓名
+                <div class="block">
+                  <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="orderData.deliveryType !== 'delivery'" /><icon-ic-baseline-radio-button-checked v-show="orderData.deliveryType === 'delivery'" /><input v-model="orderData.deliveryType" class="input-radio" value="delivery" type="radio" name="delivery">宅配</label>
+                  <Transition>
+                    <form v-if="orderData.deliveryType === 'delivery'" class="sub-content delivery-block" @submit.prevent>
+                      <FormKit
+                        v-model="orderData.county"
+                        validation="required"
+                        validation-visibility="live"
+                        :validation-messages="{
+                          required: '這是必要輸入',
+                        }"
+                      >
+                        <!-- eslint-disable-next-line vue/no-unused-vars, vue/no-template-shadow -->
+                        <template #wrapper="context">
+                          <select v-model="orderData.county" class="delivery-dropdown" name="county">
+                            <option :value="null">
+                              縣市
+                            </option>
+                            <option v-for="(county, i) in taiwanCounty" :key="`county-${i}`" :value="county">
+                              {{ county }}
+                            </option>
+                          </select>
+                        </template>
+                      </FormKit>
+                      <FormKit
+                        v-model="orderData.address"
+                        type="text"
+                        validation="required:trim"
+                        validation-visibility="live"
+                        :validation-messages="{
+                          required: '這是必要輸入',
+                        }"
+                      >
+                        <!-- eslint-disable-next-line vue/no-unused-vars, vue/no-template-shadow -->
+                        <template #wrapper="context">
+                          <input v-model="orderData.address" placeholder="請輸入詳細地址..." class="address-input" type="text" name="address">
+                        </template>
+                      </FormKit>
+                    </form>
+                  </Transition>
+                  <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="orderData.deliveryType !== 'self-pickup'" /><icon-ic-baseline-radio-button-checked v-show="orderData.deliveryType === 'self-pickup'" /><input v-model="orderData.deliveryType" class="input-radio" value="self-pickup" type="radio" name="delivery">超商取貨</label>
+                  <div v-if="orderData.deliveryType === 'self-pickup'" class="sub-content convience-block">
+                    <button class="select-btn">
+                      選取超商
+                    </button>
+                    <span class="select-status">尚未選取超商</span>
+                  </div>
                 </div>
-                <input v-model="orderData.cardOwner" type="text">
-              </div>
-              <div class="credit-input-block">
-                <div class="credit-title">
-                  有效期
-                </div>
-                <input v-model="orderData.cardValidDate" type="text" placeholder="MM/YY">
-              </div>
-              <div class="credit-input-block">
-                <div class="credit-title">
-                  安全碼
-                </div>
-                <input v-model="orderData.cardValidCode" type="text" maxlength="3">
-              </div>
-            </form>
-            <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="orderData.paymentType !== 'cash-on-delivery'" /><icon-ic-baseline-radio-button-checked v-show="orderData.paymentType === 'cash-on-delivery'" /><input v-model="orderData.paymentType" class="input-radio" value="cash-on-delivery" type="radio" name="payment">貨到付款</label>
+              </template>
+            </Formkit>
           </div>
         </div>
-        <div class="delivery-container">
-          <div class="title">
-            收件資料
-          </div>
-          <div class="block">
-            <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="orderData.deliveryType !== 'delivery'" /><icon-ic-baseline-radio-button-checked v-show="orderData.deliveryType === 'delivery'" /><input v-model="orderData.deliveryType" class="input-radio" value="delivery" type="radio" name="delivery">宅配</label>
-            <form v-show="orderData.deliveryType === 'delivery'" class="sub-content delivery-block" @submit.prevent>
-              <select v-model="orderData.county" class="delivery-dropdown" name="county">
-                <option :value="null">
-                  縣市
-                </option>
-                <option v-for="(county, i) in taiwanCounty" :key="`county-${i}`" :value="county">
-                  {{ county }}
-                </option>
-              </select>
-              <input v-model="orderData.address" type="text" name="address">
-            </form>
-            <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="orderData.deliveryType !== 'self-pickup'" /><icon-ic-baseline-radio-button-checked v-show="orderData.deliveryType === 'self-pickup'" /><input v-model="orderData.deliveryType" class="input-radio" value="self-pickup" type="radio" name="delivery">超商取貨</label>
-            <div v-show="orderData.deliveryType === 'self-pickup'" class="sub-content convience-block">
-              <button class="select-btn">
-                選取超商
-              </button>
-              <span class="select-status">尚未選取超商</span>
-            </div>
-          </div>
+        <div class="complete-btn">
+          <PButton type="submit" class="btn" :content="textInSureCheckoutBtn" />
         </div>
       </div>
-      <div class="complete-btn">
-        <PButton class="btn" :content="textInSureCheckoutBtn" @click="isDialogOpen = true" />
-      </div>
-    </div>
+    </FormKit>
   </PCheckoutLayout>
   <InfoDialog v-if="isDialogOpen && isSaveSuccess" :text-in-dialog="orderSuccessDialog" @close-info-dialog="handleCheckout" />
   <InfoDialog v-if="isDialogOpen && !isSaveSuccess" :text-in-dialog="orderFailDialog" @close-info-dialog="handleCheckout" />
 </template>
 
 <style lang="scss" scoped>
+.checked-deco {
+  display: none;
+}
+
+.deco {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 0.5rem;
+}
+
+[data-checked] .checked-deco {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 0.5rem;
+
+}
+
+[data-checked] .deco {
+  display: none;
+}
+
+.v-enter-active {
+  transition: all 0.5s ease-out;
+}
+
+.v-enter-from,
+.v-leave-to {
+  transform: translateY(-14px);
+  opacity: 0;
+}
 .input-radio {
   width: 0.1px;
   height: 0.1px;
@@ -272,6 +514,7 @@ input {
       border: 1px solid var(--main-product-color);
       box-sizing: border-box;
       padding: 1rem;
+      height: 36rem;
     }
 
     .sub-title {
@@ -300,7 +543,7 @@ input {
         .payment-credit-block {
           display: flex;
           flex-direction: column;
-          gap: 1rem;
+          gap: 0.5rem;
 
           .credit-input-block {
             display: flex;
@@ -313,6 +556,34 @@ input {
           }
         }
 
+        .transfer-block {
+          display: flex;
+          flex-direction: column;
+
+          .account-btn {
+            width: 50%;
+            background-color: var(--main-color);
+            outline: none;
+            border: none;
+            color: var(--white-color);
+            padding: 0.2rem 0;
+            cursor: pointer;
+            box-shadow: 1px 1px 0 0 rgb(0 0 0 / 20%);
+            margin-bottom: 1rem;
+          }
+
+          .transfer-input-block {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+
+            .transfer-title {
+              color: var(--text-color);
+            }
+          }
+        }
+
       }
     }
 
@@ -320,7 +591,7 @@ input {
 
       .delivery-block {
         display: flex;
-        justify-content: start;
+        flex-direction: column;
 
         .delivery-dropdown {
           outline: none;
@@ -335,6 +606,10 @@ input {
 
         input {
           flex-grow: 1;
+        }
+
+        .address-input {
+          width: 80%;
         }
       }
 
@@ -375,7 +650,7 @@ input {
 @media screen and (min-width: 916px) {
 
   .block {
-    height: 20rem;
+    height: 30rem;
   }
   .credit-input-block {
     align-items: center;
@@ -389,12 +664,11 @@ input {
 @media screen and (max-width: 915px) {
 
   .block {
-    height: 26rem;
+    height: 30rem;
   }
   .credit-input-block {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.5rem;
 
     .credit-title {
       width: 100%;
@@ -410,9 +684,6 @@ input {
   .delivery-container {
     width: 55%;
 
-    .delivery-block {
-      align-items: center;
-    }
   }
 }
 
@@ -435,7 +706,6 @@ input {
       width: 100%;
 
       .delivery-block {
-        flex-direction: column;
         gap: 1rem;
 
         .delivery-dropdown {

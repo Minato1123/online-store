@@ -6,7 +6,8 @@ export interface OrderPayment {
   cardOwner: string | null
   cardValidDate: string | null
   cardValidCode: string | null
-  transferData: string | null
+  bankCode: string | null
+  bankAccount: string | null
 }
 
 export interface OrderDelivery {

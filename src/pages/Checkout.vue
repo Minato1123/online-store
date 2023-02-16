@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { FormKitMessages } from '@formkit/vue'
 import PButton from '@/components/PButton.vue'
 import PCheckoutLayout from '@/components/PCheckoutLayout.vue'
 import router from '@/router'
@@ -52,42 +53,95 @@ function handleSubmit() {
 
 <template>
   <PCheckoutLayout v-slot="slotProps" target="checkout">
-    <form class="container" @submit.prevent>
-      <div class="accept-container">
-        <div class="title">
-          收件資料
-          <button class="same-user-btn" @click="handleSameUserBtnClick">
-            <icon-material-symbols-check-box-outline v-if="isSameWithUser" /><icon-material-symbols-check-box-outline-blank v-else />同使用者資料
+    <FormKit
+      form-class="$reset"
+      type="form"
+      :actions="false"
+      incomplete-message=" "
+      @submit="handleSubmit"
+      @submit-invalid="() => { return }"
+    >
+      <div class="container">
+        <div class="accept-container">
+          <div class="title">
+            收件資料
+            <button class="same-user-btn" @click="handleSameUserBtnClick">
+              <icon-material-symbols-check-box-outline v-if="isSameWithUser" /><icon-material-symbols-check-box-outline-blank v-else />同使用者資料
+            </button>
+          </div>
+          <div class="data-block">
+            <FormKit
+              v-model="orderData.name"
+              type="text"
+              name="name"
+              validation="required:trim"
+              validation-visibility="live"
+              :validation-messages="{
+                required: '請輸入姓名',
+              }"
+            >
+              <!-- eslint-disable-next-line vue/no-unused-vars -->
+              <template #wrapper="context">
+                <div class="data-item">
+                  <div>姓名</div>
+                  <input v-model="orderData.name" type="text">
+                </div>
+              </template>
+            </FormKit>
+            <FormKit
+              v-model="orderData.mobile"
+              type="text"
+              name="name"
+              validation="required|matches:/^[0-9]{10}$/"
+              validation-visibility="live"
+              :validation-messages="{
+                required: '請輸入電話',
+                matches: '請輸入正確的電話號碼',
+              }"
+            >
+              <!-- eslint-disable-next-line vue/no-unused-vars -->
+              <template #wrapper="context">
+                <div class="data-item">
+                  <div>電話</div>
+                  <input v-model="orderData.mobile" type="text">
+                </div>
+              </template>
+            </FormKit>
+            <FormKit
+              v-model="orderData.email"
+              type="text"
+              name="email"
+              validation="required|email"
+              validation-visibility="live"
+              :validation-messages="{
+                required: '請輸入電子信箱',
+                email: '請輸入正確的電子信箱',
+              }"
+            >
+              <!-- eslint-disable-next-line vue/no-unused-vars -->
+              <template #wrapper="context">
+                <div class="data-item">
+                  <div>電子信箱</div>
+                  <input v-model="orderData.email" type="text">
+                </div>
+              </template>
+            </FormKit>
+          </div>
+        </div>
+        <div class="check-container">
+          <button class="discount-btn" @click="isOpenDiscount = !isOpenDiscount">
+            使用優惠代碼
           </button>
-        </div>
-        <div class="data-block">
-          <div class="data-item">
-            <div>姓名</div>
-            <input v-model="orderData.name" type="text">
+          <div v-show="isOpenDiscount" class="discount-input">
+            <input v-model="codeForDiscount" type="text"><button>套用</button>
           </div>
-          <div class="data-item">
-            <div>電話</div>
-            <input v-model="orderData.mobile" type="text">
+          <div class="detail">
+            共 {{ slotProps.num }} 件商品｜總金額 NT$ {{ slotProps.total }}
           </div>
-          <div class="data-item">
-            <div>電子信箱</div>
-            <input v-model="orderData.email" type="text">
-          </div>
+          <PButton class="check-btn" type="submit" :content="textInCheckoutBtn" />
         </div>
       </div>
-      <div class="check-container">
-        <button class="discount-btn" @click="isOpenDiscount = !isOpenDiscount">
-          使用優惠代碼
-        </button>
-        <div v-show="isOpenDiscount" class="discount-input">
-          <input v-model="codeForDiscount" type="text"><button>套用</button>
-        </div>
-        <div class="detail">
-          共 {{ slotProps.num }} 件商品｜總金額 NT$ {{ slotProps.total }}
-        </div>
-        <PButton class="check-btn" :content="textInCheckoutBtn" @click="handleSubmit" />
-      </div>
-    </form>
+    </FormKit>
   </PCheckoutLayout>
 </template>
 
@@ -147,8 +201,7 @@ function handleSubmit() {
 
       .data-item {
         display: flex;
-        padding: 1rem 0;
-        height: 2rem;
+        padding-top: 1rem;
         gap: 2rem;
 
         div {
@@ -161,6 +214,8 @@ function handleSubmit() {
         input {
           width: 60%;
           border: 1px solid var(--main-color);
+          outline: none;
+          height: 2rem;
         }
 
       }
