@@ -1,10 +1,10 @@
 import { http } from '@/utils/request'
 
-export interface AddUserRequestData {
+export interface DeleteUserRequestData {
   id: number
 }
 
-export function addUser({ id }: AddUserRequestData) {
+export function deleteUser({ id }: DeleteUserRequestData) {
   return http.delete<void>({
     url: `/users/${id}`,
   })

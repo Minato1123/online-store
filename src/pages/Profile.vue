@@ -7,8 +7,11 @@ import { updateUserData } from '@/api/users/updateUserData'
 import IconCheckCircleRounded from '~icons/material-symbols/check-circle-rounded'
 import IconCrossCircle from '~icons/gridicons/cross-circle'
 import { useUsersStore } from '@/stores/user'
+import { deleteUser } from '@/api/users/deleteUser'
+import router from '@/router'
 
 const { userId, isLoggedIn } = storeToRefs(useUsersStore())
+const { forcedLogout } = useUsersStore()
 const user = ref<GetCurrentUserResponseData>()
 async function fetchCurrentUser() {
   if (!isLoggedIn.value)
@@ -20,8 +23,10 @@ onMounted(() => {
   fetchCurrentUser()
 })
 
-const isDialogOpen = ref(false)
+const isSaveInfoDialogOpen = ref(false)
+const isDeleteInfoDialogOpen = ref(false)
 const isSaveSuccess = ref(true)
+const isDeleteSuccess = ref(true)
 
 const editProfile = computed(() => {
   if (user.value == null)
@@ -38,12 +43,40 @@ const editProfile = computed(() => {
 async function submitUpdateProfile() {
   if (editProfile.value == null)
     return
-  await updateUserData({
-    id: userId.value,
-    ...editProfile.value,
-  })
+
+  try {
+    await updateUserData({
+      id: userId.value,
+      ...editProfile.value,
+    })
+  }
+  catch (error) {
+    isSaveSuccess.value = false
+    isSaveInfoDialogOpen.value = true
+    return
+  }
+
   isSaveSuccess.value = true
-  isDialogOpen.value = true
+  isSaveInfoDialogOpen.value = true
+}
+
+async function handleDeleteUser() {
+  try {
+    await deleteUser({ id: userId.value })
+  }
+  catch (error) {
+    isDeleteSuccess.value = false
+    isDeleteInfoDialogOpen.value = true
+    return
+  }
+  isDeleteSuccess.value = true
+  isDeleteInfoDialogOpen.value = true
+}
+
+function handleLogout() {
+  isDeleteInfoDialogOpen.value = false
+  forcedLogout()
+  router.replace({ name: 'home' })
 }
 
 const saveBtnContent = {
@@ -73,11 +106,34 @@ const saveBtnFailDialog = {
     color: 'main-product-color',
   },
 }
+
+const deleteBtnSuccessDialog = {
+  iconBeforeText: IconCheckCircleRounded,
+  text: '刪除成功！',
+  color: 'main-color',
+  borderColor: 'main-color',
+  textInBtnOK: {
+    text: '確定',
+    color: 'match-color',
+  },
+}
+
+const deleteBtnFailDialog = {
+  iconBeforeText: IconCrossCircle,
+  text: '刪除失敗！',
+  additionalText: '請稍後再試一次',
+  color: 'main-product-color',
+  borderColor: 'main-product-color',
+  textInBtnOK: {
+    text: '確定',
+    color: 'main-product-color',
+  },
+}
 </script>
 
 <template>
   <PUserLayout>
-    <form class="profile-container" @submit.prevent="submitUpdateProfile">
+    <form class="profile-container" @submit.prevent="">
       <div class="name-birthday-container">
         <div class="name-block">
           <div class="sub-title">
@@ -111,12 +167,17 @@ const saveBtnFailDialog = {
         <input v-if="editProfile" v-model="editProfile.address" type="text">
       </div>
       <div class="save-button">
-        <PButton class="save-btn" :content="saveBtnContent">
+        <PButton class="save-btn" :content="saveBtnContent" @click="submitUpdateProfile">
           儲存
         </PButton>
-        <InfoDialog v-if="isDialogOpen && isSaveSuccess" :text-in-dialog="saveBtnSuccessDialog" @close-info-dialog="isDialogOpen = false" />
-        <InfoDialog v-if="isDialogOpen && !isSaveSuccess" :text-in-dialog="saveBtnFailDialog" @close-info-dialog="isDialogOpen = false" />
+        <button class="delete-btn" @click="handleDeleteUser">
+          刪除帳號
+        </button>
       </div>
+      <InfoDialog v-if="isSaveInfoDialogOpen && isSaveSuccess" :text-in-dialog="saveBtnSuccessDialog" @close-info-dialog="isSaveInfoDialogOpen = false" />
+      <InfoDialog v-if="isSaveInfoDialogOpen && !isSaveSuccess" :text-in-dialog="saveBtnFailDialog" @close-info-dialog="isSaveInfoDialogOpen = false" />
+      <InfoDialog v-if="isDeleteInfoDialogOpen && isDeleteSuccess" :text-in-dialog="deleteBtnSuccessDialog" @close-info-dialog="handleLogout" />
+      <InfoDialog v-if="isDeleteInfoDialogOpen && !isDeleteSuccess" :text-in-dialog="deleteBtnFailDialog" @close-info-dialog="isDeleteInfoDialogOpen = false" />
     </form>
   </PUserLayout>
 </template>
@@ -158,9 +219,20 @@ const saveBtnFailDialog = {
       margin-top: 2rem;
       display: flex;
       justify-content: center;
+      gap: 1rem;
 
       .save-btn {
         width: 50%;
+      }
+
+      .delete-btn {
+        background: transparent;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        text-decoration: underline;
+        font-weight: 500;
+        color: var(--main-product-color);
       }
     }
   }
