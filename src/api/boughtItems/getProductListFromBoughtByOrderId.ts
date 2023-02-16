@@ -1,7 +1,6 @@
 import { http } from '@/utils/request'
 
 export interface GetProductListFromBoughtByOrderIdRequestData {
-  userId: number
   orderId: string
 }
 
@@ -19,11 +18,10 @@ export interface GetProductListFromBoughtByOrderIdResponseData {
   status: 'prepared' | 'shipped' | 'completed'
 }
 
-export function getProductListFromBoughtByOrderId({ userId, orderId }: GetProductListFromBoughtByOrderIdRequestData) {
+export function getProductListFromBoughtByOrderId({ orderId }: GetProductListFromBoughtByOrderIdRequestData) {
   return http.get<GetProductListFromBoughtByOrderIdResponseData[]>({
     url: '/boughtItems',
     params: {
-      userId,
       orderId,
     },
   })

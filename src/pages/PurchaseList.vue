@@ -1,23 +1,39 @@
 <script lang="ts" setup>
 import PUserLayout from '@/components/PUserLayout.vue'
-import type { GetProductListFromBoughtByStatusResponseData } from '@/api/boughtItems/getProductListFromBoughtByStatus'
-import { getProductListFromBoughtByStatus } from '@/api/boughtItems/getProductListFromBoughtByStatus'
+import { type GetOrderSerialNumberByStatusResponseData, getOrderSerialNumberByStatus } from '@/api/orders/getOrderSerialNumberByStatus'
 import { useUsersStore } from '@/stores/user'
+import { type GetProductListFromBoughtByOrderIdResponseData, getProductListFromBoughtByOrderId } from '@/api/boughtItems/getProductListFromBoughtByOrderId'
 const { userId, isLoggedIn } = storeToRefs(useUsersStore())
 
-const boughtItemsInPrepared = ref<GetProductListFromBoughtByStatusResponseData[]>([])
-const boughtItemsInShipped = ref<GetProductListFromBoughtByStatusResponseData[]>([])
-const boughtItemsInCompleted = ref<GetProductListFromBoughtByStatusResponseData[]>([])
+const serialNumberForPrepared = ref<GetOrderSerialNumberByStatusResponseData[]>([])
+const boughtItemsInPrepared = ref<GetProductListFromBoughtByOrderIdResponseData[]>([])
+const serialNumberForShipped = ref<GetOrderSerialNumberByStatusResponseData[]>([])
+const boughtItemsInShipped = ref<GetProductListFromBoughtByOrderIdResponseData[]>([])
+const serialNumberForCompleted = ref<GetOrderSerialNumberByStatusResponseData[]>([])
+const boughtItemsInCompleted = ref<GetProductListFromBoughtByOrderIdResponseData[]>([])
+
 async function fetchBoughtItemsInPrepared() {
-  boughtItemsInPrepared.value = (await getProductListFromBoughtByStatus({ userId: userId.value, status: 'prepared' })).data
+  serialNumberForPrepared.value = (await getOrderSerialNumberByStatus({ userId: userId.value, status: 'prepared' })).data
+  await Promise.all(serialNumberForPrepared.value.map(async (item) => {
+    const { data } = await getProductListFromBoughtByOrderId({ orderId: item.serialNumber })
+    boughtItemsInPrepared.value.push(...data)
+  }))
 }
 
 async function fetchBoughtItemsInShipped() {
-  boughtItemsInShipped.value = (await getProductListFromBoughtByStatus({ userId: userId.value, status: 'shipped' })).data
+  serialNumberForShipped.value = (await getOrderSerialNumberByStatus({ userId: userId.value, status: 'shipped' })).data
+  await Promise.all(serialNumberForShipped.value.map(async (item) => {
+    const { data } = await getProductListFromBoughtByOrderId({ orderId: item.serialNumber })
+    boughtItemsInShipped.value.push(...data)
+  }))
 }
 
 async function fetchBoughtItemsInCompleted() {
-  boughtItemsInCompleted.value = (await getProductListFromBoughtByStatus({ userId: userId.value, status: 'completed' })).data
+  serialNumberForCompleted.value = (await getOrderSerialNumberByStatus({ userId: userId.value, status: 'completed' })).data
+  await Promise.all(serialNumberForCompleted.value.map(async (item) => {
+    const { data } = await getProductListFromBoughtByOrderId({ orderId: item.serialNumber })
+    boughtItemsInCompleted.value.push(...data)
+  }))
 }
 
 onMounted(() => {
@@ -46,7 +62,7 @@ onMounted(() => {
           <tbody>
             <tr v-for="(item, i) in boughtItemsInPrepared" :key="`prepared-${i + 1}`" class="item">
               <td>{{ item.name }}</td>
-              <td>{{ item.specification }}</td>
+              <td>{{ item.specificationName }}</td>
               <td>{{ item.amount }}</td>
               <td>{{ item.price * item.amount }}</td>
             </tr>

@@ -55,13 +55,13 @@ async function fetchCartProductList() {
 async function fetchOrder() {
   if (props.orderId == null)
     return
-  order.value = (await getOrderByOrderId({ serialNumber: props.orderId })).data[0]
+  order.value = (await getOrderByOrderId({ serialNumber: props.orderId })).data
 }
 
 async function fetchBoughtProductList() {
   if (props.orderId == null)
     return
-  boughtProductList.value = (await getProductListFromBoughtByOrderId({ userId: userId.value, orderId: props.orderId })).data
+  boughtProductList.value = (await getProductListFromBoughtByOrderId({ orderId: props.orderId })).data
 }
 
 onMounted(async () => {
