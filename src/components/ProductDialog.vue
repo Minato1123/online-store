@@ -134,26 +134,48 @@ onBeforeUnmount(() => {
           <div v-if="productImages[0] != null" class="product-img">
             <img :src="getPublicImgSrc(productImages[0].image)" alt="">
           </div>
-          <form @submit.prevent="submitAddCart">
+          <FormKit
+            form-class="$reset"
+            type="form"
+            :actions="false"
+            incomplete-message=" "
+            @submit="submitAddCart"
+            @submit-invalid="() => { return }"
+          >
             <div class="spec-num">
               <div class="spec-block">
                 <div class="spec-num-title">
                   規格
                 </div>
                 <div class="spec-subblock">
-                  <label v-for="(spec, i) in productSpec" :key="`specifications-${i}`" class="spec-label" :class="{ active: specPicked === spec.id }">
+                  <FormKit
+                    v-if="hasSpecifications"
+                    v-model="specPicked"
+                    validation="required"
+                    validation-visibility="live"
+                    :validation-messages="{
+                      required: '請選擇規格',
+                    }"
+                  >
+                    <!-- eslint-disable-next-line vue/no-unused-vars -->
+                    <template #wrapper="context">
+                      <div class="spec-labels">
+                        <label v-for="(spec, i) in productSpec" :key="`specifications-${i}`" class="spec-label" :class="{ active: specPicked === spec.id }">
+                          <input
+                            v-model="specPicked" class="spec-radio"
+                            type="radio" name="specifications"
+                            :value="spec.id"
+                          >
+                          {{ spec.specName }}
+                        </label>
+                      </div>
+                    </template>
+                  </FormKit>
+                  <label v-else class="active">
                     <input
                       v-model="specPicked" class="spec-radio"
                       type="radio" name="specifications"
-                      :value="spec.id"
-                    >
-                    {{ spec.specName }}
-                  </label>
-                  <label v-if="!hasSpecifications" class="active">
-                    <input
-                      v-model="specPicked" class="spec-radio"
-                      type="radio" name="specifications"
-                      value="null" disabled
+                      value="null"
                     >
                     無
                   </label>
@@ -163,7 +185,22 @@ onBeforeUnmount(() => {
                 <div class="spec-num-title">
                   數量
                 </div>
-                <input v-model="numOfProduct" name="amount" class="num-product" type="number" min="1" max="10">
+                <div class="num-product-container">
+                  <FormKit
+                    v-model="numOfProduct"
+                    validation="required|between:1,10"
+                    validation-visibility="live"
+                    :validation-messages="{
+                      required: '請輸入數量',
+                      between: '請輸入 1~10 的數量',
+                    }"
+                  >
+                    <!-- eslint-disable-next-line vue/no-unused-vars -->
+                    <template #wrapper="context">
+                      <input v-model="numOfProduct" name="amount" class="num-product" type="number" min="1" max="10">
+                    </template>
+                  </FormKit>
+                </div>
               </div>
             </div>
             <div class="subtotal">
@@ -172,7 +209,7 @@ onBeforeUnmount(() => {
             <div class="add-cart-btn-block">
               <PButton class="add-cart-btn" type="submit" :content="textInBtnAddCart" />
             </div>
-          </form>
+          </FormKit>
         </div>
       </OnClickOutside>
     </div>
@@ -236,6 +273,7 @@ onBeforeUnmount(() => {
           display: flex;
           justify-content: center;
           align-items: center;
+          margin-bottom: 1rem;
 
           img {
             width: 60%;
@@ -246,14 +284,12 @@ onBeforeUnmount(() => {
         .spec-num {
           display: flex;
           justify-content: space-around;
-          align-items: center;
           min-height: 5rem;
 
           .spec-block, .num-block {
             display: flex;
             flex-direction: column;
             justify-content: space-evenly;
-            height: 100%;
             color: var(--main-color);
 
             input {
@@ -263,25 +299,39 @@ onBeforeUnmount(() => {
             .spec-num-title {
               font-weight: 500;
               font-size: 1.2rem;
+              padding-bottom: 0.6rem;
             }
 
             .spec-subblock {
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              flex-wrap: wrap;
+              height: 60%;
+              width: 100%;
 
-              .spec-label {
-                cursor: pointer;
+              .spec-labels {
+                width: 100%;
+                display: flex;
+                justify-content: start;
+                gap: 0.5rem;
+                flex-wrap: wrap;
 
+                .spec-label {
+                  cursor: pointer;
+                }
+              }
+
+            }
+
+            .num-product-container {
+              width: 100%;
+              height: 60%;
+
+              .num-product {
+                width: 100%;
+                border: solid 0.1rem var(--main-color);
+                padding: 0.3rem 0;
+                outline: none;
               }
             }
 
-            .num-product {
-              border: solid 0.1rem var(--main-color);
-              padding: 0.3rem 0;
-              outline: none;
-            }
           }
 
           .active {
@@ -352,10 +402,10 @@ onBeforeUnmount(() => {
 
   @media screen and (min-width: 786px) {
     .spec-num {
-      height: 5rem;
+      height: 10rem;
 
       .spec-block {
-        width: 46%;
+        width: 40%;
       }
 
        .num-block {
@@ -373,9 +423,10 @@ onBeforeUnmount(() => {
       .spec-num {
         flex-direction: column;
         height: 10rem;
+        align-items: center;
 
         .spec-block, .num-block {
-          width: 50%;
+          width: 90%;
         }
       }
     }

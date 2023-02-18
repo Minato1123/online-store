@@ -44,6 +44,7 @@ const newPassword = ref<string>('')
 const confirmNewPassword = ref<string>('')
 
 async function updatePassword() {
+  isDialogOpen.value = true
   if (newPassword.value !== confirmNewPassword.value) {
     isSaveSuccess.value = false
     return
@@ -62,36 +63,89 @@ async function updatePassword() {
 
 <template>
   <PUserLayout>
-    <form class="pw-container" @submit.prevent="updatePassword">
-      <div class="outer-block">
-        <div class="pw-blocks">
-          <div class="pw-block">
-            <div class="subtitle">
-              目前的密碼
-              <button class="forget-pw-btn">
-                忘記密碼？
-              </button>
-            </div>
-            <input v-model="oldPassword" type="password" autocomplete="off">
-          </div>
-          <div class="pw-block">
-            <div class="subtitle">
-              新密碼
-            </div>
-            <input v-model="newPassword" type="password" autocomplete="off">
-          </div>
-          <div class="pw-block">
-            <div class="subtitle">
-              確認新密碼
-            </div>
-            <input v-model="confirmNewPassword" type="password" autocomplete="off">
+    <FormKit
+      form-class="$reset"
+      type="form"
+      :actions="false"
+      incomplete-message=" "
+      @submit="updatePassword"
+      @submit-invalid="() => { return }"
+    >
+      <form class="pw-container" @submit.prevent>
+        <div class="outer-block">
+          <div class="pw-blocks">
+            <FormKit
+              v-model="oldPassword"
+              type="password"
+              validation="required:trim|length:8"
+              validation-visibility="live"
+              :validation-messages="{
+                required: '請輸入現在的密碼',
+                length: '請輸入至少 8 個字元',
+              }"
+            >
+              <!-- eslint-disable-next-line vue/no-unused-vars -->
+              <template #wrapper="context">
+                <div class="pw-block">
+                  <div class="subtitle">
+                    目前的密碼
+                    <button class="forget-pw-btn">
+                      忘記密碼？
+                    </button>
+                  </div>
+                  <input v-model="oldPassword" type="password" autocomplete="off">
+                </div>
+              </template>
+            </FormKit>
+            <FormKit
+              v-model="newPassword"
+              type="password"
+              name="newPassword"
+              validation="required:trim|length:8"
+              validation-visibility="live"
+              :validation-messages="{
+                required: '請輸入新的密碼',
+                length: '請輸入至少 8 個字元',
+              }"
+            >
+              <!-- eslint-disable-next-line vue/no-unused-vars -->
+              <template #wrapper="context">
+                <div class="pw-block">
+                  <div class="subtitle">
+                    新密碼
+                  </div>
+                  <input v-model="newPassword" type="password" autocomplete="off">
+                </div>
+              </template>
+            </FormKit>
+            <FormKit
+              v-model="confirmNewPassword"
+              type="password"
+              name="newPassword_confirm"
+              validation="required|confirm"
+              validation-visibility="live"
+              :validation-messages="{
+                required: '請輸入新的密碼',
+                confirm: '新密碼不相同，請再次確認',
+              }"
+            >
+              <!-- eslint-disable-next-line vue/no-unused-vars -->
+              <template #wrapper="context">
+                <div class="pw-block">
+                  <div class="subtitle">
+                    確認新密碼
+                  </div>
+                  <input v-model="confirmNewPassword" type="password" autocomplete="off">
+                </div>
+              </template>
+            </FormKit>
           </div>
         </div>
-      </div>
-      <div class="save-btn-block">
-        <PButton class="save-btn" :content="saveBtnContent" @click="isDialogOpen = true" />
-      </div>
-    </form>
+        <div class="save-btn-block">
+          <PButton class="save-btn" :content="saveBtnContent" type="submit" />
+        </div>
+      </form>
+    </FormKit>
   </PUserLayout>
   <InfoDialog v-if="isDialogOpen && isSaveSuccess" :text-in-dialog="saveBtnSuccessDialog" @close-info-dialog="isDialogOpen = false" />
   <InfoDialog v-if="isDialogOpen && !isSaveSuccess" :text-in-dialog="saveBtnFailDialog" @close-info-dialog="isDialogOpen = false" />
@@ -102,7 +156,6 @@ async function updatePassword() {
     display: flex;
     flex-direction: column;
     justify-content: start;
-    height: 100%;
     gap: 5rem;
 
     .outer-block {
