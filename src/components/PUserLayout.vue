@@ -92,6 +92,7 @@
     }
 
     .user-content {
+      overflow-y: auto;
       width: 80%;
     }
   }
@@ -128,6 +129,7 @@
         flex-direction: row;
         flex-wrap: wrap;
         gap: 0.5rem;
+        padding-bottom: 1rem;
 
         button {
           width: 48%;
