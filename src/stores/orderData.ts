@@ -14,7 +14,7 @@ export const useOrderDataStore = defineStore('orderData', () => {
       cardValidCode: '',
       bankCode: null,
       bankAccount: null,
-      deliveryType: 'delivery',
+      deliveryType: 'home-delivery',
       county: null,
       address: '',
       convenienceStoreData: null,

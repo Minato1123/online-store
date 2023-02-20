@@ -13,8 +13,7 @@ export interface GetProductListFromBoughtByUserIdResponseData {
   specification: string | null
   amount: number
   price: number
-  dateOfPurchase: string
-  timeOfPurchase: string
+  purchaseTime: string
   status: 'prepared' | 'shipped' | 'completed'
 }
 

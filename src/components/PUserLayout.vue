@@ -57,7 +57,7 @@
     margin: 3rem 0;
     display: flex;
     width: 80%;
-    height: 36rem;
+    min-height: 36rem;
     background-color: var(--white-color);
 
     .user-sidebar {
@@ -92,7 +92,6 @@
     }
 
     .user-content {
-      overflow-y: auto;
       width: 80%;
     }
   }
@@ -102,6 +101,10 @@
       min-width: 36rem;
       border-radius: 2rem;
       border: 1px solid var(--main-color);
+
+      .user-content {
+        overflow-y: hidden;
+      }
     }
     .user-sidebar {
       margin-top: 2rem;

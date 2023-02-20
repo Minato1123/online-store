@@ -363,9 +363,9 @@ function handleSubmit() {
                   收件資料
                 </div>
                 <div class="block">
-                  <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="orderData.deliveryType !== 'delivery'" /><icon-ic-baseline-radio-button-checked v-show="orderData.deliveryType === 'delivery'" /><input v-model="orderData.deliveryType" class="input-radio" value="delivery" type="radio" name="delivery">宅配</label>
+                  <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="orderData.deliveryType !== 'home-delivery'" /><icon-ic-baseline-radio-button-checked v-show="orderData.deliveryType === 'home-delivery'" /><input v-model="orderData.deliveryType" class="input-radio" value="home-delivery" type="radio" name="delivery">宅配</label>
                   <Transition>
-                    <form v-if="orderData.deliveryType === 'delivery'" class="sub-content delivery-block" @submit.prevent>
+                    <form v-if="orderData.deliveryType === 'home-delivery'" class="sub-content delivery-block" @submit.prevent>
                       <FormKit
                         v-model="orderData.county"
                         validation="required"
@@ -402,8 +402,8 @@ function handleSubmit() {
                       </FormKit>
                     </form>
                   </Transition>
-                  <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="orderData.deliveryType !== 'self-pickup'" /><icon-ic-baseline-radio-button-checked v-show="orderData.deliveryType === 'self-pickup'" /><input v-model="orderData.deliveryType" class="input-radio" value="self-pickup" type="radio" name="delivery">超商取貨</label>
-                  <div v-if="orderData.deliveryType === 'self-pickup'" class="sub-content convience-block">
+                  <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="orderData.deliveryType !== 'convenience-store'" /><icon-ic-baseline-radio-button-checked v-show="orderData.deliveryType === 'convenience-store'" /><input v-model="orderData.deliveryType" class="input-radio" value="convenience-store" type="radio" name="delivery">超商取貨</label>
+                  <div v-if="orderData.deliveryType === 'convenience-store'" class="sub-content convience-block">
                     <button class="select-btn">
                       選取超商
                     </button>

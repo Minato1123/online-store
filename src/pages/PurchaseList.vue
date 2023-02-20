@@ -1,39 +1,28 @@
 <script lang="ts" setup>
 import PUserLayout from '@/components/PUserLayout.vue'
+import OrderDialog from '@/components/OrderDialog.vue'
 import { type GetOrderSerialNumberByStatusResponseData, getOrderSerialNumberByStatus } from '@/api/orders/getOrderSerialNumberByStatus'
 import { useUsersStore } from '@/stores/user'
 import { type GetProductListFromBoughtByOrderIdResponseData, getProductListFromBoughtByOrderId } from '@/api/boughtItems/getProductListFromBoughtByOrderId'
 const { userId, isLoggedIn } = storeToRefs(useUsersStore())
 
-const serialNumberForPrepared = ref<GetOrderSerialNumberByStatusResponseData[]>([])
-const boughtItemsInPrepared = ref<GetProductListFromBoughtByOrderIdResponseData[]>([])
-const serialNumberForShipped = ref<GetOrderSerialNumberByStatusResponseData[]>([])
-const boughtItemsInShipped = ref<GetProductListFromBoughtByOrderIdResponseData[]>([])
-const serialNumberForCompleted = ref<GetOrderSerialNumberByStatusResponseData[]>([])
-const boughtItemsInCompleted = ref<GetProductListFromBoughtByOrderIdResponseData[]>([])
+const orderListForPrepared = ref<GetOrderSerialNumberByStatusResponseData[]>([])
+const orderListForShipped = ref<GetOrderSerialNumberByStatusResponseData[]>([])
+const orderListForCompleted = ref<GetOrderSerialNumberByStatusResponseData[]>([])
 
 async function fetchBoughtItemsInPrepared() {
-  serialNumberForPrepared.value = (await getOrderSerialNumberByStatus({ userId: userId.value, status: 'prepared' })).data
-  await Promise.all(serialNumberForPrepared.value.map(async (item) => {
-    const { data } = await getProductListFromBoughtByOrderId({ orderId: item.serialNumber })
-    boughtItemsInPrepared.value.push(...data)
-  }))
+  orderListForPrepared.value = (await getOrderSerialNumberByStatus({ userId: userId.value, status: 'prepared' })).data
+  orderListForPrepared.value.sort((a, b) => +b.purchaseTime - +a.purchaseTime)
 }
 
 async function fetchBoughtItemsInShipped() {
-  serialNumberForShipped.value = (await getOrderSerialNumberByStatus({ userId: userId.value, status: 'shipped' })).data
-  await Promise.all(serialNumberForShipped.value.map(async (item) => {
-    const { data } = await getProductListFromBoughtByOrderId({ orderId: item.serialNumber })
-    boughtItemsInShipped.value.push(...data)
-  }))
+  orderListForShipped.value = (await getOrderSerialNumberByStatus({ userId: userId.value, status: 'shipped' })).data
+  orderListForShipped.value.sort((a, b) => +b.purchaseTime - +a.purchaseTime)
 }
 
 async function fetchBoughtItemsInCompleted() {
-  serialNumberForCompleted.value = (await getOrderSerialNumberByStatus({ userId: userId.value, status: 'completed' })).data
-  await Promise.all(serialNumberForCompleted.value.map(async (item) => {
-    const { data } = await getProductListFromBoughtByOrderId({ orderId: item.serialNumber })
-    boughtItemsInCompleted.value.push(...data)
-  }))
+  orderListForCompleted.value = (await getOrderSerialNumberByStatus({ userId: userId.value, status: 'completed' })).data
+  orderListForCompleted.value.sort((a, b) => +b.purchaseTime - +a.purchaseTime)
 }
 
 onMounted(() => {
@@ -41,6 +30,13 @@ onMounted(() => {
   fetchBoughtItemsInShipped()
   fetchBoughtItemsInCompleted()
 })
+
+const isOpenDialog = ref(false)
+const currentOrder = ref<GetOrderSerialNumberByStatusResponseData>()
+function openDialog(order: GetOrderSerialNumberByStatusResponseData) {
+  isOpenDialog.value = true
+  currentOrder.value = order
+}
 </script>
 
 <template>
@@ -50,24 +46,36 @@ onMounted(() => {
         <div class="subtitle">
           訂單準備中
         </div>
-        <table v-if="boughtItemsInPrepared.length > 0" class="order-content">
-          <thead>
-            <tr class="item">
-              <th>商品名稱</th>
-              <th>規格</th>
-              <th>數量</th>
-              <th>總計</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item, i) in boughtItemsInPrepared" :key="`prepared-${i + 1}`" class="item">
-              <td>{{ item.name }}</td>
-              <td>{{ item.specificationName }}</td>
-              <td>{{ item.amount }}</td>
-              <td>{{ item.price * item.amount }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <div v-if="orderListForPrepared.length > 0" class="order-content">
+          <div class="item-titles">
+            <div class="item-time">
+              購買日期
+            </div>
+            <div class="item-orderid">
+              訂單編號
+            </div>
+            <div class="item-payment-status">
+              付款狀態
+            </div>
+            <div class="item-total-price">
+              總計
+            </div>
+          </div>
+          <div v-for="(item, i) in orderListForPrepared" :key="`prepared-${i + 1}`" class="item" @click="openDialog(item)">
+            <div class="item-time">
+              {{ `${new Date(+item.purchaseTime).getFullYear()}/${new Date(+item.purchaseTime).getMonth() + 1}/${new Date(+item.purchaseTime).getDate()}` }}
+            </div>
+            <div class="item-orderid">
+              {{ item.serialNumber }}
+            </div>
+            <div class="item-payment-status">
+              {{ item.paymentStatus === 'paid' ? '已付款' : '未付款' }}
+            </div>
+            <div class="item-total-price">
+              {{ item.totalPrice }}
+            </div>
+          </div>
+        </div>
       </div>
       <div class="order-shipped-block block">
         <div class="subtitle">
@@ -87,11 +95,11 @@ onMounted(() => {
       </div>
     </div>
   </PUserLayout>
+  <OrderDialog v-if="isOpenDialog && currentOrder" :order="currentOrder" @close-dialog="isOpenDialog = false" />
 </template>
 
 <style lang="scss" scoped>
   .purchase-list-container {
-    padding: 2rem;
 
     .block {
       width: 100%;
@@ -107,14 +115,55 @@ onMounted(() => {
       width: 100%;
       color: var(--text-color);
 
-      th, td {
-        height: 1.5rem;
-        text-align: center;
+      .item-titles {
+        display: flex;
+        align-items: center;
+        gap: 1%;
+
       }
       .item {
+        display: flex;
         width: 100%;
-        padding: 0.5rem 0;
+        padding: 0.8rem 0 0.5rem 0;
+        gap: 1%;
+        cursor: pointer;
+        border-bottom: 0.1rem dashed var(--main-color);
+        transition: all 0.2s ease-in-out;
+
+        &:hover {
+          opacity: 0.8;
+          color: var(--main-product-color);
+        }
       }
+
+      .item-time {
+        width: 25%;
+        min-width: 5rem;
+      }
+
+      .item-orderid {
+        width: 35%;
+      }
+
+      .item-payment-status {
+        width: 23%;
+      }
+
+      .item-total-price {
+        width: 14%;
+      }
+    }
+  }
+
+  @media screen and (min-width: 577px) {
+    .purchase-list-container {
+      padding: 2rem;
+    }
+  }
+
+  @media screen and (max-width: 576px) {
+    .purchase-list-container {
+      padding: 1rem;
     }
   }
 </style>

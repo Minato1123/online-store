@@ -7,13 +7,7 @@ module.exports = defineRoute((router, data) => {
 
     if (ctx.query.status) {
       const userId = parseInt(ctx.query.userId)
-      ctx.response.body = orderList
-        .filter(order => order.userId === userId && order.status === ctx.query.status)
-        .map((order) => {
-          return {
-            serialNumber: order.serialNumber,
-          }
-        })
+      ctx.response.body = orderList.filter(order => order.userId === userId && order.status === ctx.query.status)
       return
     }
     ctx.response.body = orderList.find(order => order.serialNumber === serialNumber)

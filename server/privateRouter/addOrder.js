@@ -23,6 +23,7 @@ module.exports = defineRoute((router, data, tokenMap) => {
       totalAmount,
       totalPrice,
       deleted: false,
+      purchaseTime: createdTime,
       ...orderData,
     }
     orderList.push(addedOrderData)

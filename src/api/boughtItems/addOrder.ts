@@ -11,7 +11,7 @@ export interface OrderPayment {
 }
 
 export interface OrderDelivery {
-  deliveryType: 'delivery' | 'self-pickup'
+  deliveryType: 'home-delivery' | 'convenience-store'
   county: string | null
   address: string | null
   convenienceStoreData: string | null
@@ -47,6 +47,7 @@ export interface AddOrderResponseData {
   boughtItems: BoughtItem[]
   totalAmount: number
   totalPrice: number
+  purchaseTime: string
 }
 
 export function addOrder(data: AddOrderRequestData) {
