@@ -92,11 +92,11 @@ function handleClickBankBtn(target: TypeTarget, data?: GetPaymentByTypeResponseD
       <div class="main-block">
         <div class="credit-card-block block">
           <div class="subtitle">
-            信用卡 / 金融卡
+            信用卡／金融卡
           </div>
           <div class="credit-card-content content">
             <div v-for="(data, i) in userCreditCards" :key="`card-${i + 1}`" class="item" @click="handleClickCreditCardBtn('edit', data)">
-              <div>-{{ i + 1 }}-</div>
+              <div>（{{ i + 1 }}）</div>
               <div class="item-name">
                 {{ data.cardOwner }}
               </div>
@@ -117,7 +117,7 @@ function handleClickBankBtn(target: TypeTarget, data?: GetPaymentByTypeResponseD
           </div>
           <div class="bank-content content">
             <div v-for="(account, i) in userAccounts" :key="`account-${i + 1}`" class="item" @click="handleClickBankBtn('edit', account)">
-              <div>-{{ i + 1 }}-</div>
+              <div>（{{ i + 1 }}）</div>
               <div class="item-name">
                 {{ account.bankCode }}
               </div>

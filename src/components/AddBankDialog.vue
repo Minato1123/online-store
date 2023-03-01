@@ -148,7 +148,7 @@ async function handleDelete() {
               <FormKit
                 v-model="bankData.bankAccount"
                 type="text"
-                validation="required:trim|number|length:14, 20"
+                validation="required:trim|number|length:10, 14"
                 validation-visibility="live"
                 :validation-messages="{
                   required: '這是必要輸入',
