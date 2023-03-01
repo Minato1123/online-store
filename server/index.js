@@ -12,7 +12,7 @@ const usePublicRouter = require('./publicRouter')
 const { getUserIdByToken } = require('./utils')
 const usePrivateRouter = require('./privateRouter')
 
-const tokenMap = new Map([['pochacco', 1]])
+const tokenMap = new Map([])
 
 app.use(cors())
 app.use(koaBody())
@@ -21,6 +21,7 @@ usePublicRouter(publicRouter, data, tokenMap)
 
 // 檢查 token 有無過期（就算沒 token 也沒差）
 app.use((ctx, next) => {
+  console.log(ctx.method, ctx.URL.pathname, ctx.URL.search)
   const theToken = ctx.request.headers['access-token']
   if (theToken === '') {
     next()
@@ -43,7 +44,6 @@ usePrivateRouter(privateRouter, data, tokenMap)
 // 確認一定要登入
 app.use((ctx, next) => {
   const theToken = ctx.request.headers['access-token']
-  console.log(ctx.URL.pathname, ctx.URL.search)
   if (theToken === '') {
     ctx.status = 401
     return
