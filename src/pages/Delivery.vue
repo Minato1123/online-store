@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import PButton from '@/components/PButton.vue'
 import InfoDialog from '@/components/InfoDialog.vue'
+import PaymentSelect from '@/components/PaymentSelect.vue'
 import router from '@/router'
 import PCheckoutLayout from '@/components/PCheckoutLayout.vue'
 import IconMoneyDollarCircleLine from '~icons/ri/money-dollar-circle-line'
@@ -17,6 +18,7 @@ import { deleteProductFromCart } from '@/api/cartItems/deleteProductFromCart'
 import { useUsersStore } from '@/stores/user'
 import { useCartUpdatedEventBus } from '@/composables/useCartUpdatedEventBus'
 import type { BtnType, InfoType } from '@/types'
+import type { GetPaymentByTypeResponseData } from '@/api/payment/getPaymentByType'
 
 const { orderData } = storeToRefs(useOrderDataStore())
 const { userId } = storeToRefs(useUsersStore())
@@ -80,6 +82,8 @@ const delveryMethodList = [
 
 const isDialogOpen = ref(false)
 const isSaveSuccess = ref(true)
+const isPaymentSelectDialog = ref(false)
+const targetPaymentMethod = ref<'credit-card' | 'transfer'>('credit-card')
 
 const addedOrderData = ref<AddOrderResponseData>()
 const cartList = ref<GetProductListFromShoppingCartByUserIdResponseData[]>()
@@ -112,6 +116,15 @@ async function fetchToBuyProductList() {
   )
 }
 
+function openPaymentSelectDialog(type: 'credit-card' | 'transfer') {
+  isPaymentSelectDialog.value = true
+
+  if (type === 'credit-card')
+    targetPaymentMethod.value = 'credit-card'
+  else if (type === 'transfer')
+    targetPaymentMethod.value = 'transfer'
+}
+
 async function handleCheckout() {
   isDialogOpen.value = false
   if (toBuyProductList.value == null)
@@ -134,6 +147,7 @@ async function handleCheckout() {
 }
 
 onMounted(async () => {
+  checkUserDataInOrder()
   await fetchCartList()
   fetchToBuyProductList()
 })
@@ -163,6 +177,40 @@ const orderFailDialog: InfoType = {
 
 function handleSubmit() {
   isDialogOpen.value = true
+}
+
+function handlePaymentSelect(paymentData?: GetPaymentByTypeResponseData) {
+  if (paymentData == null) {
+    isPaymentSelectDialog.value = false
+    return
+  }
+
+  if (targetPaymentMethod.value === 'credit-card') {
+    orderData.value.cardOwner = paymentData.cardOwner
+    orderData.value.cardNumber = paymentData.cardNumber
+    orderData.value.cardValidDate = paymentData.cardValidDate
+    orderData.value.cardValidCode = paymentData.cardValidCode
+  }
+  else if (targetPaymentMethod.value === 'transfer') {
+    orderData.value.bankCode = paymentData.bankCode
+    orderData.value.bankAccount = paymentData.bankAccount
+  }
+  isPaymentSelectDialog.value = false
+}
+
+function checkUserDataInOrder() {
+  if (orderData.value.name == null || orderData.value.name === '') {
+    router.replace({ name: 'checkout' })
+    return
+  }
+
+  if (orderData.value.mobile == null || orderData.value.mobile === '') {
+    router.replace({ name: 'checkout' })
+    return
+  }
+
+  if (orderData.value.email == null || orderData.value.email === '')
+    router.replace({ name: 'checkout' })
 }
 </script>
 
@@ -201,6 +249,9 @@ function handleSubmit() {
                   <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="orderData.paymentType !== 'credit-card'" /><icon-ic-baseline-radio-button-checked v-show="orderData.paymentType === 'credit-card'" /><input v-model="orderData.paymentType" class="input-radio" value="credit-card" type="radio" name="payment">信用卡／金融卡</label>
                   <Transition>
                     <form v-if="orderData.paymentType === 'credit-card'" class="sub-content payment-credit-block" @submit.prevent>
+                      <button type="button" class="account-btn" @click="openPaymentSelectDialog('credit-card')">
+                        選取信用卡
+                      </button>
                       <FormKit
                         v-model="orderData.cardNumber"
                         type="text"
@@ -287,7 +338,7 @@ function handleSubmit() {
                   <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="orderData.paymentType !== 'transfer'" /><icon-ic-baseline-radio-button-checked v-show="orderData.paymentType === 'transfer'" /><input v-model="orderData.paymentType" class="input-radio" value="transfer" type="radio" name="payment">銀行轉帳</label>
                   <Transition>
                     <form v-if="orderData.paymentType === 'transfer'" class="sub-content transfer-block" @submit.prevent>
-                      <button class="account-btn">
+                      <button type="button" class="account-btn" @click="openPaymentSelectDialog('transfer')">
                         選取銀行帳戶
                       </button>
                       <FormKit
@@ -415,6 +466,7 @@ function handleSubmit() {
   </PCheckoutLayout>
   <InfoDialog v-if="isDialogOpen && isSaveSuccess" :text-in-dialog="orderSuccessDialog" @close-info-dialog="handleCheckout" />
   <InfoDialog v-if="isDialogOpen && !isSaveSuccess" :text-in-dialog="orderFailDialog" @close-info-dialog="handleCheckout" />
+  <PaymentSelect v-if="isPaymentSelectDialog" :target="targetPaymentMethod" @close-dialog="handlePaymentSelect" />
 </template>
 
 <style lang="scss" scoped>
@@ -548,12 +600,7 @@ input {
 
           }
         }
-
-        .transfer-block {
-          display: flex;
-          flex-direction: column;
-
-          .account-btn {
+        .account-btn {
             width: 50%;
             background-color: var(--main-color);
             outline: none;
@@ -564,6 +611,10 @@ input {
             box-shadow: 1px 1px 0 0 rgb(0 0 0 / 20%);
             margin-bottom: 1rem;
           }
+
+        .transfer-block {
+          display: flex;
+          flex-direction: column;
 
           .transfer-input-block {
             display: flex;

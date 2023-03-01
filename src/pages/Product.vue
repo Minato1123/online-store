@@ -157,47 +157,60 @@ const textInBtnCheckout: BtnType = {
   color: 'main-product-color',
 }
 
-const textInDialogAddCart: InfoType = {
+const textInInfoAddCart: InfoType = {
   iconBeforeText: IconCartCheckFill,
   text: '已加入購物車',
   color: 'main-color',
   borderColor: 'main-color',
 }
-const isOpenDialogAddCart = ref(false)
+
+const textInInfoAddCartFail: InfoType = {
+  text: '加入失敗！',
+  additionalText: '請稍後再試。',
+  color: 'main-product-color',
+  borderColor: 'main-product-olor',
+  textInBtnOK: {
+    text: '確定',
+    color: 'main-product-color',
+  },
+}
+
+const isOpenInfoAddCart = ref(false)
+const isOpenInfoAddCartFail = ref(false)
+const isHandleCheckout = ref(false)
 
 async function handleAddCart() {
   const theProduct = product.value
   if (theProduct == null)
     return
 
-  if (isLoggedIn.value) {
-    await addProductToShoppingCart({
-      userId: userId.value,
-      productId: theProduct.id,
-      specificationId: specPicked.value,
-      amount: amountOfProduct.value,
-    })
+  try {
+    if (isLoggedIn.value) {
+      await addProductToShoppingCart({
+        userId: userId.value,
+        productId: theProduct.id,
+        specificationId: specPicked.value,
+        amount: amountOfProduct.value,
+      })
+    }
+    else {
+      addLocalCart(theProduct.id, specPicked.value, amountOfProduct.value)
+    }
+
+    emitCartUpdated()
+    isOpenInfoAddCart.value = true
+    window.setTimeout(() => {
+      isOpenInfoAddCart.value = false
+    }, 800)
   }
-  else {
-    addLocalCart(theProduct.id, specPicked.value, amountOfProduct.value)
+  catch (err) {
+    isOpenInfoAddCartFail.value = true
   }
 
-  emitCartUpdated()
-  isOpenDialogAddCart.value = true
-  window.setTimeout(() => {
-    isOpenDialogAddCart.value = false
-  }, 800)
-}
-
-function handleCheckout() {
-  if (product.value == null)
-    return
-
-  const pId = product.value.id
-  if (pId != null) {
-    addLocalCart(pId, specPicked.value, amountOfProduct.value)
+  if (isHandleCheckout.value)
     router.push({ name: 'cart' })
-  }
+
+  isHandleCheckout.value = false
 }
 
 const slideImgs = computed(() => {
@@ -270,62 +283,100 @@ const slidesConfig = computed<SlideType>(() => {
           </label>
         </div>
       </div>
-      <div class="content-block">
-        <div class="title">
-          {{ product.name }}
-        </div>
-        <div class="description">
-          <div v-for="(decsLineObj, i) in productDescription" :key="`decs-${i}`">
-            {{ decsLineObj.description }}
+      <FormKit
+        form-class="$reset"
+        type="form"
+        :actions="false"
+        incomplete-message=" "
+        @submit="handleAddCart"
+        @submit-invalid="() => { return }"
+      >
+        <div class="content-block">
+          <div class="title">
+            {{ product.name }}
           </div>
-        </div>
-        <div class="follow-price">
-          <button @click="handleFollowedProducts">
-            <icon-icon-park-solid-like v-if="followingList.has(product.id)" /><icon-icon-park-outline-like v-else />
-          </button>
-          <div class="price">
-            NT$ {{ product.price }}
-          </div>
-        </div>
-        <div class="spec-amount">
-          <div class="spec-block">
-            <div class="subtitle">
-              規格
-            </div>
-            <div class="spec-subblock">
-              <label v-for="(spec, i) in productSpec" :key="`spec-${i}`" class="spec-label" :class="{ 'spec-active': specPicked === i }">
-                <input
-                  v-model="specPicked" class="spec-radio hidden"
-                  type="radio" name="specifications"
-                  :value="i"
-                >
-                {{ spec.specName }}
-              </label>
-              <label v-if="!hasSpecifications" class="spec-label spec-active">
-                <input
-                  v-model="specPicked" class="spec-radio hidden"
-                  type="radio" name="specifications"
-                  value="null" disabled
-                >
-                無
-              </label>
+          <div class="description">
+            <div v-for="(decsLineObj, i) in productDescription" :key="`decs-${i}`">
+              {{ decsLineObj.description }}
             </div>
           </div>
-          <div class="amount-block">
-            <div class="subtitle">
-              數量
+          <div class="follow-price">
+            <button @click="handleFollowedProducts">
+              <icon-icon-park-solid-like v-if="followingList.has(product.id)" /><icon-icon-park-outline-like v-else />
+            </button>
+            <div class="price">
+              NT$ {{ product.price }}
             </div>
-            <input v-model="amountOfProduct" name="amount" class="amount-product" type="number" min="1" max="10">
+          </div>
+          <div class="spec-amount">
+            <div class="spec-block">
+              <div class="subtitle">
+                規格
+              </div>
+
+              <FormKit
+                v-if="hasSpecifications"
+                v-model="specPicked"
+                validation="required"
+                validation-visibility="live"
+                :validation-messages="{
+                  required: '請選擇規格',
+                }"
+              >
+                <!-- eslint-disable-next-line vue/no-unused-vars -->
+                <template #wrapper="context">
+                  <div class="spec-subblock">
+                    <label v-for="(spec, i) in productSpec" :key="`spec-${i}`" class="spec-label" :class="{ 'spec-active': specPicked === i }">
+                      <input
+                        v-model="specPicked" class="spec-radio hidden"
+                        type="radio" name="specifications"
+                        :value="i"
+                      >
+                      {{ spec.specName }}
+                    </label>
+                  </div>
+                </template>
+              </FormKit>
+              <div v-if="!hasSpecifications" class="spec-subblock">
+                <label class="spec-label spec-active">
+                  <input
+                    v-model="specPicked" class="spec-radio hidden"
+                    type="radio" name="specifications"
+                    value="null" disabled
+                  >
+                  無
+                </label>
+              </div>
+            </div>
+            <div class="amount-block">
+              <div class="subtitle">
+                數量
+              </div>
+              <FormKit
+                v-model="amountOfProduct"
+                validation="required|between:1,10"
+                validation-visibility="live"
+                :validation-messages="{
+                  required: '請輸入數量',
+                  between: '請輸入 1~10 的數量',
+                }"
+              >
+                <!-- eslint-disable-next-line vue/no-unused-vars -->
+                <template #wrapper="context">
+                  <input v-model="amountOfProduct" name="amount" class="amount-input" type="number" min="1" max="10">
+                </template>
+              </FormKit>
+            </div>
+          </div>
+          <div class="buy-btns">
+            <PButton class="btn" :content="textInBtnToAddCart" />
+            <PButton class="btn" :content="textInBtnCheckout" @click="isHandleCheckout = true" />
+          </div>
+          <div class="postscript">
+            付款後，從備貨到寄出商品為 2~4 個工作天（不包含假日），請耐心等候。
           </div>
         </div>
-        <div class="buy-btns">
-          <PButton class="btn" :content="textInBtnToAddCart" @click="handleAddCart" />
-          <PButton class="btn" :content="textInBtnCheckout" @click="handleCheckout" />
-        </div>
-        <div class="postscript">
-          付款後，從備貨到寄出商品為 2~4 個工作天（不包含假日），請耐心等候。
-        </div>
-      </div>
+      </FormKit>
     </div>
     <ul class="activity-list">
       <li class="activity">
@@ -434,7 +485,8 @@ const slidesConfig = computed<SlideType>(() => {
       </div>
     </div>
   </div>
-  <InfoDialog v-if="isOpenDialogAddCart" :text-in-dialog="textInDialogAddCart" />
+  <InfoDialog v-if="isOpenInfoAddCart" :text-in-dialog="textInInfoAddCart" />
+  <InfoDialog v-if="isOpenInfoAddCartFail" :text-in-dialog="textInInfoAddCartFail" @close-info-dialog="isOpenInfoAddCartFail = false" />
 </template>
 
 <style lang="scss" scoped>
@@ -567,13 +619,12 @@ a {
 
         .spec-amount {
           display: flex;
-          justify-content: space-around;
-          align-items: center;
+          justify-content: space-between;
 
           .spec-block, .amount-block {
             display: flex;
             flex-direction: column;
-            width: 40%;
+            width: 47%;
             gap: 1rem;
 
             .subtitle {
@@ -613,9 +664,9 @@ a {
               }
             }
 
-            .amount-product {
-              width: 80%;
-              height: 1.5rem;
+            .amount-input {
+              width: 100%;
+              height: 1.7rem;
               outline: none;
               border: 0.1rem solid var(--text-color);
               padding-left: 0.3rem;
