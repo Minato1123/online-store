@@ -15,6 +15,7 @@ export const useUsersStore = defineStore('users', () => {
   const email = useLocalStorage<string>('user-email', null, { serializer: StorageSerializers.string })
   const password = useLocalStorage<string>('user-password', null, { serializer: StorageSerializers.string })
 
+  const hasErrorInLogin = ref(false)
   const { emit: emitLoginStatusUpdated } = useLoginStatusUpdatedEventBus()
   const userData = ref<loginResponseData>()
 
@@ -118,17 +119,22 @@ export const useUsersStore = defineStore('users', () => {
   const [loginEmail, loginPassword] = useLoginFieldModel(['email', 'password'])
 
   const handleLogin = handleLoginSubmit(async (values) => {
-    userData.value = (await login({
-      email: values.email,
-      password: values.password,
-    })).data
-    userToken.value = userData.value.token
-    userId.value = userData.value.userId
+    try {
+      userData.value = (await login({
+        email: values.email,
+        password: values.password,
+      })).data
+      userToken.value = userData.value.token
+      userId.value = userData.value.userId
 
-    await nextTick()
-    emitLoginStatusUpdated()
-    await updateLocalCartToDB(userId.value)
-    router.replace({ name: 'home' })
+      await nextTick()
+      emitLoginStatusUpdated()
+      await updateLocalCartToDB(userId.value)
+      router.replace({ name: 'home' })
+    }
+    catch (error) {
+      hasErrorInLogin.value = true
+    }
   })
 
   const { errors: registerErrors, useFieldModel: useRegisterFieldModel, handleSubmit: handleRegisterSubmit, resetForm } = useForm({
@@ -145,18 +151,24 @@ export const useUsersStore = defineStore('users', () => {
       birthday: values.birthday,
       mobile: values.mobile,
     }
-    await addUser(newUser)
-    router.replace({ name: 'login' })
 
-    resetForm({
-      values: {
-        email: '',
-        password: '',
-        name: '',
-        birthday: '',
-        mobile: '',
-      },
-    })
+    try {
+      await addUser(newUser)
+      router.replace({ name: 'login' })
+
+      resetForm({
+        values: {
+          email: '',
+          password: '',
+          name: '',
+          birthday: '',
+          mobile: '',
+        },
+      })
+    }
+    catch (error) {
+      hasErrorInLogin.value = true
+    }
   })
 
   const isLoggedIn = computed(() => {
@@ -195,6 +207,7 @@ export const useUsersStore = defineStore('users', () => {
   return {
     userToken,
     userId,
+    hasErrorInLogin,
     handleLogin,
     loginErrors,
     loginEmail,

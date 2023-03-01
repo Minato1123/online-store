@@ -2,17 +2,30 @@
 import { RouterLink } from 'vue-router'
 import { useUsersStore } from '@/stores/user'
 import PButton from '@/components/PButton.vue'
+import InfoDialog from '@/components/InfoDialog.vue'
+import type { BtnType, InfoType } from '@/types'
 
-const textInBtnLogin = {
+const textInBtnLogin: BtnType = {
   text: '登入',
   color: 'main-color',
 }
 
+const textInLoginFailDialog: InfoType = {
+  text: '登入失敗！',
+  additionalText: '請確認帳號密碼是否正確。',
+  color: 'main-product-color',
+  borderColor: 'main-product-color',
+  textInBtnOK: {
+    text: '確認',
+    color: 'main-product-color',
+  },
+}
+
 const { rememberAccount, forgetAccount } = useUsersStore()
-const { email, password } = storeToRefs(useUsersStore())
+const { hasErrorInLogin, email, password } = storeToRefs(useUsersStore())
 
 const { handleLogin } = useUsersStore()
-const { loginErrors, loginEmail, loginPassword } = storeToRefs(useUsersStore())
+const { loginEmail, loginPassword } = storeToRefs(useUsersStore())
 const { email: rememberEmail, password: rememberPassword } = storeToRefs(useUsersStore())
 if (rememberEmail.value != null && rememberPassword.value != null) {
   email.value = rememberEmail.value
@@ -121,6 +134,7 @@ watch([loginEmail, loginPassword], () => {
       </div>
     </div>
   </form>
+  <InfoDialog v-if="hasErrorInLogin" :text-in-dialog="textInLoginFailDialog" @close-info-dialog="hasErrorInLogin = false" />
 </template>
 
 <style lang="scss" scoped>

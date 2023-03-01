@@ -2,14 +2,27 @@
 import { RouterLink } from 'vue-router'
 import { useUsersStore } from '@/stores/user'
 import PButton from '@/components/PButton.vue'
+import InfoDialog from '@/components/InfoDialog.vue'
+import type { BtnType, InfoType } from '@/types/index'
 
-const textInBtnRegister = {
+const textInBtnRegister: BtnType = {
   text: '註冊',
   color: 'main-color',
 }
 
+const textInRegisterFailDialog: InfoType = {
+  text: '註冊失敗！',
+  additionalText: '此信箱已被使用過。',
+  color: 'main-product-color',
+  borderColor: 'main-product-color',
+  textInBtnOK: {
+    text: '確認',
+    color: 'main-product-color',
+  },
+}
+
 const { handleRegister } = useUsersStore()
-const { registerErrors, registerEmail, registerPassword, registerName, registerBirthday, registerMobile } = storeToRefs(useUsersStore())
+const { hasErrorInLogin, registerErrors, registerEmail, registerPassword, registerName, registerBirthday, registerMobile } = storeToRefs(useUsersStore())
 </script>
 
 <template>
@@ -107,6 +120,7 @@ const { registerErrors, registerEmail, registerPassword, registerName, registerB
       </div>
     </div>
   </form>
+  <InfoDialog v-if="hasErrorInLogin" :text-in-dialog="textInRegisterFailDialog" @close-info-dialog="hasErrorInLogin = false" />
 </template>
 
 <style lang="scss" scoped>
