@@ -22,7 +22,7 @@ app.use(FloatingVue, {
       triggers: [],
       hideTriggers: [],
     },
-    'login-tooltip': {
+    'nav-tooltip': {
       $extend: 'dropdown',
       placement: 'bottom',
       triggers: ['hover'],

@@ -104,10 +104,17 @@ function handleEnter(e: KeyboardEvent) {
         </button>
       </div>
       <div class="nav-btns">
-        <button class="btn-bell">
-          <icon-mdi-bell-outline />
-        </button>
-        <VDropdown theme="login-tooltip">
+        <VDropdown theme="nav-tooltip">
+          <button class="btn-bell">
+            <icon-mdi-bell-outline />
+          </button>
+          <template #popper>
+            <div>
+              新消息！
+            </div>
+          </template>
+        </VDropdown>
+        <VDropdown theme="nav-tooltip">
           <button>
             <RouterLink
               :to="userPageRoute"
