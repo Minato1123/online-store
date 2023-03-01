@@ -64,7 +64,7 @@ export interface InfoType {
   iconBeforeText?: Component
   text: string
   additionalText?: string
-  color: string
+  color: 'main-color' | 'main-product-color'
   borderColor: string
   textInBtnNO?: BtnType
   textInBtnOK?: BtnType

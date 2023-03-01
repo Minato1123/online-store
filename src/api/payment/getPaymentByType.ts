@@ -9,12 +9,12 @@ export interface GetPaymentByTypeResponseData {
   id: number
   userId: number
   type: 'credit-card' | 'transfer'
-  cardNumber: string | null
-  cardOwner: string | null
-  cardValidDate: string | null
-  cardValidCode: string | null
-  bankCode: string | null
-  bankAccount: string | null
+  cardNumber: string
+  cardOwner: string
+  cardValidDate: string
+  cardValidCode: string
+  bankCode: string
+  bankAccount: string
 }
 
 export function getPaymentByType({ userId, type }: GetPaymentByTypeRequestData) {

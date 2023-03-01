@@ -4,6 +4,7 @@ import { OnClickOutside } from '@vueuse/components'
 import PButton from './PButton.vue'
 import type { GetOrderSerialNumberByStatusResponseData } from '@/api/orders/getOrderSerialNumberByStatus'
 import { type GetProductListFromBoughtByOrderIdResponseData, getProductListFromBoughtByOrderId } from '@/api/boughtItems/getProductListFromBoughtByOrderId'
+import type { BtnType } from '@/types'
 
 const props = defineProps({
   order: {
@@ -49,12 +50,12 @@ const deliveryMethod = {
   'convenience-store': '超商取貨',
 }
 
-const textInBtnOK = {
+const textInBtnOK: BtnType = {
   text: 'OK',
   color: 'main-color',
 }
 
-const textInBtnCancel = {
+const textInBtnCancel: BtnType = {
   text: '聯絡客服',
   color: 'main-product-color',
 }
@@ -119,8 +120,8 @@ onBeforeUnmount(() => {
                 {{ item.name }}
               </div>
               <div>{{ item.specificationName }}</div>
-              <div>{{ item.amount }}</div>
-              <div>{{ item.price * item.amount }}</div>
+              <div>{{ item.amount }} 項</div>
+              <div>NT$ {{ item.price * item.amount }}</div>
             </div>
           </div>
         </div>

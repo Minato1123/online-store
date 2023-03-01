@@ -7,6 +7,7 @@ import { useOrderDataStore } from '@/stores/orderData'
 import { getCurrentUser } from '@/api/users/getCurrentUser'
 import { useUsersStore } from '@/stores/user'
 import type { GetCurrentUserResponseData } from '@/api/users/getCurrentUser'
+import type { BtnType } from '@/types'
 
 const isOpenDiscount = ref(false)
 const codeForDiscount = ref('')
@@ -41,7 +42,7 @@ function handleSameUserBtnClick() {
   isSameWithUser.value = !isSameWithUser.value
 }
 
-const textInCheckoutBtn = {
+const textInCheckoutBtn: BtnType = {
   text: '確認結帳',
   color: 'main-product-color',
 }
@@ -65,7 +66,7 @@ function handleSubmit() {
         <div class="accept-container">
           <div class="title">
             收件資料
-            <button class="same-user-btn" @click="handleSameUserBtnClick">
+            <button type="button" class="same-user-btn" @click="handleSameUserBtnClick">
               <icon-material-symbols-check-box-outline v-if="isSameWithUser" /><icon-material-symbols-check-box-outline-blank v-else />同使用者資料
             </button>
           </div>
@@ -129,11 +130,13 @@ function handleSubmit() {
           </div>
         </div>
         <div class="check-container">
-          <button class="discount-btn" @click="isOpenDiscount = !isOpenDiscount">
+          <button type="button" class="discount-btn" @click="isOpenDiscount = !isOpenDiscount">
             使用優惠代碼
           </button>
           <div v-show="isOpenDiscount" class="discount-input">
-            <input v-model="codeForDiscount" type="text"><button>套用</button>
+            <input v-model="codeForDiscount" type="text"><button type="button">
+              套用
+            </button>
           </div>
           <div class="detail">
             共 {{ slotProps.num }} 件商品｜總金額 NT$ {{ slotProps.total }}
