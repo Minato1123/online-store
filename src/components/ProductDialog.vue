@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { type PropType, Teleport } from 'vue'
 import { OnClickOutside } from '@vueuse/components'
-import type { InfoType, Product } from '../types/index'
+import type { BtnType, InfoType, Product } from '../types/index'
 import { getPublicImgSrc } from '../utils/index'
 import { useCartStore } from '../stores/shoppingCart'
 import PButton from './PButton.vue'
@@ -62,7 +62,7 @@ if (productSpec.value.length > 0)
 
 const hasSpecifications = computed(() => productSpec.value.length > 0)
 
-const textInBtnAddCart = {
+const textInBtnAddCart: BtnType = {
   text: '加入購物車',
   color: 'main-product-color',
 }

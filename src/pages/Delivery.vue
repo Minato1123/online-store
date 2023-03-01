@@ -16,12 +16,13 @@ import { getProductSpecificationsByProductId } from '@/api/productSpecifications
 import { deleteProductFromCart } from '@/api/cartItems/deleteProductFromCart'
 import { useUsersStore } from '@/stores/user'
 import { useCartUpdatedEventBus } from '@/composables/useCartUpdatedEventBus'
+import type { BtnType, InfoType } from '@/types'
 
 const { orderData } = storeToRefs(useOrderDataStore())
 const { userId } = storeToRefs(useUsersStore())
 const { emit: emitCartUpdated } = useCartUpdatedEventBus()
 
-const textInSureCheckoutBtn = {
+const textInSureCheckoutBtn: BtnType = {
   text: '確認付款',
   color: 'main-product-color',
   afterTextIcon: IconMoneyDollarCircleLine,
@@ -137,7 +138,7 @@ onMounted(async () => {
   fetchToBuyProductList()
 })
 
-const orderSuccessDialog = {
+const orderSuccessDialog: InfoType = {
   iconBeforeText: IconCheckCircleRounded,
   text: '訂單已送出！',
   color: 'main-color',
@@ -148,7 +149,7 @@ const orderSuccessDialog = {
   },
 }
 
-const orderFailDialog = {
+const orderFailDialog: InfoType = {
   iconBeforeText: IconCrossCircle,
   text: '訂單失敗！',
   additionalText: '請稍後再試一次',
@@ -336,14 +337,6 @@ function handleSubmit() {
                   <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="orderData.paymentType !== 'cash-on-delivery'" /><icon-ic-baseline-radio-button-checked v-show="orderData.paymentType === 'cash-on-delivery'" /><input v-model="orderData.paymentType" class="input-radio" value="cash-on-delivery" type="radio" name="payment">貨到付款</label>
                 </div>
               </template>
-            <!-- <template #decorator="context">
-              <div class="checked-deco">
-                <icon-ic-baseline-radio-button-checked />
-              </div>
-              <div class="deco">
-                <icon-ic-baseline-radio-button-unchecked />
-              </div>
-            </template> -->
             </FormKit>
           </div>
           <div class="delivery-container">

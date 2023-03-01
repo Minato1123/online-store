@@ -55,7 +55,7 @@ export type { OrderPayment, OrderDelivery, OrderData } from '@/api/boughtItems/a
 
 export interface BtnType {
   text: string
-  color: string
+  color: 'main-product-color' | 'main-color' | 'match-color'
   beforeTextIcon?: Component
   afterTextIcon?: Component
 }
@@ -86,4 +86,18 @@ export interface User {
   birthday: string
   mobile: string
   address: string | undefined
+}
+
+export interface CreditCradType {
+  id: number
+  cardNumber: string
+  cardOwner: string
+  cardValidDate: string
+  cardValidCode: string
+}
+
+export interface BankType {
+  id: number
+  bankCode: string
+  bankAccount: string
 }
