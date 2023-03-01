@@ -307,7 +307,7 @@ function handleThePage(page: number) {
           </div>
         </div>
       </div>
-      <div v-if="pagination == null && productList.length <= 0 && hasPageAttr" class="no-products">
+      <div v-if="productList.length <= 0 && hasPageAttr" class="no-products">
         目前沒有商品喔～ 去看看其他分類吧！
       </div>
     </div>
