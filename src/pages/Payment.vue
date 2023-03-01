@@ -1,32 +1,89 @@
 <script lang="ts" setup>
 import PUserLayout from '@/components/PUserLayout.vue'
+import AddCreditCardDialog from '@/components/AddCreditCardDialog.vue'
+import AddBankDialog from '@/components/AddBankDialog.vue'
+import { getPaymentByType } from '@/api/payment/getPaymentByType'
+import type { BankType, CreditCradType } from '@/types/index'
+import type { GetPaymentByTypeResponseData } from '@/api/payment/getPaymentByType'
+import { useUsersStore } from '@/stores/user'
 
-const userCreditCards = ref([
-  {
-    name: '台新國際商業銀行 A',
-    number: '*5678',
-  },
-  {
-    name: '台新國際商業銀行 B',
-    number: '*8765',
-  },
-])
+const { userId } = storeToRefs(useUsersStore())
+const userCreditCards = ref<GetPaymentByTypeResponseData[]>()
+const userAccounts = ref<GetPaymentByTypeResponseData[]>()
 
-const userAccounts = ref([
-  {
-    name: '中華信託商業銀行',
-    number: '*6733',
-  },
-  {
-    name: '中華信託商業銀行',
-    number: '*6259',
-  },
-  {
-    name: '中華信託商業銀行',
-    number: '*9489',
-  },
+async function fetchPaymentList() {
+  userCreditCards.value = (await getPaymentByType({ userId: userId.value, type: 'credit-card' })).data
+  userAccounts.value = (await getPaymentByType({ userId: userId.value, type: 'transfer' })).data
+}
 
-])
+onMounted(() => {
+  fetchPaymentList()
+})
+
+const isOpenCreditCardtDialog = ref(false)
+const isOpenBankDialog = ref(false)
+type TypeTarget = 'add' | 'edit'
+const targetOfDialog = ref<TypeTarget>()
+const creditCardData = ref<CreditCradType>({
+  id: -1,
+  cardNumber: '',
+  cardOwner: '',
+  cardValidDate: '',
+  cardValidCode: '',
+})
+
+function handleClickCreditCardBtn(target: TypeTarget, data?: GetPaymentByTypeResponseData) {
+  isOpenCreditCardtDialog.value = true
+  targetOfDialog.value = target
+  if (target === 'add') {
+    creditCardData.value = {
+      id: -1,
+      cardNumber: '',
+      cardOwner: '',
+      cardValidDate: '',
+      cardValidCode: '',
+    }
+  }
+  else if (target === 'edit') {
+    if (data) {
+      creditCardData.value = {
+        id: data.id,
+        cardNumber: data.cardNumber ?? '',
+        cardOwner: data.cardOwner ?? '',
+        cardValidDate: data.cardValidDate ?? '',
+        cardValidCode: data.cardValidCode ?? '',
+      }
+    }
+  }
+}
+
+const bankData = ref<BankType>({
+  id: -1,
+  bankCode: '',
+  bankAccount: '',
+})
+
+function handleClickBankBtn(target: TypeTarget, data?: GetPaymentByTypeResponseData) {
+  isOpenBankDialog.value = true
+  targetOfDialog.value = target
+
+  if (target === 'add') {
+    bankData.value = {
+      id: -1,
+      bankCode: '',
+      bankAccount: '',
+    }
+  }
+  else if (target === 'edit') {
+    if (data) {
+      bankData.value = {
+        id: data.id,
+        bankCode: data.bankCode ?? '',
+        bankAccount: data.bankAccount ?? '',
+      }
+    }
+  }
+}
 </script>
 
 <template>
@@ -38,17 +95,17 @@ const userAccounts = ref([
             信用卡 / 金融卡
           </div>
           <div class="credit-card-content content">
-            <div v-for="(card, i) in userCreditCards" :key="`card-${i + 1}`" class="item">
-              <div>{{ i + 1 }}</div>
+            <div v-for="(data, i) in userCreditCards" :key="`card-${i + 1}`" class="item" @click="handleClickCreditCardBtn('edit', data)">
+              <div>-{{ i + 1 }}-</div>
               <div class="item-name">
-                {{ card.name }}
+                {{ data.cardOwner }}
               </div>
               <div class="item-number">
-                {{ card.number }}
+                *{{ data.cardNumber?.slice(-4) }}
               </div>
             </div>
             <div class="add-btn-container">
-              <button class="add-btn">
+              <button class="add-btn" @click="handleClickCreditCardBtn('add')">
                 <icon-material-symbols-add />新增信用卡
               </button>
             </div>
@@ -59,17 +116,17 @@ const userAccounts = ref([
             銀行帳號
           </div>
           <div class="bank-content content">
-            <div v-for="(account, i) in userAccounts" :key="`account-${i + 1}`" class="item">
-              <div>{{ i + 1 }}</div>
+            <div v-for="(account, i) in userAccounts" :key="`account-${i + 1}`" class="item" @click="handleClickBankBtn('edit', account)">
+              <div>-{{ i + 1 }}-</div>
               <div class="item-name">
-                {{ account.name }}
+                {{ account.bankCode }}
               </div>
               <div class="item-number">
-                {{ account.number }}
+                *{{ account.bankAccount?.slice(-4) }}
               </div>
             </div>
             <div class="add-btn-container">
-              <button class="add-btn">
+              <button class="add-btn" @click="handleClickBankBtn('add')">
                 <icon-material-symbols-add />新增銀行帳號
               </button>
             </div>
@@ -78,6 +135,8 @@ const userAccounts = ref([
       </div>
     </div>
   </PUserLayout>
+  <AddCreditCardDialog v-if="isOpenCreditCardtDialog && targetOfDialog" :target="targetOfDialog" :current-credit-card-data="creditCardData" @close-dialog="isOpenCreditCardtDialog = false" @update-payment-list="fetchPaymentList" />
+  <AddBankDialog v-if="isOpenBankDialog && targetOfDialog" :target="targetOfDialog" :current-bank-data="bankData" @close-dialog="isOpenBankDialog = false" @update-payment-list="fetchPaymentList" />
 </template>
 
 <style lang="scss" scoped>

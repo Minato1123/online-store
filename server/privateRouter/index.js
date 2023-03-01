@@ -12,6 +12,11 @@ const getProductListInFollowingByUserId = require('./getProductListInFollowingBy
 const getOrder = require('./getOrder')
 const addOrder = require('./addOrder')
 const getProductListInBought = require('./getProductListInBought')
+const addPayment = require('./addPayment')
+const deletePayment = require('./deletePayment')
+const getPayment = require('./getPayment')
+const getPaymentByUserId = require('./getPaymentByUserId')
+const updatePayment = require('./updatePayment')
 const logout = require('./logout')
 
 module.exports = function usePrivateRouter(router, data, tokenMap) {
@@ -30,6 +35,11 @@ module.exports = function usePrivateRouter(router, data, tokenMap) {
     getOrder,
     addOrder,
     getProductListInBought,
+    addPayment,
+    deletePayment,
+    getPayment,
+    getPaymentByUserId,
+    updatePayment,
     logout,
   ].forEach(fn => fn(router, data, tokenMap))
 }
