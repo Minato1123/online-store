@@ -21,6 +21,7 @@ usePublicRouter(publicRouter, data, tokenMap)
 
 // 檢查 token 有無過期（就算沒 token 也沒差）
 app.use((ctx, next) => {
+  // eslint-disable-next-line no-console
   console.log(ctx.method, ctx.URL.pathname, ctx.URL.search)
   const theToken = ctx.request.headers['access-token']
   if (theToken === '') {

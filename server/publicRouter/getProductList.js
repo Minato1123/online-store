@@ -13,8 +13,8 @@ module.exports = defineRoute((router, data) => {
       productList = productList.filter(p => p.subCategoryId === parseInt(ctx.query.subCategoryId))
     else if (ctx.query.query)
       productList = productList.filter(p => p.name.includes(ctx.query.query))
-    else if (ctx.query.productId && ctx.query.categoryId && ctx.query.subCategoryId)
-      return productList.filter(p => p.id !== parseInt(ctx.query.productId) && p.categoryId === parseInt(ctx.query.categoryId) && p.subCategoryId === parseInt(ctx.query.subCategoryId))
+    else if (ctx.query.productId && ctx.query.subCategoryId)
+      return productList.filter(p => p.id !== parseInt(ctx.query.productId) && p.subCategoryId === parseInt(ctx.query.subCategoryId))
 
     if (sortBy === 'id') {
       if (orderBy === 'asc')
