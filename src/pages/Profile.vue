@@ -7,16 +7,22 @@ import { updateUserData } from '@/api/users/updateUserData'
 import IconCheckCircleRounded from '~icons/material-symbols/check-circle-rounded'
 import IconCrossCircle from '~icons/gridicons/cross-circle'
 import { useUsersStore } from '@/stores/user'
+import { useLoadingStore } from '@/stores/loading'
 import { deleteUser } from '@/api/users/deleteUser'
 import router from '@/router'
+import type { BtnType, InfoType } from '@/types'
 
 const { userId, isLoggedIn } = storeToRefs(useUsersStore())
 const { forcedLogout } = useUsersStore()
+const { startLoading, endLoading } = useLoadingStore()
 const user = ref<GetCurrentUserResponseData>()
 async function fetchCurrentUser() {
   if (!isLoggedIn.value)
     return
+
+  startLoading()
   user.value = (await getCurrentUser({ id: userId.value })).data
+  endLoading()
 }
 
 onMounted(() => {
@@ -79,12 +85,12 @@ function handleLogout() {
   router.replace({ name: 'home' })
 }
 
-const saveBtnContent = {
+const saveBtnContent: BtnType = {
   text: '儲存',
   color: 'main-color',
 }
 
-const saveBtnSuccessDialog = {
+const saveBtnSuccessDialog: InfoType = {
   iconBeforeText: IconCheckCircleRounded,
   text: '儲存成功！',
   color: 'main-color',
@@ -95,7 +101,7 @@ const saveBtnSuccessDialog = {
   },
 }
 
-const saveBtnFailDialog = {
+const saveBtnFailDialog: InfoType = {
   iconBeforeText: IconCrossCircle,
   text: '儲存失敗！',
   additionalText: '請稍後再試一次',
@@ -107,7 +113,7 @@ const saveBtnFailDialog = {
   },
 }
 
-const deleteBtnSuccessDialog = {
+const deleteBtnSuccessDialog: InfoType = {
   iconBeforeText: IconCheckCircleRounded,
   text: '刪除成功！',
   color: 'main-color',
@@ -118,7 +124,7 @@ const deleteBtnSuccessDialog = {
   },
 }
 
-const deleteBtnFailDialog = {
+const deleteBtnFailDialog: InfoType = {
   iconBeforeText: IconCrossCircle,
   text: '刪除失敗！',
   additionalText: '請稍後再試一次',

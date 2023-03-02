@@ -6,14 +6,18 @@ import { getPaymentByType } from '@/api/payment/getPaymentByType'
 import type { BankType, CreditCradType } from '@/types/index'
 import type { GetPaymentByTypeResponseData } from '@/api/payment/getPaymentByType'
 import { useUsersStore } from '@/stores/user'
+import { useLoadingStore } from '@/stores/loading'
 
 const { userId } = storeToRefs(useUsersStore())
+const { startLoading, endLoading } = useLoadingStore()
 const userCreditCards = ref<GetPaymentByTypeResponseData[]>()
 const userAccounts = ref<GetPaymentByTypeResponseData[]>()
 
 async function fetchPaymentList() {
+  startLoading()
   userCreditCards.value = (await getPaymentByType({ userId: userId.value, type: 'credit-card' })).data
   userAccounts.value = (await getPaymentByType({ userId: userId.value, type: 'transfer' })).data
+  endLoading()
 }
 
 onMounted(() => {

@@ -4,8 +4,11 @@ import Nav from './components/Nav.vue'
 import MenuMobile from './components/MenuMobile.vue'
 import Footer from './components/Footer.vue'
 import Top from './components/Top.vue'
+import Loading from './components/Loading.vue'
+import { useLoadingStore } from './stores/loading'
 
 const isOpenMenu = ref(false)
+const { isLoading } = storeToRefs(useLoadingStore())
 </script>
 
 <template>
@@ -16,6 +19,7 @@ const isOpenMenu = ref(false)
   </div>
   <Footer class="footer" />
   <Top class="top" />
+  <Loading v-if="isLoading" />
 </template>
 
 <style scoped lang="scss">

@@ -12,6 +12,7 @@ import { useCartStore } from '@/stores/shoppingCart'
 import IconCartPlus from '~icons/bi/cart-plus'
 import IconCartCheckFill from '~icons/bi/cart-check-fill'
 import { useUsersStore } from '@/stores/user'
+import { useLoadingStore } from '@/stores/loading'
 
 import { getProduct } from '@/api/products/getProduct'
 import type { GetProductResponseData } from '@/api/products/getProduct'
@@ -43,25 +44,34 @@ const category = ref<GetCategoryResponseData | null>(null)
 const subCategory = ref<GetSubCategoryResponseData | null>(null)
 const recommendProductList = ref<GetProductResponseData[]>([])
 const followProductList = ref<GetProductListFromFollowingByUserIdResponseData[]>([])
+const { startLoading, endLoading } = useLoadingStore()
 
 const { userId, isLoggedIn } = storeToRefs(useUsersStore())
 const { addLocalCart } = useCartStore()
 const { emit: emitCartUpdated } = useCartUpdatedEventBus()
 
 async function fetchProduct() {
+  startLoading()
   product.value = (await getProduct({ id: Number(productId.value) })).data
+  endLoading()
 }
 
 async function fetchProductSpec() {
+  startLoading()
   productSpec.value = (await getProductSpecificationsByProductId({ productId: Number(productId.value) })).data
+  endLoading()
 }
 
 async function fetchProductImages() {
+  startLoading()
   productImages.value = (await getProductImagesByProductId({ productId: Number(productId.value) })).data
+  endLoading()
 }
 
 async function fetchProductDescription() {
+  startLoading()
   productDescription.value = (await getProductDescriptionByProductId({ productId: Number(productId.value) })).data
+  endLoading()
 }
 
 async function fetchCategory() {
@@ -79,7 +89,10 @@ async function fetchSubCategory() {
 async function fetchRecommendProductList() {
   if (product.value == null)
     return
+
+  startLoading()
   recommendProductList.value = (await getRecommendProductList({ productId: product.value.id, subCategoryId: Number(product.value.subCategoryId) })).data
+  endLoading()
 }
 
 async function fetchFollowProductList() {

@@ -1,27 +1,34 @@
 <script lang="ts" setup>
+import { useLoadingStore } from '../stores/loading'
 import PUserLayout from '@/components/PUserLayout.vue'
 import OrderDialog from '@/components/OrderDialog.vue'
 import { type GetOrderSerialNumberByStatusResponseData, getOrderSerialNumberByStatus } from '@/api/orders/getOrderSerialNumberByStatus'
 import { useUsersStore } from '@/stores/user'
-import { type GetProductListFromBoughtByOrderIdResponseData, getProductListFromBoughtByOrderId } from '@/api/boughtItems/getProductListFromBoughtByOrderId'
 const { userId, isLoggedIn } = storeToRefs(useUsersStore())
+const { startLoading, endLoading } = useLoadingStore()
 
 const orderListForPrepared = ref<GetOrderSerialNumberByStatusResponseData[]>([])
 const orderListForShipped = ref<GetOrderSerialNumberByStatusResponseData[]>([])
 const orderListForCompleted = ref<GetOrderSerialNumberByStatusResponseData[]>([])
 
 async function fetchBoughtItemsInPrepared() {
+  startLoading()
   orderListForPrepared.value = (await getOrderSerialNumberByStatus({ userId: userId.value, status: 'prepared' })).data
+  endLoading()
   orderListForPrepared.value.sort((a, b) => +b.purchaseTime - +a.purchaseTime)
 }
 
 async function fetchBoughtItemsInShipped() {
+  startLoading()
   orderListForShipped.value = (await getOrderSerialNumberByStatus({ userId: userId.value, status: 'shipped' })).data
+  endLoading()
   orderListForShipped.value.sort((a, b) => +b.purchaseTime - +a.purchaseTime)
 }
 
 async function fetchBoughtItemsInCompleted() {
+  startLoading()
   orderListForCompleted.value = (await getOrderSerialNumberByStatus({ userId: userId.value, status: 'completed' })).data
+  endLoading()
   orderListForCompleted.value.sort((a, b) => +b.purchaseTime - +a.purchaseTime)
 }
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import _ from 'lodash-es'
+import { useLoadingStore } from '../stores/loading'
 import PMain from '@/components/PMain.vue'
 import { type GetCategoryResponseData, getCategory } from '@/api/categories/getCategory'
 import { getProductListBySubCategory } from '@/api/products/getProductListBySubCategory'
@@ -14,6 +15,8 @@ const route = useRoute()
 const categoryId = computed(() => route.params.categoryId)
 const subCategoryId = computed(() => route.params.subCategoryId)
 
+const { startLoading, endLoading } = useLoadingStore()
+
 const productListBySubCategory = ref<GetProductResponseData[]>()
 const productListBySubCategoryPagination = ref<Pagination>()
 const totalNumOfProductsBySubCategory = ref<number>()
@@ -27,7 +30,9 @@ const fetchProductListBySubCategoryParams = ref<GetProductBySubCategoryRequestDa
   orderBy: 'asc',
 })
 async function fetchProductListByCategory() {
+  startLoading()
   const data = (await getProductListBySubCategory(fetchProductListBySubCategoryParams.value)).data
+  endLoading()
   productListBySubCategory.value = data.productList
   productListBySubCategoryPagination.value = data.pagination
 }

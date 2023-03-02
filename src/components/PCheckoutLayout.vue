@@ -11,6 +11,7 @@ import type { GetProductListFromBoughtByOrderIdResponseData } from '@/api/bought
 import type { GetOrderByOrderIdResponseData } from '@/api/orders/getOrder'
 import { useUsersStore } from '@/stores/user'
 import { getOrderByOrderId } from '@/api/orders/getOrder'
+import { useLoadingStore } from '@/stores/loading'
 
 const props = defineProps({
   target: {
@@ -27,11 +28,15 @@ const cartList = ref<GetProductListFromShoppingCartByUserIdResponseData[]>([])
 const cartProductList = ref<ProductInCart[]>([])
 const order = ref<GetOrderByOrderIdResponseData>()
 const boughtProductList = ref<GetProductListFromBoughtByOrderIdResponseData[]>([])
+const { startLoading, endLoading } = useLoadingStore()
 async function fetchCartList() {
+  startLoading()
   cartList.value = (await getProductListFromShoppingCartByUserId({ userId: userId.value })).data
+  endLoading()
 }
 
 async function fetchCartProductList() {
+  startLoading()
   cartProductList.value = await Promise.all(cartList.value.map(async (item) => {
     const product = (await getProduct({ id: item.productId })).data
     const productImage = (await getProductImagesByProductId({ productId: item.productId })).data
@@ -50,18 +55,25 @@ async function fetchCartProductList() {
       specificationName: productSpec.find(spec => spec.id === item.specificationId)?.specName ?? '無',
     }
   }))
+  endLoading()
 }
 
 async function fetchOrder() {
   if (props.orderId == null)
     return
+
+  startLoading()
   order.value = (await getOrderByOrderId({ serialNumber: props.orderId })).data
+  endLoading()
 }
 
 async function fetchBoughtProductList() {
   if (props.orderId == null)
     return
+
+  startLoading()
   boughtProductList.value = (await getProductListFromBoughtByOrderId({ orderId: props.orderId })).data
+  endLoading()
 }
 
 onMounted(async () => {

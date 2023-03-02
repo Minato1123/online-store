@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { RouterLink } from 'vue-router'
 import { getPublicImgSrc } from '../utils/index'
+import { useLoadingStore } from '../stores/loading'
 import { useUsersStore } from '@/stores/user'
 import PButton from '@/components/PButton.vue'
 import IconShoppingBasketLine from '~icons/ri/shopping-basket-line'
@@ -11,7 +12,7 @@ import type { GetProductListFromShoppingCartByUserIdResponseData } from '@/api/c
 import { getProduct } from '@/api/products/getProduct'
 import { getProductImagesByProductId } from '@/api/productImages/getProductImagesByProductId'
 import { getProductSpecificationsByProductId } from '@/api/productSpecifications/getProductSpecificationsByProductId'
-import type { ProductInCart } from '@/types'
+import type { BtnType, ProductInCart } from '@/types'
 import { deleteProductFromCart } from '@/api/cartItems/deleteProductFromCart'
 import { updateProductToShoppingCart } from '@/api/cartItems/updateProductToShoppingCart'
 import { useCartUpdatedEventBus } from '@/composables/useCartUpdatedEventBus'
@@ -20,18 +21,23 @@ import { useCartStore } from '@/stores/shoppingCart'
 const { updateAmountOfProductInLocalCart, deleteAllLocalCart, removeProductInLocalCart } = useCartStore()
 const { cartList } = storeToRefs(useCartStore())
 const { userId, isLoggedIn } = storeToRefs(useUsersStore())
+const { startLoading, endLoading } = useLoadingStore()
 
 const { emit: emitCartUpdated } = useCartUpdatedEventBus()
 
 const shoppingCartList = ref<GetProductListFromShoppingCartByUserIdResponseData[]>()
 async function fetchCartItemsByUserId() {
-  if (isLoggedIn.value)
+  if (isLoggedIn.value) {
+    startLoading()
     shoppingCartList.value = (await getProductListFromShoppingCartByUserId({ userId: userId.value })).data
+    endLoading()
+  }
 }
 
 const cartProductList = ref<ProductInCart[]>([])
 async function fetchCartProductList() {
   if (isLoggedIn.value) {
+    startLoading()
     cartProductList.value = await Promise.all(
       (shoppingCartList.value ?? []).map(async (item) => {
         const product = (await getProduct({ id: item.productId })).data
@@ -51,6 +57,7 @@ async function fetchCartProductList() {
         }
       }),
     )
+    endLoading()
   }
   else {
     cartProductList.value = cartList.value ?? []
@@ -65,13 +72,13 @@ onMounted(async () => {
 const numOfproductCart = computed(() => cartProductList.value.reduce((acc, cur) => acc + cur.amount, 0))
 const total = computed(() => cartProductList.value.reduce((acc, cur) => acc + cur.amount * cur.price, 0))
 
-const textInGoShoppingBtn = {
+const textInGoShoppingBtn: BtnType = {
   text: '繼續購物',
   color: 'match-color',
   afterTextIcon: IconShoppingBasketLine,
 }
 
-const textInCheckoutBtn = {
+const textInCheckoutBtn: BtnType = {
   text: '訂單結帳',
   color: 'main-product-color',
   afterTextIcon: IconCashRegister,

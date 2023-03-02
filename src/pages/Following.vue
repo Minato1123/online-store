@@ -4,10 +4,12 @@ import { type GetProductListFromFollowingByUserIdHasPageRequestData, getProductL
 import type { GetProductListFromFollowingByUserIdResponseData } from '@/api/followItems/getProductListFromFollowingByUserId'
 import type { GetProductResponseData } from '@/api/products/getProduct'
 import { useUsersStore } from '@/stores/user'
+import { useLoadingStore } from '@/stores/loading'
 import { getProduct } from '@/api/products/getProduct'
 import type { Pagination } from '@/api/products/getProductList'
 
 const { userId } = storeToRefs(useUsersStore())
+const { startLoading, endLoading } = useLoadingStore()
 const currentPageFollowingItemList = ref<GetProductListFromFollowingByUserIdResponseData[]>()
 const currentPageFollowingItemListPagination = ref<Pagination>()
 const productList = ref<GetProductResponseData[]>([])
@@ -20,7 +22,9 @@ const paramsInFetchFollowingList = ref<GetProductListFromFollowingByUserIdHasPag
 })
 
 async function fetchCurrentPageFollowingItemList() {
+  startLoading()
   const data = (await getProductListFromFollowingByUserIdHasPage(paramsInFetchFollowingList.value)).data
+  endLoading()
   currentPageFollowingItemList.value = data.productList
   currentPageFollowingItemListPagination.value = data.pagination
 }
@@ -28,10 +32,13 @@ async function fetchCurrentPageFollowingItemList() {
 async function fetchCurrentPageFollowingProductList() {
   if (currentPageFollowingItemList.value == null)
     return
+
+  startLoading()
   productList.value = await Promise.all(currentPageFollowingItemList.value.map(async (item) => {
     const product = (await getProduct({ id: item.productId })).data
     return product
   }))
+  endLoading()
 }
 
 watch(paramsInFetchFollowingList, async () => {

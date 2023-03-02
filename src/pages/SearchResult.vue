@@ -1,12 +1,14 @@
 <script setup lang="ts">
+import { useLoadingStore } from '../stores/loading'
 import PMain from '@/components/PMain.vue'
-import type { Response } from '@/utils/request'
 import { type GetProductListBySearchRequestData, getProductListListBySearch } from '@/api/products/getProductListBySearch'
 import type { GetProductResponseData } from '@/api/products/getProduct'
 import type { Pagination } from '@/api/products/getProductList'
 
 const route = useRoute()
 const queryKeyword = computed(() => String(route.query.keyword))
+
+const { startLoading, endLoading } = useLoadingStore()
 
 const productList = ref<GetProductResponseData[]>()
 const productListPagination = ref<Pagination>()
@@ -19,7 +21,9 @@ const paramsInFetchProductListBySearch = ref<GetProductListBySearchRequestData>(
 })
 
 async function fetchCurrentPageProductListBySearch() {
+  startLoading()
   const data = (await getProductListListBySearch(paramsInFetchProductListBySearch.value)).data
+  endLoading()
   productList.value = data.productList
   productListPagination.value = data.pagination
 }

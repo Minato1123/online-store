@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import _ from 'lodash-es'
 import Slide from '../components/Slide.vue'
+import { useLoadingStore } from '../stores/loading'
 import { getSlides } from '@/api/slides/getSlides'
 import type { GetSlideListResponseData } from '@/api/slides/getSlides'
 import { getProductList } from '@/api/products/getProductList'
@@ -10,9 +11,13 @@ import PMain from '@/components/PMain.vue'
 import type { GetProductResponseData } from '@/api/products/getProduct'
 import { getTotalNumOfProducts } from '@/api/products/getTotalNumOfProducts'
 
+const { startLoading, endLoading } = useLoadingStore()
+
 const slideList = ref<GetSlideListResponseData[]>()
 async function fetchSlides() {
+  startLoading()
   const s = await getSlides()
+  endLoading()
   slideList.value = s.data
 }
 
@@ -26,12 +31,16 @@ const fetchProductListParams = ref<GetProductRequestData>({
   orderBy: 'asc',
 })
 async function fetchProductList() {
+  startLoading()
   const data = (await getProductList(fetchProductListParams.value)).data
+  endLoading()
   productList.value = data.productList
   productPagination.value = data.pagination
 }
 async function fetchTotalNumOfProducts() {
+  startLoading()
   totalNumOfProducts.value = (await getTotalNumOfProducts()).data.numOfProducts
+  endLoading()
 }
 
 watch(fetchProductListParams, async () => {
