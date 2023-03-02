@@ -36,7 +36,7 @@ const address = computed(() => {
     return `${props.order.county} ${props.order.address}`
 
   else
-    return `${props.order.convenienceStoreData}`
+    return ''
 })
 
 const paymentMethod = {
@@ -111,7 +111,7 @@ onBeforeUnmount(() => {
           </div>
           <div class="order-methods">
             <div>付款方式｜{{ paymentMethod[order.paymentType] }}</div>
-            <div>配送方式｜{{ deliveryMethod[order.deliveryType] }}：{{ address }}</div>
+            <div>配送方式｜{{ deliveryMethod[order.deliveryType] }}<span v-if="address !== ''">：{{ address }}</span></div>
           </div>
           <div v-if="boughtItems" class="product-list-container">
             <div v-for="(item, i) in boughtItems" :key="`boughtItem-${i}`" class="product">

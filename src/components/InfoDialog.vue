@@ -14,8 +14,6 @@ const props = defineProps({
 
 const emit = defineEmits(['closeInfoDialog'])
 
-const isBackgroundLocked = useScrollLock(window.document.body)
-
 function closeInfoDialog() {
   emit('closeInfoDialog')
 }
@@ -24,6 +22,8 @@ window.addEventListener('keydown', (e) => {
   if (e.code === 'Escape')
     closeInfoDialog()
 }, false)
+
+const isBackgroundLocked = useScrollLock(window.document.body)
 
 onMounted(() => {
   isBackgroundLocked.value = true
