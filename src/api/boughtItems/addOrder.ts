@@ -49,7 +49,6 @@ export interface AddOrderResponseData {
   boughtItems: BoughtItem[]
   totalAmount: number
   totalPrice: number
-  purchaseTime: string
 }
 
 export function addOrder(data: AddOrderRequestData) {
@@ -67,11 +66,11 @@ export function addOrder(data: AddOrderRequestData) {
 
   if (isUserTokenValid(userToken.value) === false) {
     forcedLogout()
-    return { data: {} }
+    return { data: {} as AddOrderResponseData }
   }
 
   if (mockData.value == null)
-    return { data: {} }
+    return { data: {} as AddOrderResponseData }
 
   const { orderData, boughtItems } = data
   const orderList = mockData.value.orders
@@ -125,6 +124,6 @@ export function addOrder(data: AddOrderRequestData) {
       boughtItems: addedBoughtItems,
       totalAmount: addedOrderData.totalAmount,
       totalPrice: addedOrderData.totalPrice,
-    },
+    } as AddOrderResponseData,
   }
 }

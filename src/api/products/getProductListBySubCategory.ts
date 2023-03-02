@@ -36,7 +36,7 @@ export function getProductListBySubCategory({
   }
 
   if (mockData.value == null)
-    return { data: [] }
+    return { data: {} }
 
   let productList = [...mockData.value.products]
   productList = productList.filter(p => p.subCategoryId === subCategoryId)

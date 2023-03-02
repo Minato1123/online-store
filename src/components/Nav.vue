@@ -9,6 +9,7 @@ import { useUsersStore } from '@/stores/user'
 import { useLoginStatusUpdatedEventBus } from '@/composables/useLoginStatusUpdatedEventBus'
 import router from '@/router'
 import { useCartStore } from '@/stores/shoppingCart'
+import type { Ref } from 'vue'
 
 defineEmits(['toggleMenu'])
 
@@ -63,7 +64,7 @@ const userPageRoute = computed<RouteLocationRaw>(() => {
     return { name: 'login' }
 })
 
-const searchBtnRef = ref<HTMLElement | null>(null)
+const searchBtnRef: Ref<HTMLElement | null> = ref(null)
 const searchText = ref<string>('')
 function handleSearch() {
   searchText.value = searchText.value.trim()

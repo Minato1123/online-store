@@ -23,12 +23,12 @@ export function login(data: loginRequestData) {
   }
 
   if (mockData.value == null)
-    return { data: {} }
+    return { data: {} as loginResponseData }
 
   const users = mockData.value.users as any[]
   const user = users.find(u => u.email === data.email && u.password === data.password)
   if (user == null)
-    return { data: {} }
+    return { data: {} as loginResponseData }
 
   for (const [key, value] of tokenMap) {
     if (value === user.id) {

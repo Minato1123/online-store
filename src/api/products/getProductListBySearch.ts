@@ -36,8 +36,14 @@ export function getProductListListBySearch({
     })
   }
 
-  if (mockData.value == null)
-    return { data: [] }
+  if (mockData.value == null) {
+    return {
+      data: {} as {
+        productList: GetProductResponseData[]
+        pagination: Pagination
+      },
+    }
+  }
 
   let productList = [...mockData.value.products]
   productList = productList.filter(p => p.name.includes(query))

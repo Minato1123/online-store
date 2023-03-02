@@ -6,17 +6,18 @@ import IconCheckCircleRounded from '~icons/material-symbols/check-circle-rounded
 import IconCrossCircle from '~icons/gridicons/cross-circle'
 import { updateUserPasswordData } from '@/api/users/updateUserPassword'
 import { useUsersStore } from '@/stores/user'
+import type { BtnType, InfoType } from '@/types'
 
 const isDialogOpen = ref(false)
 const isSaveSuccess = ref(true)
 const { userId } = storeToRefs(useUsersStore())
 
-const saveBtnContent = {
+const saveBtnContent: BtnType = {
   text: '儲存',
   color: 'main-color',
 }
 
-const saveBtnSuccessDialog = {
+const saveBtnSuccessDialog: InfoType = {
   iconBeforeText: IconCheckCircleRounded,
   text: '儲存成功！',
   color: 'main-color',
@@ -27,7 +28,7 @@ const saveBtnSuccessDialog = {
   },
 }
 
-const saveBtnFailDialog = {
+const saveBtnFailDialog: InfoType = {
   iconBeforeText: IconCrossCircle,
   text: '儲存失敗！',
   additionalText: '請稍後再試一次',

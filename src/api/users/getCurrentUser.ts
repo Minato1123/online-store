@@ -30,17 +30,17 @@ export function getCurrentUser({ id }: GetCurrentUserRequestData) {
 
   if (isUserTokenValid(userToken.value) === false) {
     forcedLogout()
-    return
+    return { data: {} as GetCurrentUserResponseData }
   }
 
   if (mockData.value == null)
-    return
+    return { data: {} as GetCurrentUserResponseData }
 
   const userList = mockData.value.users as any[]
 
   const user = userList.find(u => u.id === id)
   if (user == null || user.deleted === true)
-    return { data: {} }
+    return { data: {} as GetCurrentUserResponseData }
 
   return {
     data: {

@@ -4,6 +4,7 @@ import PCheckoutLayout from '@/components/PCheckoutLayout.vue'
 import PButton from '@/components/PButton.vue'
 import IconShoppingBasketLine from '~icons/ri/shopping-basket-line'
 import { type GetOrderByOrderIdResponseData, getOrderByOrderId } from '@/api/orders/getOrder'
+import type { BtnType } from '@/types'
 
 const route = useRoute()
 const orderId = computed(() => String(route.params.orderId))
@@ -40,7 +41,7 @@ onMounted(() => {
   fetchBoughtList()
 })
 
-const textInGoShoppingBtn = {
+const textInGoShoppingBtn: BtnType = {
   text: '繼續購物',
   color: 'match-color',
   afterTextIcon: IconShoppingBasketLine,

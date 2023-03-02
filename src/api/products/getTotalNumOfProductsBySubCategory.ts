@@ -18,8 +18,8 @@ export async function getTotalNumOfProductsBySubCategory({ subCategoryId }: GetP
   }
 
   if (mockData.value == null)
-    return { data: {} }
+    return { data: { numOfProducts: 0 } }
 
   const productList = [...mockData.value.products]
-  return { data: productList.filter(p => p.subCategoryId === subCategoryId).length }
+  return { data: { numOfProducts: productList.filter(p => p.subCategoryId === subCategoryId).length } }
 }

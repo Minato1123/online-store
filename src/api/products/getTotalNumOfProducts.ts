@@ -11,7 +11,7 @@ export async function getTotalNumOfProducts() {
   }
 
   if (mockData.value == null)
-    return { data: {} }
+    return { data: { numOfProducts: 0 } }
 
   const productList = [...mockData.value.products]
   const numOfProducts = productList.length
