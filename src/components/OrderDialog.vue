@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PropType } from 'vue'
+import { getPublicImgSrc } from '../utils/index'
 import { OnClickOutside } from '@vueuse/components'
 import PButton from './PButton.vue'
 import type { GetOrderSerialNumberByStatusResponseData } from '@/api/orders/getOrderSerialNumberByStatus'
@@ -115,7 +116,7 @@ onBeforeUnmount(() => {
           </div>
           <div v-if="boughtItems" class="product-list-container">
             <div v-for="(item, i) in boughtItems" :key="`boughtItem-${i}`" class="product">
-              <img class="product-img" :src="item.image">
+              <img class="product-img" :src="getPublicImgSrc(item.image)">
               <div class="product-name">
                 {{ item.name }}
               </div>
