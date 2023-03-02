@@ -314,7 +314,7 @@ const slidesConfig = computed<SlideType>(() => {
             </div>
           </div>
           <div class="follow-price">
-            <button @click="handleFollowedProducts">
+            <button type="button" @click="handleFollowedProducts">
               <icon-icon-park-solid-like v-if="followingList.has(product.id)" /><icon-icon-park-outline-like v-else />
             </button>
             <div class="price">
