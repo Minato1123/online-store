@@ -4,6 +4,7 @@ import FloatingVue from 'floating-vue'
 import { defaultConfig, plugin } from '@formkit/vue'
 import App from './App.vue'
 import router from './router'
+import { useMockDataStore } from './stores/mock'
 import DisableAutocomplete from '@/plugins/disable-autocomplete'
 import 'floating-vue/dist/style.css'
 import '@formkit/themes/genesis'
@@ -33,5 +34,14 @@ app.use(FloatingVue, {
 
 app.use(plugin, defaultConfig)
 
-app.mount('#app')
+useMockDataStore()
+if (useMockDataStore().isMocked) {
+  until(() => useMockDataStore().isMockDataReady).toBeTruthy()
+    .then(() => {
+      app.mount('#app')
+    })
+}
+else {
+  app.mount('#app')
+}
 

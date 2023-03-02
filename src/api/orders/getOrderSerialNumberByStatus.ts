@@ -1,4 +1,6 @@
 import { http } from '@/utils/request'
+import { useMockDataStore } from '@/stores/mock'
+import { useUsersStore } from '@/stores/user'
 
 export interface GetOrderSerialNumberByStatusRequestData {
   userId: number
@@ -32,11 +34,29 @@ export interface GetOrderSerialNumberByStatusResponseData {
 }
 
 export function getOrderSerialNumberByStatus({ userId, status }: GetOrderSerialNumberByStatusRequestData) {
-  return http.get<GetOrderSerialNumberByStatusResponseData[]>({
-    url: '/orders',
-    params: {
-      userId,
-      status,
-    },
-  })
+  const { isMocked, mockData } = storeToRefs(useMockDataStore())
+  const { isUserTokenValid } = useMockDataStore()
+  const { userToken } = storeToRefs(useUsersStore())
+  const { forcedLogout } = useUsersStore()
+
+  if (!isMocked.value) {
+    return http.get<GetOrderSerialNumberByStatusResponseData[]>({
+      url: '/orders',
+      params: {
+        userId,
+        status,
+      },
+    })
+  }
+
+  if (isUserTokenValid(userToken.value) === false) {
+    forcedLogout()
+    return { data: [] }
+  }
+
+  if (mockData.value == null)
+    return { data: [] }
+
+  const orderList = mockData.value.orders as any[]
+  return { data: orderList.filter(order => order.userId === userId && order.status === status) }
 }

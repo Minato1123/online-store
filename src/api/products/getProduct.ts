@@ -1,4 +1,5 @@
 import { http } from '@/utils/request'
+import { useMockDataStore } from '@/stores/mock'
 
 export interface GetProductRequestData {
   id: number
@@ -19,7 +20,22 @@ export interface GetProductResponseData {
 }
 
 export function getProduct({ id }: GetProductRequestData) {
-  return http.get<GetProductResponseData>({
-    url: `/products/${id}`,
-  })
+  const { isMocked, mockData } = storeToRefs(useMockDataStore())
+
+  if (!isMocked.value) {
+    return http.get<GetProductResponseData>({
+      url: `/products/${id}`,
+    })
+  }
+
+  if (mockData.value == null)
+    return { data: {} }
+
+  const productList = mockData.value.products as any[]
+
+  const product = productList.find(u => u.id === id)
+  if (product == null)
+    return { data: {} }
+
+  return { data: product }
 }

@@ -1,4 +1,5 @@
 import { http } from '@/utils/request'
+import { useMockDataStore } from '@/stores/mock'
 
 export interface GetSlideListResponseData {
   id: number
@@ -8,7 +9,16 @@ export interface GetSlideListResponseData {
 }
 
 export function getSlides() {
-  return http.get<GetSlideListResponseData[]>({
-    url: '/slides',
-  })
+  const { isMocked, mockData } = storeToRefs(useMockDataStore())
+
+  if (!isMocked.value) {
+    return http.get<GetSlideListResponseData[]>({
+      url: '/slides',
+    })
+  }
+
+  if (mockData.value == null)
+    return { data: [] }
+
+  return { data: mockData.value.slides }
 }

@@ -1,4 +1,6 @@
 import { http } from '@/utils/request'
+import { useMockDataStore } from '@/stores/mock'
+import { useUsersStore } from '@/stores/user'
 
 interface GetPaymentByIdRequestData {
   id: number
@@ -17,7 +19,30 @@ interface GetPaymentByIdResponseData {
 }
 
 export function getPaymentById({ id }: GetPaymentByIdRequestData) {
-  return http.get<GetPaymentByIdResponseData>({
-    url: `/payment/${id}`,
-  })
+  const { isMocked, mockData } = storeToRefs(useMockDataStore())
+  const { isUserTokenValid } = useMockDataStore()
+  const { userToken } = storeToRefs(useUsersStore())
+  const { forcedLogout } = useUsersStore()
+
+  if (!isMocked.value) {
+    return http.get<GetPaymentByIdResponseData>({
+      url: `/payment/${id}`,
+    })
+  }
+
+  if (isUserTokenValid(userToken.value) === false) {
+    forcedLogout()
+    return { data: {} }
+  }
+
+  if (mockData.value == null)
+    return { data: {} }
+
+  const paymentList = mockData.value.payment as any[]
+
+  const thePayment = paymentList.find(u => u.id === id)
+  if (thePayment == null)
+    return { data: {} }
+
+  return thePayment
 }
