@@ -12,8 +12,6 @@ export const useUsersStore = defineStore('users', () => {
   const { updateLocalCartToDB } = useCartStore()
   const userToken = useLocalStorage<string>('user-token', null, { serializer: StorageSerializers.string })
   const userId = useLocalStorage<number>('user-id', null, { serializer: StorageSerializers.number })
-  const email = useLocalStorage<string>('user-email', null, { serializer: StorageSerializers.string })
-  const password = useLocalStorage<string>('user-password', null, { serializer: StorageSerializers.string })
 
   const hasErrorInLogin = ref(false)
   const { emit: emitLoginStatusUpdated } = useLoginStatusUpdatedEventBus()
@@ -192,18 +190,6 @@ export const useUsersStore = defineStore('users', () => {
     router.replace({ name: 'login' })
   }
 
-  function rememberAccount() {
-    if (loginEmail.value == null || loginPassword.value == null)
-      return
-    email.value = loginEmail.value
-    password.value = btoa(loginPassword.value)
-  }
-
-  function forgetAccount() {
-    email.value = null
-    password.value = null
-  }
-
   return {
     userToken,
     userId,
@@ -223,9 +209,5 @@ export const useUsersStore = defineStore('users', () => {
     isLoggedIn,
     userLogout,
     forcedLogout,
-    email,
-    password,
-    rememberAccount,
-    forgetAccount,
   }
 })

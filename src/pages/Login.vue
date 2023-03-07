@@ -21,36 +21,12 @@ const textInLoginFailDialog: InfoType = {
   },
 }
 
-const { rememberAccount, forgetAccount } = useUsersStore()
-const { hasErrorInLogin, email, password } = storeToRefs(useUsersStore())
+const { hasErrorInLogin } = storeToRefs(useUsersStore())
 
 const { handleLogin } = useUsersStore()
 const { loginEmail, loginPassword } = storeToRefs(useUsersStore())
-const { email: rememberEmail, password: rememberPassword } = storeToRefs(useUsersStore())
-if (rememberEmail.value != null && rememberPassword.value != null) {
-  email.value = rememberEmail.value
-  password.value = atob(rememberPassword.value)
-}
 
-const isRememberAccount = computed(() => {
-  if (email.value == null || password.value == null)
-    return false
-  else
-    return true
-})
-
-function toggleRemeberAccount() {
-  if (!isRememberAccount.value)
-    rememberAccount()
-
-  else
-    forgetAccount()
-}
-
-watch([loginEmail, loginPassword], () => {
-  if (isRememberAccount.value)
-    rememberAccount()
-})
+const isRememberAccount = ref(false)
 </script>
 
 <template>
@@ -90,20 +66,19 @@ watch([loginEmail, loginPassword], () => {
         </div>
       </div>
       <div class="account-setup">
-        <label class="remember-password" @click.self="toggleRemeberAccount">
+        <label class="remember-password" @click.self="isRememberAccount = !isRememberAccount">
           <input class="hidden" type="checkbox">
           <icon-material-symbols-check-box-outline v-if="isRememberAccount" />
           <icon-material-symbols-check-box-outline-blank v-else />
           記住我
         </label>
         <div>
-          <RouterLink
-            class="forget-password" :to="{
-              name: 'home',
-            }"
+          <button
+            type="button"
+            class="forget-password"
           >
             忘記密碼？
-          </RouterLink>
+          </button>
         </div>
       </div>
       <div
@@ -118,11 +93,11 @@ watch([loginEmail, loginPassword], () => {
         快速登入
       </div>
       <div class="quick-login-block">
-        <button class="quick-login-btn">
+        <button type="button" class="quick-login-btn">
           <icon-logos-google-icon />
           Google 登入
         </button>
-        <button class="quick-login-btn">
+        <button type="button" class="quick-login-btn">
           <icon-logos-facebook />
           Facebook 登入
         </button>
@@ -170,6 +145,11 @@ watch([loginEmail, loginPassword], () => {
 
   .forget-password {
     color: var(--main-color);
+    background: transparent;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
   }
 }
 
