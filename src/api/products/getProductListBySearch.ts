@@ -1,3 +1,4 @@
+import { Fzf } from 'fzf'
 import type { GetProductResponseData } from './getProduct'
 import type { Pagination } from './getProductList'
 import { http } from '@/utils/request'
@@ -46,7 +47,11 @@ export function getProductListListBySearch({
   }
 
   let productList = [...mockData.value.products]
-  productList = productList.filter(p => p.name.includes(query))
+  const theQueryString = query.split(' ').join('')
+  const fzf = new Fzf(productList, {
+    selector: item => item.name,
+  })
+  productList = fzf.find(theQueryString).map(({ item }) => item)
 
   if (sortBy === 'id') {
     if (orderBy === 'asc')
