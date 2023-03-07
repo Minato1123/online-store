@@ -66,7 +66,14 @@ Demo：https://minato1123.github.io/online-store/
 ![image](https://user-images.githubusercontent.com/71639540/223125983-0a1ae5e0-bbb1-4d74-93cc-43e329d9b0b5.png)
 
 ### 商品名稱搜尋功能
+* 單關鍵字搜尋
+
 ![](https://i.imgur.com/5CsvtCq.png)
+
+* 配合 FZF 套件模糊搜尋（可多關鍵字）
+
+![](https://i.imgur.com/f77j9kG.png)
+
 
 
 ## 本地端架設環境的使用方法
@@ -102,3 +109,5 @@ pnpm dev
 3. [FormKit](https://formkit.com/)
 4. [Vee-validation](https://vee-validate.logaretm.com/v4/)
 5. [Floating Vue](https://floating-vue.starpad.dev/)
+6. [esno](https://github.com/esbuild-kit/esno)
+7. [FZF](https://fzf.netlify.app/docs/latest)
