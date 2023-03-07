@@ -66,6 +66,8 @@ Demo：https://minato1123.github.io/online-store/
 ![image](https://user-images.githubusercontent.com/71639540/223125983-0a1ae5e0-bbb1-4d74-93cc-43e329d9b0b5.png)
 
 ### 商品名稱搜尋功能
+![](https://i.imgur.com/5CsvtCq.png)
+
 
 ## 本地端架設環境的使用方法
 1. 下載需要的套件
