@@ -834,10 +834,6 @@ a {
   @media screen and (min-width: 1251px) {
     .buy-btns {
       gap: 3rem;
-
-      .btn {
-        width: 30%;
-      }
     }
   }
 
@@ -865,9 +861,9 @@ a {
       }
 
       .content-block {
-        width: 60%;
+        width: 80%;
         padding: 0 2rem 0 4rem;
-
+        height: 100%;
       }
 
     }
