@@ -1,6 +1,6 @@
-const { defineRoute } = require('../utils')
+import { defineRoute } from '../utils'
 
-module.exports = defineRoute((router, data) => {
+export default defineRoute((router, data) => {
   router.patch('/payment/:id', (ctx) => {
     const id = parseInt(ctx.params.id)
     const payment = ctx.request.body

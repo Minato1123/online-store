@@ -1,6 +1,6 @@
-const { defineRoute } = require('../utils')
+import { defineRoute } from '../utils'
 
-module.exports = defineRoute((router, data, tokenMap) => {
+export default defineRoute((router, data, tokenMap) => {
   router.post('/login', (ctx) => {
     const { email, password } = ctx.request.body
     const users = data.users

@@ -1,20 +1,29 @@
-const { defineRoute } = require('../utils')
+import { Fzf } from 'fzf'
+import { defineRoute } from '../utils'
 
-module.exports = defineRoute((router, data) => {
+export default defineRoute((router, data) => {
   router.get('/products', (ctx) => {
     const { sortBy, orderBy } = ctx.query
     const currentPage = parseInt(ctx.query.currentPage)
     const pageSize = parseInt(ctx.query.pageSize)
     let productList = [...data.products]
 
-    if (ctx.query.categoryId)
+    if (ctx.query.categoryId) {
       productList = productList.filter(p => p.categoryId === parseInt(ctx.query.categoryId))
-    else if (ctx.query.subCategoryId)
+    }
+    else if (ctx.query.subCategoryId) {
       productList = productList.filter(p => p.subCategoryId === parseInt(ctx.query.subCategoryId))
-    else if (ctx.query.query)
-      productList = productList.filter(p => p.name.includes(ctx.query.query))
-    else if (ctx.query.productId && ctx.query.subCategoryId)
+    }
+    else if (ctx.query.query) {
+      const query = ctx.query.query.split(' ').join('')
+      const fzf = new Fzf(productList, {
+        selector: item => item.name,
+      })
+      productList = fzf.find(query).map(({ item }) => item)
+    }
+    else if (ctx.query.productId && ctx.query.subCategoryId) {
       return productList.filter(p => p.id !== parseInt(ctx.query.productId) && p.subCategoryId === parseInt(ctx.query.subCategoryId))
+    }
 
     if (sortBy === 'id') {
       if (orderBy === 'asc')

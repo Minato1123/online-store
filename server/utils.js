@@ -18,7 +18,7 @@ function getUserIdByToken(accessToken, tokenMap) {
   return tokenMap.get(accessToken)
 }
 
-module.exports = {
+export {
   defineRoute,
   getTimeStamp,
   getUserIdByToken,

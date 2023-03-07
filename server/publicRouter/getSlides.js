@@ -1,6 +1,6 @@
-const { defineRoute } = require('../utils')
+import { defineRoute } from '../utils'
 
-module.exports = defineRoute((router, data) => {
+export default defineRoute((router, data) => {
   router.get('/slides', (ctx) => {
     ctx.response.body = data.slides
   })

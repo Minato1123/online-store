@@ -1,6 +1,6 @@
-const { defineRoute } = require('../utils')
+import { defineRoute } from '../utils'
 
-module.exports = defineRoute((router, data) => {
+export default defineRoute((router, data) => {
   router.post('/followItems', (ctx) => {
     const { userId, productId } = ctx.request.body
     const followItemList = data.followItems

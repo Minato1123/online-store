@@ -1,6 +1,6 @@
-const { defineRoute, getUserIdByToken } = require('../utils')
+import { defineRoute, getUserIdByToken } from '../utils'
 
-module.exports = defineRoute((router, data, tokenMap) => {
+export default defineRoute((router, data, tokenMap) => {
   router.post('/payment', (ctx) => {
     const userId = getUserIdByToken(ctx.request.headers['access-token'], tokenMap)
     const paymentData = ctx.request.body

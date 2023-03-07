@@ -1,18 +1,18 @@
-const login = require('./login')
-const addUser = require('./addUser')
-const getCategory = require('./getCategory')
-const getCategoryList = require('./getCategoryList')
-const getSubCategory = require('./getSubCategory')
-const getSubCategoryList = require('./getSubCategoryList')
-const getProduct = require('./getProduct')
-const getProductList = require('./getProductList')
-const getTotalNumOfProducts = require('./getTotalNumOfProducts')
-const getProductDescription = require('./getProductDescription')
-const getProductImages = require('./getProductImages')
-const getProductSpecifications = require('./getProductSpecifications')
-const getSlides = require('./getSlides')
+import login from './login'
+import addUser from './addUser'
+import getCategory from './getCategory'
+import getCategoryList from './getCategoryList'
+import getSubCategory from './getSubCategory'
+import getSubCategoryList from './getSubCategoryList'
+import getProduct from './getProduct'
+import getProductList from './getProductList'
+import getTotalNumOfProducts from './getTotalNumOfProducts'
+import getProductDescription from './getProductDescription'
+import getProductImages from './getProductImages'
+import getProductSpecifications from './getProductSpecifications'
+import getSlides from './getSlides'
 
-module.exports = function usePublicRouter(router, data, tokenMap) {
+export default function usePublicRouter(router, data, tokenMap) {
   [
     login,
     addUser,

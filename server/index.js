@@ -1,16 +1,17 @@
-const Koa = require('koa')
-const Router = require('koa-router')
-const cors = require('@koa/cors')
-const { koaBody } = require('koa-body')
-const data = require('../public/db.json')
+import fs from 'fs'
+import Koa from 'koa'
+import Router from 'koa-router'
+import cors from '@koa/cors'
+import { koaBody } from 'koa-body'
+import data from '../public/db.json'
+
+import usePublicRouter from './publicRouter'
+import { getUserIdByToken } from './utils'
+import usePrivateRouter from './privateRouter'
 
 const app = new Koa()
 const publicRouter = new Router()
 const privateRouter = new Router()
-
-const usePublicRouter = require('./publicRouter')
-const { getUserIdByToken } = require('./utils')
-const usePrivateRouter = require('./privateRouter')
 
 const tokenMap = new Map([])
 
@@ -70,6 +71,5 @@ app.use(privateRouter.routes())
 app.listen(3000)
 
 setInterval(() => {
-  const fs = require('fs')
   fs.writeFileSync('./public/db.json', JSON.stringify(data, null, 2))
 }, 3000)

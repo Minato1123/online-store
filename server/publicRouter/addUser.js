@@ -1,9 +1,9 @@
-const { defineRoute, getTimeStamp } = require('../utils')
+import { defineRoute, getTimeStamp } from '../utils'
 const regexpForPassword = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/
 const regexpForBirthday = /^\d{4}-\d{2}-\d{2}$/
 const regexpForMobile = /^09\d{8}$/
 
-module.exports = defineRoute((router, data) => {
+export default defineRoute((router, data) => {
   router.post('/users', (ctx) => {
     const { email, password, name, birthday, mobile } = ctx.request.body
     const userList = data.users

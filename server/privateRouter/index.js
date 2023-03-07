@@ -1,25 +1,25 @@
-const deleteUser = require('./deleteUser')
-const getCurrentUser = require('./getCurrentUser')
-const updateUser = require('./updateUser')
-const addProductToCart = require('./addProductToCart')
-const deleteProductInCart = require('./deleteProductInCart')
-const getProductListInCartByUserId = require('./getProductListInCartByUserId')
-const getTotalNumOfProductInCartByUserId = require('./getTotalNumOfProductInCartByUserId')
-const updateProductInCart = require('./updateProductInCart')
-const addProductToFollowing = require('./addProductToFollowing')
-const deleteProductInFollowing = require('./deleteProductInFollowing')
-const getProductListInFollowingByUserId = require('./getProductListInFollowingByUserId')
-const getOrder = require('./getOrder')
-const addOrder = require('./addOrder')
-const getProductListInBought = require('./getProductListInBought')
-const addPayment = require('./addPayment')
-const deletePayment = require('./deletePayment')
-const getPayment = require('./getPayment')
-const getPaymentByUserId = require('./getPaymentByUserId')
-const updatePayment = require('./updatePayment')
-const logout = require('./logout')
+import deleteUser from './deleteUser'
+import getCurrentUser from './getCurrentUser'
+import updateUser from './updateUser'
+import addProductToCart from './addProductToCart'
+import deleteProductInCart from './deleteProductInCart'
+import getProductListInCartByUserId from './getProductListInCartByUserId'
+import getTotalNumOfProductInCartByUserId from './getTotalNumOfProductInCartByUserId'
+import updateProductInCart from './updateProductInCart'
+import addProductToFollowing from './addProductToFollowing'
+import deleteProductInFollowing from './deleteProductInFollowing'
+import getProductListInFollowingByUserId from './getProductListInFollowingByUserId'
+import getOrder from './getOrder'
+import addOrder from './addOrder'
+import getProductListInBought from './getProductListInBought'
+import addPayment from './addPayment'
+import deletePayment from './deletePayment'
+import getPayment from './getPayment'
+import getPaymentByUserId from './getPaymentByUserId'
+import updatePayment from './updatePayment'
+import logout from './logout'
 
-module.exports = function usePrivateRouter(router, data, tokenMap) {
+export default function usePrivateRouter(router, data, tokenMap) {
   [
     deleteUser,
     getCurrentUser,

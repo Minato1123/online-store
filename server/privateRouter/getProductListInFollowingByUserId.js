@@ -1,6 +1,6 @@
-const { defineRoute } = require('../utils')
+import { defineRoute } from '../utils'
 
-module.exports = defineRoute((router, data) => {
+export default defineRoute((router, data) => {
   router.get('/followItems', (ctx) => {
     const userId = parseInt(ctx.query.userId)
     const followingItemList = data.followItems.filter(item => item.userId === userId)

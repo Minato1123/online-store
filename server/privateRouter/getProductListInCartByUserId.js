@@ -1,6 +1,6 @@
-const { defineRoute } = require('../utils')
+import { defineRoute } from '../utils'
 
-module.exports = defineRoute((router, data) => {
+export default defineRoute((router, data) => {
   router.get('/cartItems', (ctx) => {
     const userId = parseInt(ctx.query.userId)
     const cartItemList = data.cartItems

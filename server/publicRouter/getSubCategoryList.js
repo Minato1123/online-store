@@ -1,6 +1,6 @@
-const { defineRoute } = require('../utils')
+import { defineRoute } from '../utils'
 
-module.exports = defineRoute((router, data) => {
+export default defineRoute((router, data) => {
   router.get('/subCategories', (ctx) => {
     const categoryId = parseInt(ctx.query.categoryId)
     const subCategoriesList = data.subCategories.filter(subcategory => subcategory.categoryId === categoryId)
