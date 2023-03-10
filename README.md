@@ -103,7 +103,7 @@ pnpm dev
 ### 後端
 1. Koa.js
 
-## 函式庫
+## 套件
 1. [unplugin-auto-import](https://github.com/antfu/unplugin-auto-import)
 2. [unplugin-icons](https://github.com/antfu/unplugin-icons)
 3. [unplugin-vue-components](https://github.com/antfu/unplugin-vue-components)
