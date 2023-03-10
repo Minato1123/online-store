@@ -104,10 +104,13 @@ pnpm dev
 1. Koa.js
 
 ## 函式庫
-1. [VueUse](https://vueuse.org/)
-2. [Lodash](https://lodash.com/)
-3. [FormKit](https://formkit.com/)
-4. [Vee-validation](https://vee-validate.logaretm.com/v4/)
-5. [Floating Vue](https://floating-vue.starpad.dev/)
-6. [esno](https://github.com/esbuild-kit/esno)
-7. [FZF](https://fzf.netlify.app/docs/latest)
+1. [unplugin-auto-import](https://github.com/antfu/unplugin-auto-import)
+2. [unplugin-icons](https://github.com/antfu/unplugin-icons)
+3. [unplugin-vue-components](https://github.com/antfu/unplugin-vue-components)
+4. [VueUse](https://vueuse.org/)
+5. [Lodash](https://lodash.com/)
+6. [FormKit](https://formkit.com/)
+7. [Vee-validation](https://vee-validate.logaretm.com/v4/)
+8. [Floating Vue](https://floating-vue.starpad.dev/)
+9. [esno](https://github.com/esbuild-kit/esno)
+10. [FZF](https://fzf.netlify.app/docs/latest)
