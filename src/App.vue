@@ -19,7 +19,11 @@ const { isLoading } = storeToRefs(useLoadingStore())
   </div>
   <Footer class="footer" />
   <Top class="top" />
-  <Loading v-if="isLoading" />
+  <Teleport to="body">
+    <Transition name="loading">
+      <Loading v-if="isLoading" />
+    </Transition>
+  </Teleport>
 </template>
 
 <style scoped lang="scss">

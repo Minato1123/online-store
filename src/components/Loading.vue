@@ -11,22 +11,18 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <Teleport to="body">
-    <Transition>
-      <div class="mask">
-        <div class="container">
-          <div class="loadingio-spinner-interwind-0032szko1knau">
-            <div class="ldio-cyicwfxrufe">
-              <div><div><div><div /></div></div><div><div><div /></div></div></div>
-            </div>
-          </div>
-          <div class="content">
-            Loading...
-          </div>
+  <div class="mask">
+    <div class="container">
+      <div class="loadingio-spinner-interwind-0032szko1knau">
+        <div class="ldio-cyicwfxrufe">
+          <div><div><div><div /></div></div><div><div><div /></div></div></div>
         </div>
       </div>
-    </Transition>
-  </Teleport>
+      <div class="content">
+        Loading...
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped lang="scss">
@@ -115,14 +111,4 @@ onBeforeUnmount(() => {
 }
 .ldio-cyicwfxrufe div { box-sizing: content-box; }
 .ldio-0xji4dc6kkl div { box-sizing: content-box; }
-
-.v-enter-active,
-.v-leave-active {
-  transition: opacity 0.6s ease;
-}
-
-.v-enter-from,
-.v-leave-to {
-  opacity: 0;
-}
 </style>
