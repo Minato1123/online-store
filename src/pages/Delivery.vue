@@ -448,7 +448,7 @@ function checkUserDataInOrder() {
                   </Transition>
                   <label class="sub-title"><icon-ic-baseline-radio-button-unchecked v-show="orderData.deliveryType !== 'convenience-store'" /><icon-ic-baseline-radio-button-checked v-show="orderData.deliveryType === 'convenience-store'" /><input v-model="orderData.deliveryType" class="input-radio" value="convenience-store" type="radio" name="delivery">超商取貨</label>
                   <div v-if="orderData.deliveryType === 'convenience-store'" class="sub-content convience-block">
-                    <button class="select-btn">
+                    <button type="button" class="select-btn">
                       選取超商
                     </button>
                     <span class="select-status">尚未選取超商</span>
@@ -464,8 +464,16 @@ function checkUserDataInOrder() {
       </div>
     </FormKit>
   </PCheckoutLayout>
-  <InfoDialog v-if="isDialogOpen && isSaveSuccess" :text-in-dialog="orderSuccessDialog" @close-info-dialog="handleCheckout" />
-  <InfoDialog v-if="isDialogOpen && !isSaveSuccess" :text-in-dialog="orderFailDialog" @close-info-dialog="handleCheckout" />
+  <Teleport to="body">
+    <Transition>
+      <InfoDialog v-if="isDialogOpen && isSaveSuccess" :text-in-dialog="orderSuccessDialog" @close-info-dialog="handleCheckout" />
+    </Transition>
+  </Teleport>
+  <Teleport to="body">
+    <Transition>
+      <InfoDialog v-if="isDialogOpen && !isSaveSuccess" :text-in-dialog="orderFailDialog" @close-info-dialog="handleCheckout" />
+    </Transition>
+  </Teleport>
   <PaymentSelect v-if="isPaymentSelectDialog" :target="targetPaymentMethod" @close-dialog="handlePaymentSelect" />
 </template>
 
