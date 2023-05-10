@@ -180,10 +180,26 @@ const deleteBtnFailDialog: InfoType = {
           刪除帳號
         </button>
       </div>
-      <InfoDialog v-if="isSaveInfoDialogOpen && isSaveSuccess" :text-in-dialog="saveBtnSuccessDialog" @close-info-dialog="isSaveInfoDialogOpen = false" />
-      <InfoDialog v-if="isSaveInfoDialogOpen && !isSaveSuccess" :text-in-dialog="saveBtnFailDialog" @close-info-dialog="isSaveInfoDialogOpen = false" />
-      <InfoDialog v-if="isDeleteInfoDialogOpen && isDeleteSuccess" :text-in-dialog="deleteBtnSuccessDialog" @close-info-dialog="handleLogout" />
-      <InfoDialog v-if="isDeleteInfoDialogOpen && !isDeleteSuccess" :text-in-dialog="deleteBtnFailDialog" @close-info-dialog="isDeleteInfoDialogOpen = false" />
+      <Teleport to="body">
+        <Transition>
+          <InfoDialog v-if="isSaveInfoDialogOpen && isSaveSuccess" :text-in-dialog="saveBtnSuccessDialog" @close-info-dialog="isSaveInfoDialogOpen = false" />
+        </Transition>
+      </Teleport>
+      <Teleport to="body">
+        <Transition>
+          <InfoDialog v-if="isSaveInfoDialogOpen && !isSaveSuccess" :text-in-dialog="saveBtnFailDialog" @close-info-dialog="isSaveInfoDialogOpen = false" />
+        </Transition>
+      </Teleport>
+      <Teleport to="body">
+        <Transition>
+          <InfoDialog v-if="isDeleteInfoDialogOpen && isDeleteSuccess" :text-in-dialog="deleteBtnSuccessDialog" @close-info-dialog="handleLogout" />
+        </Transition>
+      </Teleport>
+      <Teleport to="body">
+        <Transition>
+          <InfoDialog v-if="isDeleteInfoDialogOpen && !isDeleteSuccess" :text-in-dialog="deleteBtnFailDialog" @close-info-dialog="isDeleteInfoDialogOpen = false" />
+        </Transition>
+      </Teleport>
     </form>
   </PUserLayout>
 </template>

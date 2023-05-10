@@ -148,8 +148,16 @@ async function updatePassword() {
       </form>
     </FormKit>
   </PUserLayout>
-  <InfoDialog v-if="isDialogOpen && isSaveSuccess" :text-in-dialog="saveBtnSuccessDialog" @close-info-dialog="isDialogOpen = false" />
-  <InfoDialog v-if="isDialogOpen && !isSaveSuccess" :text-in-dialog="saveBtnFailDialog" @close-info-dialog="isDialogOpen = false" />
+  <Teleport to="body">
+    <Transition>
+      <InfoDialog v-if="isDialogOpen && isSaveSuccess" :text-in-dialog="saveBtnSuccessDialog" @close-info-dialog="isDialogOpen = false" />
+    </Transition>
+  </Teleport>
+  <Teleport to="body">
+    <Transition>
+      <InfoDialog v-if="isDialogOpen && !isSaveSuccess" :text-in-dialog="saveBtnFailDialog" @close-info-dialog="isDialogOpen = false" />
+    </Transition>
+  </Teleport>
 </template>
 
 <style lang="scss" scoped>

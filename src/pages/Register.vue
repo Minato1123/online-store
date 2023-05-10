@@ -120,7 +120,11 @@ const { hasErrorInLogin, registerErrors, registerEmail, registerPassword, regist
       </div>
     </div>
   </form>
-  <InfoDialog v-if="hasErrorInLogin" :text-in-dialog="textInRegisterFailDialog" @close-info-dialog="hasErrorInLogin = false" />
+  <Teleport to="body">
+    <Transition>
+      <InfoDialog v-if="hasErrorInLogin" :text-in-dialog="textInRegisterFailDialog" @close-info-dialog="hasErrorInLogin = false" />
+    </Transition>
+  </Teleport>
 </template>
 
 <style lang="scss" scoped>

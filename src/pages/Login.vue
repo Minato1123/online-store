@@ -109,7 +109,11 @@ const isRememberAccount = ref(false)
       </div>
     </div>
   </form>
-  <InfoDialog v-if="hasErrorInLogin" :text-in-dialog="textInLoginFailDialog" @close-info-dialog="hasErrorInLogin = false" />
+  <Teleport to="body">
+    <Transition>
+      <InfoDialog v-if="hasErrorInLogin" :text-in-dialog="textInLoginFailDialog" @close-info-dialog="hasErrorInLogin = false" />
+    </Transition>
+  </Teleport>
 </template>
 
 <style lang="scss" scoped>

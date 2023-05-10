@@ -498,8 +498,16 @@ const slidesConfig = computed<SlideType>(() => {
       </div>
     </div>
   </div>
-  <InfoDialog v-if="isOpenInfoAddCart" :text-in-dialog="textInInfoAddCart" />
-  <InfoDialog v-if="isOpenInfoAddCartFail" :text-in-dialog="textInInfoAddCartFail" @close-info-dialog="isOpenInfoAddCartFail = false" />
+  <Teleport to="body">
+    <Transition>
+      <InfoDialog v-if="isOpenInfoAddCart" :text-in-dialog="textInInfoAddCart" />
+    </Transition>
+  </Teleport>
+  <Teleport to="body">
+    <Transition>
+      <InfoDialog v-if="isOpenInfoAddCartFail" :text-in-dialog="textInInfoAddCartFail" @close-info-dialog="isOpenInfoAddCartFail = false" />
+    </Transition>
+  </Teleport>
 </template>
 
 <style lang="scss" scoped>

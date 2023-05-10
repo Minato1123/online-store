@@ -214,7 +214,11 @@ onBeforeUnmount(() => {
       </OnClickOutside>
     </div>
   </Teleport>
-  <InfoDialog v-if="isOpenDialogAddCart" :text-in-dialog="textInDialogAddCart" />
+  <Teleport to="body">
+    <Transition>
+      <InfoDialog v-if="isOpenDialogAddCart" :text-in-dialog="textInDialogAddCart" />
+    </Transition>
+  </Teleport>
 </template>
 
 <style scoped lang="scss">
