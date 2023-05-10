@@ -123,10 +123,10 @@ function handleClickProductBox(categoryId: number, subCategoryId: number, produc
     background-color: var(--white-color);
     border: 1px solid var(--match-color);
     overflow: hidden;
+    transition: 0.2s;
 
     &:hover {
       scale: 1.02;
-      transition: 0.2s;
       box-shadow: 1px 1px 1px 0px rgba(100, 100, 100, 0.2);
       cursor: pointer;
     }

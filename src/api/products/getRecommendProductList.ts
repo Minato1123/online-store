@@ -11,10 +11,10 @@ export function getRecommendProductList({ productId, subCategoryId }: GetRecomme
   const { isMocked, mockData } = storeToRefs(useMockDataStore())
 
   if (!isMocked.value) {
-    return http.get<GetProductResponseData[]>({
+    return http.get<{ productList: GetProductResponseData[] }>({
       url: '/products',
       params: {
-        id_ne: productId,
+        productId,
         subCategoryId,
       },
     })

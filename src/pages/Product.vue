@@ -91,7 +91,7 @@ async function fetchRecommendProductList() {
     return
 
   startLoading()
-  recommendProductList.value = (await getRecommendProductList({ productId: product.value.id, subCategoryId: Number(product.value.subCategoryId) })).data
+  recommendProductList.value = ((await getRecommendProductList({ productId: product.value.id, subCategoryId: Number(product.value.subCategoryId) })).data as { productList: GetProductResponseData[] }).productList
   endLoading()
 }
 
@@ -827,6 +827,7 @@ a {
         display: flex;
         flex-wrap: wrap;
         gap: 1rem;
+        padding: 0.5rem;
       }
     }
   }

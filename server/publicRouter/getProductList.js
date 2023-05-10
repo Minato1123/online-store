@@ -11,6 +11,12 @@ export default defineRoute((router, data) => {
     if (ctx.query.categoryId) {
       productList = productList.filter(p => p.categoryId === parseInt(ctx.query.categoryId))
     }
+    else if (ctx.query.productId && ctx.query.subCategoryId) {
+      ctx.response.body = {
+        productList: productList.filter(p => p.id !== parseInt(ctx.query.productId) && p.subCategoryId === parseInt(ctx.query.subCategoryId)),
+      }
+      return
+    }
     else if (ctx.query.subCategoryId) {
       productList = productList.filter(p => p.subCategoryId === parseInt(ctx.query.subCategoryId))
     }
@@ -20,9 +26,6 @@ export default defineRoute((router, data) => {
         selector: item => item.name,
       })
       productList = fzf.find(query).map(({ item }) => item)
-    }
-    else if (ctx.query.productId && ctx.query.subCategoryId) {
-      return productList.filter(p => p.id !== parseInt(ctx.query.productId) && p.subCategoryId === parseInt(ctx.query.subCategoryId))
     }
 
     if (sortBy === 'id') {
