@@ -284,7 +284,6 @@ async function updateCartItemAmount(id: number, amount: number) {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     margin: 4rem 0;
 
     .cart-title {

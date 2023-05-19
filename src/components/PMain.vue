@@ -334,7 +334,7 @@ function handleThePage(page: number) {
   flex-direction: column;
   align-items: center;
   width: 80%;
-  margin: auto;
+  margin: 0 auto;
 }
 .products-header {
   display: flex;

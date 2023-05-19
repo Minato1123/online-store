@@ -57,7 +57,7 @@
     margin: 3rem 0;
     display: flex;
     width: 80%;
-    min-height: 36rem;
+    height: 40rem;
     background-color: var(--white-color);
 
     .user-sidebar {

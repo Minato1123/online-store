@@ -196,6 +196,7 @@ const isRememberAccount = ref(false)
   background-color: var(--white-color);
   width: 80%;
   max-width: 60rem;
+  max-height: 30rem;
   border-radius: 2rem;
   border: 1px solid var(--main-color);
   display: flex;

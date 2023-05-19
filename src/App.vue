@@ -40,7 +40,6 @@ const { isLoading } = storeToRefs(useLoadingStore())
   min-height: calc(100vh - 21rem);
   display: flex;
   justify-content: center;
-  align-items: center;
   background-color: #FFFBF4;
 }
 
