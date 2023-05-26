@@ -110,7 +110,7 @@ pnpm dev
 4. [VueUse](https://vueuse.org/)
 5. [Lodash](https://lodash.com/)
 6. [FormKit](https://formkit.com/)
-7. [Vee-validation](https://vee-validate.logaretm.com/v4/)
+7. [VeeValidate](https://vee-validate.logaretm.com/v4/)
 8. [Floating Vue](https://floating-vue.starpad.dev/)
 9. [esno](https://github.com/esbuild-kit/esno)
 10. [FZF](https://fzf.netlify.app/docs/latest)
