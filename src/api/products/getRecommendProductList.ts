@@ -21,8 +21,8 @@ export function getRecommendProductList({ productId, subCategoryId }: GetRecomme
   }
 
   if (mockData.value == null)
-    return { data: [] }
+    return { data: { productList: [] } }
 
   const productList = [...mockData.value.products]
-  return { data: productList.filter(p => p.id !== productId && p.subCategoryId === subCategoryId) }
+  return { data: { productList: productList.filter(p => p.id !== productId && p.subCategoryId === subCategoryId) } }
 }
