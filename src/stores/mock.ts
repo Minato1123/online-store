@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 
 export const useMockDataStore = defineStore('mockData', () => {
-  const isMocked = ref(import.meta.env.DEV) // PROD
+  const isMocked = ref(import.meta.env.PROD)
   const mockData = ref<any | null>(null)
   const isMockDataReady = ref(false)
   const tokenMap = new Map([])
