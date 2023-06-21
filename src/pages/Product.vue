@@ -339,11 +339,11 @@ const slidesConfig = computed<SlideType>(() => {
                 <!-- eslint-disable-next-line vue/no-unused-vars -->
                 <template #wrapper="context">
                   <div class="spec-subblock">
-                    <label v-for="(spec, i) in productSpec" :key="`spec-${i}`" class="spec-label" :class="{ 'spec-active': specPicked === i }">
+                    <label v-for="(spec, i) in productSpec" :key="`spec-${i}`" class="spec-label" :class="{ 'spec-active': specPicked === spec.id }">
                       <input
                         v-model="specPicked" class="spec-radio hidden"
                         type="radio" name="specifications"
-                        :value="i"
+                        :value="spec.id"
                       >
                       {{ spec.specName }}
                     </label>
