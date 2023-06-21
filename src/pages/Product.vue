@@ -207,7 +207,7 @@ async function handleAddCart() {
       })
     }
     else {
-      addLocalCart(theProduct.id, specPicked.value, amountOfProduct.value)
+      await addLocalCart(theProduct.id, specPicked.value, amountOfProduct.value)
     }
 
     emitCartUpdated()
