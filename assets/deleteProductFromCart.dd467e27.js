@@ -1,0 +1,1 @@
+import{s as o,u as a,l as n,h as f}from"./index.2e401dab.js";function k({id:e}){const{isMocked:u,mockData:t}=o(a()),{isUserTokenValid:c}=a(),{userToken:i}=o(n()),{forcedLogout:l}=n();if(!u.value)return f.delete({url:`/cartItems/${e}`});if(c(i.value)===!1){l();return}if(t.value==null)return;const s=t.value.cartItems,r=s.findIndex(d=>d.id===e);r!==-1&&s.splice(r,1)}export{k as d};

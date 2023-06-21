@@ -1,0 +1,1 @@
+import{s as o,u as s,l as r,h as l}from"./index.2e401dab.js";function g({orderId:t}){const{isMocked:a,mockData:e}=o(s()),{isUserTokenValid:u}=s(),{userToken:n}=o(r()),{forcedLogout:i}=r();return a.value?u(n.value)===!1?(i(),{data:[]}):e.value==null?{data:[]}:{data:e.value.boughtItems.filter(c=>c.orderId===t)}:l.get({url:"/boughtItems",params:{orderId:t}})}export{g};

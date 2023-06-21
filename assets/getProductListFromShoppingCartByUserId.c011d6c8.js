@@ -1,0 +1,1 @@
+import{s as r,u as s,l as a,h as l}from"./index.2e401dab.js";function d({userId:t}){const{isMocked:o,mockData:e}=r(s()),{isUserTokenValid:u}=s(),{userToken:c}=r(a()),{forcedLogout:n}=a();return o.value?u(c.value)===!1?(n(),{data:[]}):e.value==null?{data:[]}:{data:e.value.cartItems.filter(i=>i.userId===t)}:l.get({url:"/cartItems",params:{userId:t}})}export{d as g};

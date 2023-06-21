@@ -1,0 +1,1 @@
+import{s,u,h as c}from"./index.2e401dab.js";function g({id:t}){const{isMocked:r,mockData:a}=s(u());if(!r.value)return c.get({url:`/categories/${t}`});if(a.value==null)return{data:{}};const e=a.value.categories.find(o=>o.id===t);return e==null?{data:{}}:{data:e}}export{g};
